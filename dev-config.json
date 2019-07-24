@@ -1,0 +1,18 @@
+{
+  "http": {
+    "port": 7000,
+    "ip": "127.0.0.1"
+  },
+  "logs": {
+    "prefix": "config-leader",
+    "console": {
+      "active": true,
+      "level": "info",
+      "colorize": true
+    },
+    "file": {
+      "active": false
+    }
+  },
+  "dataFolder": "test/fixtures/configs"
+}

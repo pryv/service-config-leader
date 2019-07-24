@@ -1,0 +1,15 @@
+[ignore]
+<PROJECT_ROOT>/dist/.*
+
+[include]
+
+[libs]
+flow-typed
+
+[lints]
+
+[options]
+module.use_strict=true
+suppress_comment= \\(.\\|\n\\)*FLOW
+
+[strict]

@@ -1,0 +1,18 @@
+{
+  "http": {
+    "port": 7000,
+    "ip": "0.0.0.0"
+  },
+  "logs": {
+    "prefix": "config-leader",
+    "console": {
+      "active": true,
+      "level": "info",
+      "colorize": true
+    },
+    "file": {
+      "active": false
+    }
+  },
+  "dataFolder": "/app/data"
+}

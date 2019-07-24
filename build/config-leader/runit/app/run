@@ -1,0 +1,2 @@
+#!/bin/sh
+exec chpst -u app node /app/bin/dist/server.js --main /app/conf/main.json --core /app/conf/core.json

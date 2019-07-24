@@ -1,0 +1,14 @@
+{
+  "domain": "rec.la",
+  "secrets": {
+    "core": {
+      "adminAccessKey": "CORE_ADMIN_KEY",
+      "ssoCookieSignSecret": "OVERRIDE_ME",
+      "filesReadTokenSecret": "OVERRIDE_ME",
+      "mailKey": "CORE_MAIL_KEY"
+    },
+    "register": {
+      "adminAccessKey": "REGISTER_SYSTEM_KEY_1"
+    }
+  }
+}

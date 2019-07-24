@@ -1,0 +1,29 @@
+{
+  "name": "service-config-leader",
+  "version": "0.0.1",
+  "description": "A service for centralization of Pryv.io configuration and distribution among all Pryv.io components.",
+  "main": "index.js",
+  "author": "Thiébaud Modoux",
+  "license": "MIT",
+  "scripts": {
+    "start": "node_modules/.bin/babel-node src/server.js --config dev-config.json",
+    "release": "node_modules/.bin/babel src/ -d dist/",
+    "test": "node_modules/.bin/mocha --require babel-core/register --recursive test/"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "nconf": "^0.10.0",
+    "winston": "^2.3.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-eslint": "^10.0.2",
+    "babel-preset-flow": "^6.23.0",
+    "chai": "^4.2.0",
+    "eslint": "^6.1.0",
+    "eslint-plugin-flowtype": "^3.12.1",
+    "flow-bin": "^0.103.0",
+    "mocha": "^6.2.0",
+    "supertest": "^4.0.2"
+  }
+}
