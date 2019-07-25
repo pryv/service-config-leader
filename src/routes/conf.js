@@ -3,20 +3,24 @@
 const router = require('express').Router();
 const settings = require('../settings');
 const path = require('path');
+const fs = require('fs');
 const dataFolder = path.resolve(__dirname, '../../', settings.get('dataFolder'));
-const PRYVIO_COMPONENTS = ['core', 'register'];
 
 // GET /conf/:component: get configuration for a given Pryv.io component
 router.get('/:component', (req: express$Request, res: express$Response, next: express$NextFunction) => {
   try {
     const component = req.params.component;
-    if (! PRYVIO_COMPONENTS.includes(component)) {
-      return next(new Error(`Invalid Pryv.io component: ${component}. Here is a list of available components: ${PRYVIO_COMPONENTS.join(',')}.`));
-    }
-    const mainConfPath = path.join(dataFolder, 'main.json');
-    const templateConfPath = path.join(dataFolder, 'templates', `${component}.json`);
 
+    const mainConfPath = path.join(dataFolder, 'main.json');
+    if (! fs.existsSync(mainConfPath)) {
+      return next(new Error('Missing main configuration file: main.json'));
+    }
     const mainConf = require(mainConfPath);
+
+    const templateConfPath = path.join(dataFolder, 'templates', `${component}.json`);
+    if (! fs.existsSync(templateConfPath)) {
+      return next(new Error(`Template configuration is missing for the given component: ${component}.json`));
+    }
     const templateConf = require(templateConfPath);
 
     let finalConf = JSON.stringify(templateConf);
