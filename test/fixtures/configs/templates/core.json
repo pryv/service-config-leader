@@ -17,7 +17,7 @@
     "sourceURL": "https://pryv.github.io/event-types/flat.json"
   },
   "auth": {
-    "adminAccessKey": "CORE_SYSTEM_KEY",
+    "adminAccessKey": "CORE_ADMIN_KEY",
     "trustedApps": "*@https://*.DOMAIN*, *@http://pryv.github.io*, *@https://*.rec.la*",
     "sessionMaxAge": 1209600000,
     "ssoCookieDomain": ".DOMAIN",
