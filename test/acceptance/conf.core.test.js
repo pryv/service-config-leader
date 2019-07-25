@@ -12,7 +12,7 @@ describe('GET /conf/core', function () {
     const res = await request
       .get('/conf/core');
 
-    const expectedConf = require('../fixtures/configs/coreFull.json');
+    const expectedConf = require('../fixtures/configs/core.json');
 
     assert.strictEqual(res.status, 200);
     assert.include(res.headers['content-type'], 'application/json');

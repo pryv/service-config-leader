@@ -17,18 +17,18 @@
     "sourceURL": "https://pryv.github.io/event-types/flat.json"
   },
   "auth": {
-    "adminAccessKey": "CORE_ADMIN_KEY",
-    "trustedApps": "*@http://pryv.github.io*, *@https://*.rec.la*, *@https://*.rec.la*",
+    "adminAccessKey": "CORE_SYSTEM_KEY",
+    "trustedApps": "*@https://*.DOMAIN*, *@http://pryv.github.io*, *@https://*.rec.la*",
     "sessionMaxAge": 1209600000,
-    "ssoCookieDomain": ".rec.la",
+    "ssoCookieDomain": ".DOMAIN",
     "ssoCookieSignSecret": "OVERRIDE_ME",
     "filesReadTokenSecret": "OVERRIDE_ME",
     "passwordResetRequestMaxAge": 3600000,
-    "passwordResetPageURL": "https://sw.rec.la/access/reset-password.html"
+    "passwordResetPageURL": "https://sw.DOMAIN/access/reset-password.html"
   },
   "services": {
     "register": {
-      "url": "https://reg.rec.la",
+      "url": "https://reg.DOMAIN",
       "key": "REGISTER_SYSTEM_KEY_1"
     },
     "email": {
@@ -39,7 +39,7 @@
       "welcomeTemplate": "welcome-email",
       "resetPasswordTemplate": "reset-password",
       "method": "microservice",
-      "url": "https://mail.rec.la/sendmail/",
+      "url": "https://mail.DOMAIN/sendmail/",
       "key": "CORE_MAIL_KEY"
     }
   },

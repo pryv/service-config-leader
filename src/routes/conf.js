@@ -9,38 +9,39 @@ const dataFolder = path.resolve(__dirname, '../../', settings.get('dataFolder'))
 router.get('/core', (req: express$Request, res: express$Response, next: express$NextFunction) => {
   try {
     const mainConfPath = path.join(dataFolder, 'main.json');
-    const coreConfPath = path.join(dataFolder, 'core.json');
+    const coreConfPath = path.join(dataFolder, 'templates', 'core.json');
 
     const mainConf = require(mainConfPath);
     const coreConf = require(coreConfPath);
-    
     const domain = mainConf.domain;
     const secrets = mainConf.secrets;
 
-    coreConf.auth = Object.assign({}, coreConf.auth, {
-      adminAccessKey: secrets.core.adminAccessKey,
-      ssoCookieDomain: `.${domain}`,
-      ssoCookieSignSecret: secrets.core.ssoCookieSignSecret,
-      filesReadTokenSecret: secrets.core.filesReadTokenSecret,
-      passwordResetPageURL: `https://sw.${domain}/access/reset-password.html`
-    });
+    // Secrets
+    // TODO: remove these once we can serve secrets separately (as a subobject)
+    coreConf.auth.adminAccessKey = secrets.core.adminAccessKey;
+    coreConf.auth.ssoCookieSignSecret = secrets.core.ssoCookieSignSecret;
+    coreConf.auth.filesReadTokenSecret = secrets.core.filesReadTokenSecret;
+    coreConf.services.register.key = secrets.register.adminAccessKey;
+    coreConf.services.email.key = secrets.core.mailKey;
 
-    coreConf.auth.trustedApps += `, *@https://*.${domain}*`;
-
-    coreConf.services.register = Object.assign({}, coreConf.services.register, {
-      url: `https://reg.${domain}`,
-      key: secrets.register.adminAccessKey
-    });
-
-    coreConf.services.email = Object.assign({}, coreConf.services.email, {
-      url: `https://mail.${domain}/sendmail/`,
-      key: secrets.core.mailKey
-    });
-    
-    res.json(coreConf);
+    // TODO: set replaceDomain as a global 'json replacer' in Express app
+    // Then use res.json() and remove set('Content-Type', 'application/json')
+    // https://expressjs.com/fr/api.html#app.set
+    const finalConf = JSON.stringify(coreConf, replaceDomain(domain));
+    res.set('content-type', 'application/json');
+    res.end(finalConf);
   } catch (err) {
     next(err);
   }
 });
+
+function replaceDomain (domain) {
+  return (key, value) => {
+    if (typeof value === 'string') {
+      return value.replace('DOMAIN', domain);
+    }
+    return value;
+  };
+}
 
 module.exports = router;
