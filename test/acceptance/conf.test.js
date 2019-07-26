@@ -15,7 +15,7 @@ describe('GET /conf/:component', function () {
     assert.strictEqual(res.status, 404);
     const error = res.body.error;
     assert.isDefined(error);
-    assert.strictEqual(error.message, 'Template configuration not found for the given component: invalid.json');
+    assert.strictEqual(error.message, 'Configuration file not found: templates/invalid.json');
   });
 
   it('serves the core configuration as JSON object', async () => {

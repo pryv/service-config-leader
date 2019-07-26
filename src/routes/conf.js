@@ -12,30 +12,34 @@ router.get('/:component', (req: express$Request, res: express$Response, next: ex
   try {
     const component = req.params.component;
 
-    const mainConfPath = path.join(dataFolder, 'main.json');
-    if (! fs.existsSync(mainConfPath)) {
-      return next(errorsFactory.notFound('Main configuration file not found: main.json'));
-    }
-    const mainConf = require(mainConfPath);
+    const mainConf = readJsonFile('main.json');
+    const templateConf = readJsonFile(`templates/${component}.json`);
 
-    const templateConfPath = path.join(dataFolder, 'templates', `${component}.json`);
-    if (! fs.existsSync(templateConfPath)) {
-      return next(errorsFactory.notFound(`Template configuration not found for the given component: ${component}.json`));
-    }
-    const templateConf = require(templateConfPath);
-
-    let finalConf = JSON.stringify(templateConf);
-    for (const [key, value] of Object.entries(mainConf)) {
-      if (typeof value === 'string') {
-        finalConf = finalConf.replace(new RegExp(key, 'g'), value);
-      }
-    }
-
+    const finalConf = applySubstitutions(mainConf, templateConf);
+   
     res.set('content-type', 'application/json');
     res.end(finalConf);
   } catch (err) {
     next(err);
   }
 });
+
+function readJsonFile (pathToFile) {
+  const jsonFile = path.join(dataFolder, pathToFile);
+  if (! fs.existsSync(jsonFile)) {
+    throw errorsFactory.notFound(`Configuration file not found: ${pathToFile}`);
+  }
+  return JSON.parse(fs.readFileSync(jsonFile, 'utf8'));
+}
+
+function applySubstitutions (substitutionsFile, jsonTemplate) {
+  let substitutedConf = JSON.stringify(jsonTemplate);
+  for (const [key, value] of Object.entries(substitutionsFile)) {
+    if (typeof value === 'string') {
+      substitutedConf = substitutedConf.replace(new RegExp(key, 'g'), value);
+    }
+  }
+  return substitutedConf;
+}
 
 module.exports = router;
