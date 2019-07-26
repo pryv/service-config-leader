@@ -12,7 +12,10 @@ describe('GET /conf/:component', function () {
     const res = await request
       .get('/conf/invalid');
 
-    assert.strictEqual(res.status, 500);
+    assert.strictEqual(res.status, 404);
+    const error = res.body.error;
+    assert.isDefined(error);
+    assert.strictEqual(error.message, 'Template configuration not found for the given component: invalid.json');
   });
 
   it('serves the core configuration as JSON object', async () => {

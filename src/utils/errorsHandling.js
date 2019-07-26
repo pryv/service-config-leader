@@ -45,6 +45,11 @@ class ErrorsFactory {
     return new ApiError(400, msg);
   }
 
+  notFound (message: ?string): ApiError {
+    const msg = message || 'Resource not found.';
+    return new ApiError(404, msg);
+  }
+
 }
 
 module.exports.factory = new ErrorsFactory();
