@@ -18,6 +18,8 @@ router.get('/:component', (req: express$Request, res: express$Response, next: ex
 
     const mainConf = readJsonFile('main.json');
     const templateConf = readJsonFile(`templates/${component}.json`);
+    
+    generateSecrets(mainConf);
 
     const finalConf = applySubstitutions(mainConf, templateConf);
    
@@ -40,13 +42,23 @@ function applySubstitutions (substitutions: JSONObject, jsonTemplate: JSONObject
   let substitutedConf = JSON.stringify(jsonTemplate);
   for (let [key, value] of Object.entries(substitutions)) {
     if (typeof value === 'string') {
-      if (value === 'SECRET') {
-        value = randomAlphaNumKey(32);
-      }
       substitutedConf = substitutedConf.replace(new RegExp(key, 'g'), value);
     }
   }
   return substitutedConf;
+}
+
+function generateSecrets (mainConf: JSONObject): void {
+  let changed = false;
+  for (const [key, value] of Object.entries(mainConf)) {
+    if (value === 'SECRET') {
+      mainConf[key] = randomAlphaNumKey(32);
+      changed = true;
+    }
+    if (changed) {
+      fs.writeFileSync(path.join(dataFolder, 'main.json'), JSON.stringify(mainConf, null, '\t'));
+    }
+  }
 }
 
 function randomAlphaNumKey(size: number): string {
