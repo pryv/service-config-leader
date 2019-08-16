@@ -38,12 +38,19 @@ function readJsonFile (pathToFile: string): JSONObject {
 
 function applySubstitutions (substitutions: JSONObject, jsonTemplate: JSONObject): string {
   let substitutedConf = JSON.stringify(jsonTemplate);
-  for (const [key, value] of Object.entries(substitutions)) {
+  for (let [key, value] of Object.entries(substitutions)) {
     if (typeof value === 'string') {
+      if (value === 'SECRET') {
+        value = randomAlphaNumKey(32);
+      }
       substitutedConf = substitutedConf.replace(new RegExp(key, 'g'), value);
     }
   }
   return substitutedConf;
+}
+
+function randomAlphaNumKey(size: number): string {
+  return Array(size).fill(0).map(() => Math.random().toString(36).charAt(2)).join('');
 }
 
 module.exports = router;

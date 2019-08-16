@@ -41,4 +41,15 @@ describe('GET /conf/:component', function () {
 
     assert.deepEqual(res.body, expectedConf);
   });
+
+  it('generates random secrets when needed', async () => {
+    const res = await request
+      .get('/conf/secrets');
+
+    assert.strictEqual(res.status, 200);
+    assert.include(res.headers['content-type'], 'application/json');
+
+    assert.strictEqual(res.body.secretOne, '1234');
+    assert.match(res.body.secretTwo, /^[a-z0-9]{32}$/);
+  });
 });
