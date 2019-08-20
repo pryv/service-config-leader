@@ -10,35 +10,31 @@ describe('GET /conf/:component', function () {
 
   it('does not serve invalid Pryv.io component', async () => {
     const res = await request
-      .get('/conf/invalid');
+      .get('/conf/core/conf/invalid.json');
 
     assert.strictEqual(res.status, 404);
     const error = res.body.error;
     assert.isDefined(error);
-    assert.strictEqual(error.message, 'Configuration file not found: templates/invalid.json');
+    assert.strictEqual(error.message, 'Configuration file not found: core/conf/invalid.json');
   });
 
-  it('serves the core configuration as JSON object', async () => {
+  it('serves the core configuration file', async () => {
     const res = await request
-      .get('/conf/core');
+      .get('/conf/core/conf/core.json');
 
     const expectedConf = require('../fixtures/configs/core.json');
 
     assert.strictEqual(res.status, 200);
-    assert.include(res.headers['content-type'], 'application/json');
-
-    assert.deepEqual(res.body, expectedConf);
+    assert.deepEqual(res.text, JSON.stringify(expectedConf, 'utf8', 2));
   });
 
-  it('serves the register configuration as JSON object', async () => {
+  it('serves the register configuration file', async () => {
     const res = await request
-      .get('/conf/register');
+      .get('/conf/register/conf/register.json');
 
     const expectedConf = require('../fixtures/configs/register.json');
 
     assert.strictEqual(res.status, 200);
-    assert.include(res.headers['content-type'], 'application/json');
-
-    assert.deepEqual(res.body, expectedConf);
+    assert.deepEqual(res.text, JSON.stringify(expectedConf, 'utf8', 2));
   });
 });

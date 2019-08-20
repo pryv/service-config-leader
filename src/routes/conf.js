@@ -11,33 +11,31 @@ type JSONObject = {
   [key: string]: any
 };
 
-// GET /conf/:component: get configuration for a given Pryv.io component
-router.get('/:component', (req: express$Request, res: express$Response, next: express$NextFunction) => {
+// GET /conf/*: get given configuration file
+router.get('/*', (req: express$Request, res: express$Response, next: express$NextFunction) => {
   try {
-    const component = req.params.component;
-
-    const mainConf = readJsonFile('main.json');
-    const templateConf = readJsonFile(`templates/${component}.json`);
+    const file = req.params[0];
+    const mainConf = JSON.parse(readConfFile('main.json'));
+    const templateConf = readConfFile(file);
 
     const finalConf = applySubstitutions(mainConf, templateConf);
    
-    res.set('content-type', 'application/json');
     res.end(finalConf);
   } catch (err) {
     next(err);
   }
 });
 
-function readJsonFile (pathToFile: string): JSONObject {
-  const jsonFile = path.join(dataFolder, pathToFile);
-  if (! fs.existsSync(jsonFile)) {
+function readConfFile (pathToFile: string): string {
+  const file = path.join(dataFolder, pathToFile);
+  if (! fs.existsSync(file) || ! fs.lstatSync(file).isFile()) {
     throw errorsFactory.notFound(`Configuration file not found: ${pathToFile}`);
   }
-  return JSON.parse(fs.readFileSync(jsonFile, 'utf8'));
+  return fs.readFileSync(file, 'utf8');
 }
 
-function applySubstitutions (substitutions: JSONObject, jsonTemplate: JSONObject): string {
-  let substitutedConf = JSON.stringify(jsonTemplate);
+function applySubstitutions (substitutions: JSONObject, template: string): string {
+  let substitutedConf = template;
   for (const [key, value] of Object.entries(substitutions)) {
     if (typeof value === 'string') {
       substitutedConf = substitutedConf.replace(new RegExp(key, 'g'), value);

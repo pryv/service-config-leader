@@ -8,6 +8,7 @@ const routes = require('./routes');
 const app: express$Application = express();
 
 app.use('/conf/', routes.conf);
+app.use('/machine/', routes.machine);
 
 app.use(middlewares.errors);
 
