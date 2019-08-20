@@ -5,6 +5,10 @@
 const assert = require('chai').assert;
 const app = require('../../src/app');
 const request = require('supertest')(app);
+const settings = require('../../src/settings');
+const path = require('path');
+const fs = require('fs');
+const dataFolder = path.resolve(__dirname, '../../', settings.get('dataFolder'));
 
 describe('GET /conf/:component', function () {
 
@@ -51,5 +55,8 @@ describe('GET /conf/:component', function () {
 
     assert.strictEqual(res.body.secretOne, '1234');
     assert.match(res.body.secretTwo, /^[a-z0-9]{32}$/);
+
+    // Revert changes to the main configuration file
+    fs.copyFileSync(path.join(dataFolder, 'mainClean.json'), path.join(dataFolder, 'main.json'));
   });
 });
