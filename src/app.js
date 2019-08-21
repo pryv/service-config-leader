@@ -17,13 +17,13 @@ class Application {
   }
 
   generateSecrets (settings: NconfSettings): void {
-    const secrets = settings.get('platform:secrets');
+    const platformSettings = settings.get('platform');
  
-    if (secrets == null) return;
+    if (platformSettings == null) return;
 
-    for (const [key, value] of Object.entries(secrets)) {
+    for (const [key, value] of Object.entries(platformSettings)) {
       if (value === 'SECRET') {
-        settings.set(`platform:secrets:${key}`, randomAlphaNumKey(32));
+        settings.set(`platform:${key}`, randomAlphaNumKey(32));
       }
     }
 

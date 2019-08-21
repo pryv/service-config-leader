@@ -9,6 +9,10 @@ module.exports = function (expressApp: express$Application, settings: Applicatio
   const pathToData = settings.get('pathToData');
   const platformSettings = settings.get('platform');
 
+  type SubstitutionMap = {
+    [key: string]: string
+  };
+
   // GET /conf/*: get given configuration file
   expressApp.get('/conf/*', (req: express$Request, res: express$Response, next: express$NextFunction) => {
     try {
@@ -31,13 +35,15 @@ module.exports = function (expressApp: express$Application, settings: Applicatio
     return fs.readFileSync(file, 'utf8');
   }
 
-  function applySubstitutions (substitutions: JSONObject, template: string): string {
-    let substitutedConf = template;
-    for (const [key, value] of Object.entries(substitutions)) {
-      if (typeof value === 'string') {
-        substitutedConf = substitutedConf.replace(new RegExp(key, 'g'), value);
-      }
-    }
-    return substitutedConf;
+  function applySubstitutions (substitutions: SubstitutionMap, template: string): string {
+    if (substitutions == null) return template;
+
+    const substitutionKeys = Object.keys(substitutions).filter(key => {
+      return typeof substitutions[key] === 'string';
+    });
+    const re = new RegExp(substitutionKeys.join('|'), 'g');
+    return template.replace(re, (match) => {
+      return substitutions[match];
+    });
   }
 };
