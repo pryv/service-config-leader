@@ -1,6 +1,7 @@
 // @flow
 
 const nconf = require('nconf');
+const path = require('path');
 
 // 1. `process.env`
 // 2. `process.argv`
@@ -31,5 +32,7 @@ nconf.defaults({
     }
   }
 });
+
+nconf.set('pathToData', path.resolve(__dirname, '../', nconf.get('dataFolder')));
 
 module.exports = nconf;

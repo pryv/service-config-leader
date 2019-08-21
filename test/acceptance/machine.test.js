@@ -3,8 +3,9 @@
 /*global describe, it */
 
 const assert = require('chai').assert;
-const app = require('../../src/app');
-const request = require('supertest')(app);
+const Application = require('../../src/app');
+const app = new Application();
+const request = require('supertest')(app.express);
 
 describe('GET /machine/:machineId', function () {
 

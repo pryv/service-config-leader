@@ -2,14 +2,29 @@
 
 const express = require('express');
 const middlewares = require('./middlewares');
-const routes = require('./routes');
+const nconfSettings = require('./settings');
 
-// Set up the express app
-const app: express$Application = express();
+opaque type NconfSettings = Object; 
 
-app.use('/conf/', routes.conf);
-app.use('/machine/', routes.machine);
+class Application {
+  express: express$Application;
+  settings: NconfSettings;
 
-app.use(middlewares.errors);
+  constructor() {
+    this.settings = nconfSettings;
+    this.express = this.setupExpressApp();
+  }
 
-module.exports = app;
+  setupExpressApp(): express$Application {
+    const expressApp = express();
+
+    require('./routes/conf')(expressApp, this.settings);
+    require('./routes/machine')(expressApp, this.settings);
+
+    expressApp.use(middlewares.errors);
+    
+    return expressApp;
+  }
+}
+
+module.exports = Application;

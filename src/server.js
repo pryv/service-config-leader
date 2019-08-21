@@ -1,13 +1,14 @@
 // @flow
 
-const settings = require('./settings');
-const app = require('./app');
-const logging = require('./utils/logging');
-const logger = logging.getLogger('server');
+const Application = require('./app');
+const logger = require('./utils/logging').getLogger('server');
 
-// Launch the app server
+// Launch the app and server
+const app = new Application();
+const settings = app.settings;
 const port = settings.get('http:port');
 const ip = settings.get('http:ip');
-app.listen(port, ip, () => {
+
+app.express.listen(port, ip, () => {
   logger.info(`Server running on: ${ip}:${port}`);
 });

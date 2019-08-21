@@ -3,8 +3,9 @@
 /*global describe, it */
 
 const assert = require('chai').assert;
-const app = require('../../src/app');
-const request = require('supertest')(app);
+const Application = require('../../src/app');
+const app = new Application();
+const request = require('supertest')(app.express);
 
 describe('GET /conf/:component', function () {
 
@@ -22,19 +23,20 @@ describe('GET /conf/:component', function () {
     const res = await request
       .get('/conf/core/conf/core.json');
 
-    const expectedConf = require('../fixtures/configs/core.json');
-
     assert.strictEqual(res.status, 200);
-    assert.deepEqual(res.text, JSON.stringify(expectedConf, 'utf8', 2));
+    assert.deepEqual(res.text, expectedConf('core'));
   });
 
   it('serves the register configuration file', async () => {
     const res = await request
       .get('/conf/register/conf/register.json');
 
-    const expectedConf = require('../fixtures/configs/register.json');
-
     assert.strictEqual(res.status, 200);
-    assert.deepEqual(res.text, JSON.stringify(expectedConf, 'utf8', 2));
+    assert.deepEqual(res.text, expectedConf('register'));
   });
+
+  function expectedConf(component: string) {
+    const expectedConf = require(`../fixtures/configs/${component}/conf/expected.json`);
+    return JSON.stringify(expectedConf, 'utf8', 2);
+  }
 });
