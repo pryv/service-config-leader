@@ -6,9 +6,6 @@ const errorsFactory = require('../utils/errorsHandling').factory;
 
 module.exports = function (expressApp: express$Application, settings: Application) {
 
-  const pathToData = settings.get('pathToData');
-  const platformSettings = settings.get('platform');
-
   type SubstitutionMap = {
     [key: string]: string
   };
@@ -18,6 +15,7 @@ module.exports = function (expressApp: express$Application, settings: Applicatio
     try {
       const file = req.params[0];
       const templateConf = readConfFile(file);
+      const platformSettings = settings.get('platform');
 
       const finalConf = applySubstitutions(platformSettings, templateConf);
     
@@ -28,6 +26,7 @@ module.exports = function (expressApp: express$Application, settings: Applicatio
   });
 
   function readConfFile (pathToFile: string): string {
+    const pathToData = settings.get('pathToData');
     const file = path.join(pathToData, pathToFile);
     if (! fs.existsSync(file) || ! fs.lstatSync(file).isFile()) {
       throw errorsFactory.notFound(`Configuration file not found: ${pathToFile}`);
