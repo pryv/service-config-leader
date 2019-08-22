@@ -27,6 +27,12 @@ class Application {
       }
     }
 
+    settings.save((err) => {
+      if (err) {
+        console.log('Error when saving secrets.');
+      }
+    });
+
     function randomAlphaNumKey(size: number): string {
       return Array(size).fill(0).map(
         () => Math.random().toString(36).charAt(2)
@@ -37,8 +43,11 @@ class Application {
   setupExpressApp(settings: NconfSettings): express$Application {
     const expressApp = express();
 
+    expressApp.use(express.json());
+
     require('./routes/conf')(expressApp, settings);
     require('./routes/machine')(expressApp, settings);
+    require('./routes/settings')(expressApp, settings);
 
     expressApp.use(middlewares.errors);
     

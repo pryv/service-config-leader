@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const errorsFactory = require('../utils/errorsHandling').factory;
 
-module.exports = function (expressApp: express$Application, settings: Application) {
+module.exports = function (expressApp: express$Application, settings: Object) {
 
   // GET /machine/:machineId: list necessary configuration files for given Pryv.io machine
   expressApp.get('/machine/:machineId', (req: express$Request, res: express$Response, next: express$NextFunction) => {
