@@ -13,7 +13,8 @@ describe('GET /settings', function () {
 
   it('retrieves the current platform settings', async () => {
     const res = await request
-      .get('/settings');
+      .get('/settings')
+      .set('Authorization', 'valid');
 
     const jsonFile = JSON.parse(fs.readFileSync('dev-config.json', 'utf8'));
     assert.strictEqual(res.status, 200);
@@ -29,7 +30,8 @@ describe('PUT /settings', function () {
       .put('/settings')
       .send({
         updatedProp: 'updatedVal'
-      });
+      })
+      .set('Authorization', 'valid');
 
     assert.strictEqual(res.status, 200);
     assert.strictEqual(res.text, 'Settings successfully updated.');

@@ -6,10 +6,10 @@ const errorsFactory = require('../utils/errorsHandling').factory;
 
 module.exports = function (expressApp: express$Application, settings: Object) {
 
-  // GET /machine/:machineId: list necessary configuration files for given Pryv.io machine
-  expressApp.get('/machine/:machineId', (req: express$Request, res: express$Response, next: express$NextFunction) => {
+  // GET /machine: list necessary configuration files for requesting Pryv.io machine
+  expressApp.get('/machine', (req: express$Request, res: express$Response, next: express$NextFunction) => {
     try {
-      const machineId = req.params.machineId;
+      const machineId = req.context.role;
       const pathToData = settings.get('pathToData');
       const machineFolder = path.join(pathToData, machineId);
 

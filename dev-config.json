@@ -33,5 +33,9 @@
     "REGISTER_ADMIN_KEY_1": "REGISTER_ADMIN_KEY_1",
     "SECRET_ONE": "1234",
     "SECRET_TWO": "SECRET"
+  },
+  "machines": {
+    "core-machine-key": "core",
+    "valid": "valid"
   }
 }
