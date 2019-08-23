@@ -28,10 +28,10 @@ describe('Authorization middleware', function () {
   });
 
   it('verifies machine key and set corresponding role in the context', async () => {
-    req.headers.authorization = 'core-machine-key';
+    req.headers.authorization = 'singlenode-machine-key';
     authMiddleware(req, res, (err) => {
       assert.isUndefined(err);
-      assert.strictEqual(req.context.role, 'core');
+      assert.strictEqual(req.context.role, 'pryv');
     });
   });
 

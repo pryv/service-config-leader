@@ -14,7 +14,7 @@
       "active": false
     }
   },
-  "dataFolder": "test/fixtures/configs",
+  "dataFolder": "test/fixtures",
   "platform": {
     "DOMAIN": "rec.la",
     "STATIC_WEB_IP_ADDRESS": "STATIC_WEB_IP_ADDRESS",
@@ -35,7 +35,7 @@
     "SECRET_TWO": "SECRET"
   },
   "machines": {
-    "core-machine-key": "core",
+    "singlenode-machine-key": "pryv",
     "valid": "valid"
   }
 }

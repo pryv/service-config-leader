@@ -6,51 +6,38 @@ const assert = require('chai').assert;
 const Application = require('../../src/app');
 const app = new Application();
 const request = require('supertest')(app.express);
+const settings = app.settings;
 
-describe('GET /conf/*', function () {
+describe('GET /conf', function () {
 
-  it('fails if requested configuration file does not exist', async () => {
+  it('fails if configuration folder for given role does not exist', async () => {
     const res = await request
-      .get('/conf/core/conf/invalid.json')
+      .get('/conf')
       .set('Authorization', 'valid');
 
     assert.strictEqual(res.status, 404);
     const error = res.body.error;
     assert.isDefined(error);
-    assert.strictEqual(error.message, 'Configuration file not found: core/conf/invalid.json');
-  });
-  
-  it('fails if requested configuration file does not exist', async () => {
-    const res = await request
-      .get('/conf/core/conf/invalid.json')
-      .set('Authorization', 'valid');
-
-    assert.strictEqual(res.status, 404);
-    const error = res.body.error;
-    assert.isDefined(error);
-    assert.strictEqual(error.message, 'Configuration file not found: core/conf/invalid.json');
+    assert.strictEqual(error.message, "Configuration folder not found for 'valid'.");
   });
 
-  it('serves the core configuration file', async () => {
+  it('serves a full configuration', async () => {
+    const machineKey = 'singlenode-machine-key';
+    const machineRole = settings.get(`machines:${machineKey}`);
+
     const res = await request
-      .get('/conf/core/conf/core.json')
-      .set('Authorization', 'valid');
+      .get('/conf')
+      .set('Authorization', machineKey);
 
     assert.strictEqual(res.status, 200);
-    assert.deepEqual(res.text, expectedConf('core'));
+    const fullConf = res.body;
+    assert.deepEqual(fullConf['/core/conf/core.json'], expectedConf(machineRole, 'core'));
+    assert.deepEqual(fullConf['/register/conf/register.json'], expectedConf(machineRole, 'register'));
   });
 
-  it('serves the register configuration file', async () => {
-    const res = await request
-      .get('/conf/register/conf/register.json')
-      .set('Authorization', 'valid');
-
-    assert.strictEqual(res.status, 200);
-    assert.deepEqual(res.text, expectedConf('register'));
-  });
-
-  function expectedConf(component: string) {
-    const expectedConf = require(`../fixtures/configs/${component}/conf/expected.json`);
+  function expectedConf(role: string, component: string) {
+    const dataFolder = settings.get('pathToData');
+    const expectedConf = require(`${dataFolder}/${role}/${component}/conf/expected.json`);
     return JSON.stringify(expectedConf, 'utf8', 2);
   }
 });

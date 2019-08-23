@@ -47,7 +47,6 @@ class Application {
     expressApp.use(middlewares.authorization(settings));
 
     require('./routes/conf')(expressApp, settings);
-    require('./routes/machine')(expressApp, settings);
     require('./routes/settings')(expressApp, settings);
 
     expressApp.use(middlewares.errors);
