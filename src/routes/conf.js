@@ -25,14 +25,17 @@ module.exports = function (expressApp: express$Application, settings: Object) {
       listConfFiles(confFolder, list);
 
       const platformSettings = settings.get('platform');
-      let finalConf = {};
+      let fullConf = [];
       list.forEach(file => {
         const templateConf = fs.readFileSync(file, 'utf8');
         const fileName = file.replace(confFolder, '');
-        finalConf[fileName] = applySubstitutions(platformSettings, templateConf);
+        fullConf.push({
+          path: fileName,
+          content: applySubstitutions(platformSettings, templateConf)
+        });
       });
     
-      res.json(finalConf);
+      res.json({files: fullConf});
     } catch (err) {
       next(err);
     }

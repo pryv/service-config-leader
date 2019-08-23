@@ -30,9 +30,15 @@ describe('GET /conf', function () {
       .set('Authorization', machineKey);
 
     assert.strictEqual(res.status, 200);
-    const fullConf = res.body;
-    assert.deepEqual(fullConf['/core/conf/core.json'], expectedConf(machineRole, 'core'));
-    assert.deepEqual(fullConf['/register/conf/register.json'], expectedConf(machineRole, 'register'));
+    
+    const files = res.body.files;
+    assert.isDefined(files);
+
+    ['core', 'register'].forEach(component => {
+      const conf = files.find(f => f.path === `/${component}/conf/${component}.json`);
+      assert.isNotNull(conf);
+      assert.deepEqual(conf.content, expectedConf(machineRole, component));
+    });
   });
 
   function expectedConf(role: string, component: string) {
