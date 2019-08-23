@@ -14,7 +14,7 @@
       "active": false
     }
   },
-  "dataFolder": "test/fixtures/configs",
+  "dataFolder": "test/fixtures",
   "platform": {
     "DOMAIN": "rec.la",
     "STATIC_WEB_IP_ADDRESS": "STATIC_WEB_IP_ADDRESS",
@@ -28,10 +28,14 @@
     "PLATFORM_NAME": "PLATFORM_NAME",
     "SUPPORT_LINK": "SUPPORT_LINK",
     "TERMS_OF_USE_LINK": "TERMS_OF_USE_LINK",
-    "CORE_SYSTEM_KEY": "SECRET",
-    "REGISTER_SYSTEM_KEY_1": "SECRET",
-    "REGISTER_ADMIN_KEY_1": "SECRET",
+    "CORE_SYSTEM_KEY": "CORE_SYSTEM_KEY",
+    "REGISTER_SYSTEM_KEY_1": "REGISTER_SYSTEM_KEY_1",
+    "REGISTER_ADMIN_KEY_1": "REGISTER_ADMIN_KEY_1",
     "SECRET_ONE": "1234",
     "SECRET_TWO": "SECRET"
+  },
+  "machines": {
+    "singlenode-machine-key": "pryv",
+    "valid": "valid"
   }
 }
