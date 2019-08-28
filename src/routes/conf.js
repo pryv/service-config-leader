@@ -3,12 +3,15 @@
 const path = require('path');
 const fs = require('fs');
 const errorsFactory = require('../utils/errorsHandling').factory;
+const middlewares = require('../middlewares');
 
 module.exports = function (expressApp: express$Application, settings: Object) {
 
   type SubstitutionMap = {
     [key: string]: string
   };
+
+  expressApp.all('/conf', middlewares.authorization(settings));
 
   // GET /conf: serve full configuration for given Pryv.io role
   expressApp.get('/conf', (req: express$Request, res: express$Response, next: express$NextFunction) => {

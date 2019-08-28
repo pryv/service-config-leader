@@ -34,6 +34,7 @@
     "SECRET_ONE": "1234",
     "SECRET_TWO": "SECRET"
   },
+  "adminKey": "4dmink3y",
   "followers": {
     "singlenode-machine-key": {
       "url": "http://singlenode-follower",
@@ -41,7 +42,7 @@
     },
     "valid": {
       "url": "http://valid-follower",
-      "role": "inexisting"
+      "role": "unexisting"
     }
   }
 }

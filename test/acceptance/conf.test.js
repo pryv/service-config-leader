@@ -18,7 +18,7 @@ describe('GET /conf', function () {
     assert.strictEqual(res.status, 404);
     const error = res.body.error;
     assert.isDefined(error);
-    assert.strictEqual(error.message, "Configuration folder not found for 'inexisting'.");
+    assert.strictEqual(error.message, "Configuration folder not found for 'unexisting'.");
   });
 
   it('serves a full configuration', async () => {

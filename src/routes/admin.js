@@ -1,8 +1,11 @@
 // @flow
 
 const request = require('superagent');
+const middlewares = require('../middlewares');
 
 module.exports = function (expressApp: express$Application, settings: Object) {
+
+  expressApp.all('/admin/*', middlewares.authorizationAdmin(settings));
 
   // PUT /admin/settings: updates current settings and save them to disk
   expressApp.put('/admin/settings', (req: express$Request, res: express$Response, next: express$NextFunction) => {

@@ -10,12 +10,14 @@ const request = require('supertest')(app.express);
 const fs = require('fs');
 const mockFollowers = require('../fixtures/followersMock');
 
+const adminKey = settings.get('adminKey');
+
 describe('GET /admin/settings', function () {
 
   it('retrieves the current platform settings', async () => {
     const res = await request
       .get('/admin/settings')
-      .set('Authorization', 'valid');
+      .set('Authorization', adminKey);
 
     const jsonFile = JSON.parse(fs.readFileSync('dev-config.json', 'utf8'));
     assert.strictEqual(res.status, 200);
@@ -32,7 +34,7 @@ describe('PUT /admin/settings', function () {
       .send({
         updatedProp: 'updatedVal'
       })
-      .set('Authorization', 'valid');
+      .set('Authorization', adminKey);
 
     assert.strictEqual(res.status, 200);
     assert.strictEqual(res.text, 'Settings successfully updated.');
@@ -53,7 +55,7 @@ describe('POST /admin/update', function () {
     const res = await request
       .post('/admin/update')
       .send({})
-      .set('Authorization', 'valid');
+      .set('Authorization', adminKey);
 
     assert.strictEqual(res.status, 200);
     assert.strictEqual(res.text, 'OK');

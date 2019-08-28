@@ -44,7 +44,6 @@ class Application {
     const expressApp = express();
 
     expressApp.use(express.json());
-    expressApp.use(middlewares.authorization(settings));
 
     require('./routes/conf')(expressApp, settings);
     require('./routes/admin')(expressApp, settings);
