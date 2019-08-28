@@ -22,7 +22,7 @@ describe('Authorization middleware', function () {
   });
 
   it('fails if machine is unauthorized', async () => {
-    const expectedErrorMsg = 'Provided machine key is not authorized.';
+    const expectedErrorMsg = 'Invalid follower key.';
     req.headers.authorization = 'unauthorized';
     authMiddleware(req, res, expectAPIError(expectedErrorMsg, 403));
   });

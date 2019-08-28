@@ -1,6 +1,6 @@
 // @flow
 
-/*global describe, it */
+/*global describe, it, before */
 
 const assert = require('chai').assert;
 const Application = require('../../src/app');
@@ -8,12 +8,13 @@ const app = new Application();
 const settings = app.settings;
 const request = require('supertest')(app.express);
 const fs = require('fs');
+const mockFollowers = require('../fixtures/followersMock');
 
-describe('GET /settings', function () {
+describe('GET /admin/settings', function () {
 
   it('retrieves the current platform settings', async () => {
     const res = await request
-      .get('/settings')
+      .get('/admin/settings')
       .set('Authorization', 'valid');
 
     const jsonFile = JSON.parse(fs.readFileSync('dev-config.json', 'utf8'));
@@ -23,11 +24,11 @@ describe('GET /settings', function () {
   });
 });
 
-describe('PUT /settings', function () {
+describe('PUT /admin/settings', function () {
 
   it('updates settings in memory and on disk', async () => {
     const res = await request
-      .put('/settings')
+      .put('/admin/settings')
       .send({
         updatedProp: 'updatedVal'
       })
@@ -38,5 +39,23 @@ describe('PUT /settings', function () {
     assert.strictEqual(settings.get('platform:updatedProp'), 'updatedVal');
     const jsonFile = JSON.parse(fs.readFileSync('dev-config.json', 'utf8'));
     assert.strictEqual(jsonFile.platform.updatedProp, 'updatedVal');
+  });
+});
+
+describe('POST /admin/update', function () {
+
+  before(async () => {
+    // Mocking followers
+    mockFollowers();
+  });
+
+  it('notifies followers', async () => {
+    const res = await request
+      .post('/admin/update')
+      .send({})
+      .set('Authorization', 'valid');
+
+    assert.strictEqual(res.status, 200);
+    assert.strictEqual(res.text, 'OK');
   });
 });

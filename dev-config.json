@@ -34,8 +34,14 @@
     "SECRET_ONE": "1234",
     "SECRET_TWO": "SECRET"
   },
-  "machines": {
-    "singlenode-machine-key": "pryv",
-    "valid": "valid"
+  "followers": {
+    "singlenode-machine-key": {
+      "url": "http://singlenode-follower",
+      "role": "pryv"
+    },
+    "valid": {
+      "url": "http://valid-follower",
+      "role": "inexisting"
+    }
   }
 }
