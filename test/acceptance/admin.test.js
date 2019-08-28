@@ -51,13 +51,15 @@ describe('POST /admin/update', function () {
     mockFollowers();
   });
 
-  it('notifies followers', async () => {
+  it('notifies followers and returns an array containing their responses', async () => {
     const res = await request
       .post('/admin/update')
-      .send({})
       .set('Authorization', adminKey);
 
-    assert.strictEqual(res.status, 200);
-    assert.strictEqual(res.text, 'OK');
+    const responses = res.body;
+    const followers = settings.get('followers');
+    for (const key of Object.keys(followers)) {
+      assert.strictEqual(responses[key], 'OK');
+    }
   });
 });

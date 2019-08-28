@@ -38,17 +38,23 @@ module.exports = function (expressApp: express$Application, settings: Object) {
       next(new Error('Missing followers settings.'));
     }
 
+    let responses = {};
     for (const [auth, follower] of Object.entries(followers)) {
       const followerUrl = follower.url;
 
-      if (followerUrl != null) {
-        await request
+      let currentRes = null;
+      try {
+        const res = await request
           .post(`${followerUrl}/restart`)
-          .send({})
           .set('Authorization', auth);
+        currentRes = res.text;
+      } catch(err) {
+        currentRes = err;
       }
+
+      responses[auth] = currentRes;
     }
 
-    res.send('OK');
+    res.json(responses);
   });
 };
