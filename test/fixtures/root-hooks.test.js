@@ -5,7 +5,7 @@
 const fs = require('fs');
 
 before(done => {
-  fs.copyFile('dev-config.json', 'dev-config-copy.json', done);
+  fs.copyFile('dev-config.json', 'dev-config-copy.json', 0, done);
 });
 
 after(done => {
