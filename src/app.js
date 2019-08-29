@@ -4,11 +4,9 @@ const express = require('express');
 const middlewares = require('./middlewares');
 const nconfSettings = require('./settings');
 
-opaque type NconfSettings = Object; 
-
 class Application {
   express: express$Application;
-  settings: NconfSettings;
+  settings: Object;
 
   constructor() {
     this.settings = nconfSettings;
@@ -16,7 +14,7 @@ class Application {
     this.generateSecrets(this.settings);
   }
 
-  generateSecrets (settings: NconfSettings): void {
+  generateSecrets (settings: Object): void {
     const platformSettings = settings.get('platform');
  
     if (platformSettings == null) return;
@@ -40,7 +38,7 @@ class Application {
     }
   }
 
-  setupExpressApp(settings: NconfSettings): express$Application {
+  setupExpressApp(settings: Object): express$Application {
     const expressApp = express();
 
     expressApp.use(express.json());
