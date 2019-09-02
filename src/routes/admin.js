@@ -2,6 +2,7 @@
 
 const request = require('superagent');
 const middlewares = require('../middlewares');
+const logger = require('../utils/logging').getLogger('admin');
 
 module.exports = function (expressApp: express$Application, settings: Object) {
 
@@ -31,30 +32,31 @@ module.exports = function (expressApp: express$Application, settings: Object) {
     res.json(currentSettings);
   });
 
-  // GET /admin/update: triggers an update of the platform
-  expressApp.post('/admin/update', async (req: express$Request, res: express$Response, next: express$NextFunction) => {
+  // GET /admin/notify: notifies followers about configuration changes
+  expressApp.post('/admin/notify', async (req: express$Request, res: express$Response, next: express$NextFunction) => {
     const followers = settings.get('followers');
     if (followers == null) {
       next(new Error('Missing followers settings.'));
     }
 
-    let responses = {};
+    let successes = {};
+    let failures = {};
     for (const [auth, follower] of Object.entries(followers)) {
       const followerUrl = follower.url;
-
-      let currentRes = null;
       try {
-        const res = await request
-          .post(`${followerUrl}/restart`)
+        await request
+          .post(`${followerUrl}/notify`)
           .set('Authorization', auth);
-        currentRes = res.text;
+        successes[auth] = follower;
       } catch(err) {
-        currentRes = err;
+        logger.warn('Error while notifying follower:', err);
+        failures[auth] = follower;
       }
-
-      responses[auth] = currentRes;
     }
 
-    res.json(responses);
+    res.json({
+      successes: successes,
+      failures: failures
+    });
   });
 };

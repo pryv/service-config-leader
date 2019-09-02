@@ -44,22 +44,30 @@ describe('PUT /admin/settings', function () {
   });
 });
 
-describe('POST /admin/update', function () {
+describe('POST /admin/notify', function () {
 
   before(async () => {
     // Mocking followers
     mockFollowers();
   });
 
-  it('notifies followers and returns an array containing their responses', async () => {
+  it('notifies followers and returns an array listing successes and failures', async () => {
     const res = await request
-      .post('/admin/update')
+      .post('/admin/notify')
       .set('Authorization', adminKey);
 
-    const responses = res.body;
+    const body = res.body;
+    const successes = body.successes;
+    const failures = body.failures;
+
+    assert.isDefined(failures);
+    assert.isDefined(successes);
+
+    assert.isEmpty(failures);
+
     const followers = settings.get('followers');
     for (const key of Object.keys(followers)) {
-      assert.strictEqual(responses[key], 'OK');
+      assert.isDefined(successes[key]);
     }
   });
 });

@@ -8,7 +8,7 @@ module.exports = function (): void {
 
   for (const [auth, follower] of Object.entries(followers)) {
     nock(follower.url)
-      .post('/restart')
+      .post('/notify')
       .reply(function () {
         const headerValue = this.req.headers.authorization;
         let status, result;
