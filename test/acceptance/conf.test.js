@@ -18,16 +18,16 @@ describe('GET /conf', function () {
     assert.strictEqual(res.status, 404);
     const error = res.body.error;
     assert.isDefined(error);
-    assert.strictEqual(error.message, "Configuration folder not found for 'valid'.");
+    assert.strictEqual(error.message, "Configuration folder not found for 'unexisting'.");
   });
 
   it('serves a full configuration', async () => {
-    const machineKey = 'singlenode-machine-key';
-    const machineRole = settings.get(`machines:${machineKey}`);
+    const followerKey = 'singlenode-machine-key';
+    const follower = settings.get(`followers:${followerKey}`);
 
     const res = await request
       .get('/conf')
-      .set('Authorization', machineKey);
+      .set('Authorization', followerKey);
 
     assert.strictEqual(res.status, 200);
     
@@ -37,7 +37,7 @@ describe('GET /conf', function () {
     ['core', 'register'].forEach(component => {
       const conf = files.find(f => f.path === `/${component}/conf/${component}.json`);
       assert.isNotNull(conf);
-      assert.deepEqual(conf.content, expectedConf(machineRole, component));
+      assert.deepEqual(conf.content, expectedConf(follower.role, component));
     });
   });
 

@@ -24,6 +24,7 @@
     "eslint-plugin-flowtype": "^3.12.1",
     "flow-bin": "^0.103.0",
     "mocha": "^6.2.0",
+    "nock": "^10.0.6",
     "supertest": "^4.0.2"
   }
 }

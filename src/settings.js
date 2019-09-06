@@ -29,7 +29,8 @@ nconf.defaults({
     },
     file: {
       active: false
-    }
+    },
+    dataFolder: '/app/data'
   }
 });
 

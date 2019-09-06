@@ -4,11 +4,11 @@
 
 const settings = require('../../src/settings');
 const middlewares = require('../../src/middlewares');
-const authMiddleware = middlewares.authorization(settings);
+const authMiddleware = middlewares.authorizationAdmin(settings);
 const ApiError = require('../../src/utils/errorsHandling').ApiError;
 const assert = require('chai').assert;
 
-describe('Authorization middleware', function () {
+describe('Authorization-admin middleware', function () {
 
   let req, res;
   beforeEach(async () => {
@@ -16,25 +16,25 @@ describe('Authorization middleware', function () {
     res = {};
   });
 
-  it('fails if follower key is missing', async () => {
+  it('fails if admin key is missing', async () => {
     const expectedErrorMsg = "Missing 'Authorization' header or 'auth' query parameter.";
     // FLOW: mocking req, res
     authMiddleware(req, res, expectAPIError(expectedErrorMsg, 403));
   });
 
-  it('fails if follower is unauthorized', async () => {
-    const expectedErrorMsg = 'Invalid follower key.';
+  it('fails if admin key is invalid', async () => {
+    const expectedErrorMsg = 'Invalid admin key.';
     req.headers.authorization = 'unauthorized';
     // FLOW: mocking req, res
     authMiddleware(req, res, expectAPIError(expectedErrorMsg, 403));
   });
 
-  it('verifies follower key and set corresponding role in the context', async () => {
-    req.headers.authorization = 'singlenode-machine-key';
+  it('verifies admin key', async () => {
+    const adminKey = settings.get('adminKey');
+    req.headers.authorization = adminKey;
     // FLOW: mocking req, res
     authMiddleware(req, res, (err) => {
       assert.isUndefined(err);
-      assert.strictEqual(req.context.role, 'pryv');
     });
   });
 
