@@ -29,18 +29,20 @@ describe('GET /admin/settings', function () {
 describe('PUT /admin/settings', function () {
 
   it('updates settings in memory and on disk', async () => {
+    const previousSettings = settings.get('platform');
+    const update = {updatedProp: 'updatedVal'};
+    const updatedSettings = Object.assign({}, previousSettings, update);
+
     const res = await request
       .put('/admin/settings')
-      .send({
-        updatedProp: 'updatedVal'
-      })
+      .send(update)
       .set('Authorization', adminKey);
 
     assert.strictEqual(res.status, 200);
-    assert.strictEqual(res.text, 'Settings successfully updated.');
-    assert.strictEqual(settings.get('platform:updatedProp'), 'updatedVal');
+    assert.deepEqual(res.body, updatedSettings);
+    assert.deepEqual(settings.get('platform'), updatedSettings);
     const jsonFile = JSON.parse(fs.readFileSync('dev-config.json', 'utf8'));
-    assert.strictEqual(jsonFile.platform.updatedProp, 'updatedVal');
+    assert.deepEqual(jsonFile.platform, updatedSettings);
   });
 });
 

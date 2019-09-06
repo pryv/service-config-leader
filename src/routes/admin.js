@@ -11,15 +11,16 @@ module.exports = function (expressApp: express$Application, settings: Object) {
   // PUT /admin/settings: updates current settings and save them to disk
   expressApp.put('/admin/settings', (req: express$Request, res: express$Response, next: express$NextFunction) => {
     const previousSettings = settings.get('platform');
+    const newSettings = Object.assign({}, previousSettings, req.body);
 
-    settings.set('platform', Object.assign({}, previousSettings, req.body));
+    settings.set('platform', newSettings);
 
     settings.save((err) => {
       if (err) {
         settings.set('platform', previousSettings);
         return next(err);
       }
-      res.send('Settings successfully updated.');
+      res.send(newSettings);
     });
   });
 
