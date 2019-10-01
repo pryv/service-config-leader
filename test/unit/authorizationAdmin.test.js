@@ -12,8 +12,16 @@ describe('Authorization-admin middleware', function () {
 
   let req, res;
   beforeEach(async () => {
+    settings.set('adminKey', '4dmink3y');
     req = {headers:{}, context:{}, query:{}};
     res = {};
+  });
+
+  it('fails if no admin key is configured', async () => {
+    settings.set('adminKey', null);
+    const expectedErrorMsg = "Please provide an administration key as the 'adminKey' setting.";
+    // FLOW: mocking req, res
+    authMiddleware(req, res, expectAPIError(expectedErrorMsg, 403));
   });
 
   it('fails if admin key is missing', async () => {
