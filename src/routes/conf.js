@@ -7,10 +7,6 @@ const middlewares = require('../middlewares');
 
 module.exports = function (expressApp: express$Application, settings: Object) {
 
-  type SubstitutionMap = {
-    [key: string]: string
-  };
-
   expressApp.all('/conf', middlewares.authorization(settings));
 
   // GET /conf: serve full configuration for given Pryv.io role
@@ -27,14 +23,13 @@ module.exports = function (expressApp: express$Application, settings: Object) {
       let list = [];
       listConfFiles(confFolder, list);
 
-      const platformSettings = settings.get('platform');
       let fullConf = [];
       list.forEach(file => {
         const templateConf = fs.readFileSync(file, 'utf8');
         const fileName = file.replace(confFolder, '');
         fullConf.push({
           path: fileName,
-          content: applySubstitutions(platformSettings, templateConf)
+          content: applySubstitutions(templateConf)
         });
       });
     
@@ -44,8 +39,13 @@ module.exports = function (expressApp: express$Application, settings: Object) {
     }
   });
 
-  function applySubstitutions (substitutions: SubstitutionMap, template: string): string {
-    if (substitutions == null) return template;
+  function applySubstitutions (template: string): string {
+    const platformVars = settings.get('platform');
+    const internalVars = settings.get('internals');
+
+    if (platformVars == null && internalVars == null) return template;
+
+    let substitutions = Object.assign({}, internalVars, platformVars);
 
     const substitutionKeys = Object.keys(substitutions).filter(key => {
       return typeof substitutions[key] === 'string';

@@ -15,13 +15,13 @@ class Application {
   }
 
   generateSecrets (settings: Object): void {
-    const platformSettings = settings.get('platform');
+    const internalSettings = settings.get('internals');
  
-    if (platformSettings == null) return;
+    if (internalSettings == null) return;
 
-    for (const [key, value] of Object.entries(platformSettings)) {
+    for (const [key, value] of Object.entries(internalSettings)) {
       if (value === 'SECRET') {
-        settings.set(`platform:${key}`, randomAlphaNumKey(32));
+        settings.set(`internals:${key}`, randomAlphaNumKey(32));
       }
     }
 
