@@ -45,7 +45,7 @@ module.exports = function (expressApp: express$Application, settings: Object) {
 
     if (platformVars == null && internalVars == null) return template;
 
-    let substitutions = Object.assign({}, platformVars, internalVars);
+    let substitutions = Object.assign({}, internalVars, platformVars);
 
     const substitutionKeys = Object.keys(substitutions).filter(key => {
       return typeof substitutions[key] === 'string';
