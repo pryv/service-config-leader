@@ -30,8 +30,10 @@ nconf.defaults({
     file: {
       active: false
     },
-    dataFolder: '/app/data'
-  }
+    dataFolder: '/app/data',
+  },
+  platform: {},
+  internals: {},
 });
 
 nconf.set('pathToData', path.resolve(__dirname, '../', nconf.get('dataFolder')));
