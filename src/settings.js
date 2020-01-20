@@ -1,21 +1,22 @@
 // @flow
 
 const nconf = require('nconf');
+const store = new nconf.Provider();
 const path = require('path');
 
 // 1. `process.env`
 // 2. `process.argv`
 //
-nconf.env().argv();
+store.env().argv();
 
 // 3. Values in `config.json`
 //
-const configFile = nconf.get('config') || 'dev-config.json';
-nconf.file({ file: configFile});
+const configFile = store.get('config') || 'dev-config.json';
+store.file({ file: configFile});
 
 // 4. Any default values
 //
-nconf.defaults({
+store.defaults({
   http: {
     port: 7000,
     ip: '127.0.0.1',
@@ -32,10 +33,9 @@ nconf.defaults({
     },
     dataFolder: '/app/data',
   },
-  platform: {},
   internals: {},
 });
 
-nconf.set('pathToData', path.resolve(__dirname, '../', nconf.get('dataFolder')));
+store.set('pathToData', path.resolve(__dirname, '../', store.get('dataFolder')));
 
-module.exports = nconf;
+module.exports = store;

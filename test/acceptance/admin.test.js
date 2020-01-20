@@ -6,6 +6,7 @@ const assert = require('chai').assert;
 const Application = require('../../src/app');
 const app = new Application();
 const settings = app.settings;
+const platformSettings = app.platformSettings;
 const request = require('supertest')(app.express);
 const fs = require('fs');
 const mockFollowers = require('../fixtures/followersMock');
@@ -19,7 +20,7 @@ describe('GET /admin/settings', function () {
       .get('/admin/settings')
       .set('Authorization', adminKey);
 
-    const jsonFile = JSON.parse(fs.readFileSync('dev-config.json', 'utf8'));
+    const jsonFile = JSON.parse(fs.readFileSync('platform.json', 'utf8'));
     assert.strictEqual(res.status, 200);
     assert.include(res.headers['content-type'], 'application/json');
     assert.deepEqual(res.body, jsonFile.platform);
@@ -29,7 +30,7 @@ describe('GET /admin/settings', function () {
 describe('PUT /admin/settings', function () {
 
   it('updates settings in memory and on disk', async () => {
-    const previousSettings = settings.get('platform');
+    const previousSettings = platformSettings.get('platform');
     const update = {updatedProp: 'updatedVal'};
     const updatedSettings = Object.assign({}, previousSettings, update);
 
@@ -40,8 +41,8 @@ describe('PUT /admin/settings', function () {
 
     assert.strictEqual(res.status, 200);
     assert.deepEqual(res.body, updatedSettings);
-    assert.deepEqual(settings.get('platform'), updatedSettings);
-    const jsonFile = JSON.parse(fs.readFileSync('dev-config.json', 'utf8'));
+    assert.deepEqual(platformSettings.get('platform'), updatedSettings);
+    const jsonFile = JSON.parse(fs.readFileSync('platform.json', 'utf8'));
     assert.deepEqual(jsonFile.platform, updatedSettings);
   });
 });

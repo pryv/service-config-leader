@@ -5,7 +5,7 @@ const fs = require('fs');
 const errorsFactory = require('../utils/errorsHandling').factory;
 const middlewares = require('../middlewares');
 
-module.exports = function (expressApp: express$Application, settings: Object) {
+module.exports = function (expressApp: express$Application, settings: Object, platformSettings: Object) {
 
   expressApp.all('/conf', middlewares.authorization(settings));
 
@@ -40,7 +40,7 @@ module.exports = function (expressApp: express$Application, settings: Object) {
   });
 
   function applySubstitutions (template: string): string {
-    const platformVars = settings.get('platform');
+    const platformVars = platformSettings.get('platform');
     const internalVars = settings.get('internals');
 
     if (platformVars == null && internalVars == null) return template;
