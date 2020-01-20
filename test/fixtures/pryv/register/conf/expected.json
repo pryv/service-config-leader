@@ -10,9 +10,9 @@
     }
   },
   "service": {
-    "name": "PLATFORM_NAME",
-    "support": "SUPPORT_LINK",
-    "terms": "TERMS_OF_USE_LINK"
+    "name": "REPLACE_ME",
+    "support": "REPLACE_ME",
+    "terms": "REPLACE_ME"
   },
   "server": {
     "ssl": "false",
@@ -46,41 +46,41 @@
     "nameserver": [
       {
         "name": "dns1.rec.la",
-        "ip": "REG_MASTER_IP_ADDRESS"
+        "ip": "REPLACE_ME"
       },
       {
         "name": "dns2.rec.la",
-        "ip": "REG_SLAVE_IP_ADDRESS"
+        "ip": "REPLACE_ME"
       }
     ],
     "staticDataInDomain": {
       "sw": {
-        "ip": "STATIC_WEB_IP_ADDRESS"
+        "ip": "REPLACE_ME"
       },
       "reg": {
-        "ip": "REG_MASTER_IP_ADDRESS"
+        "ip": "REPLACE_ME"
       },
       "service": {
-        "ip": "REG_MASTER_IP_ADDRESS"
+        "ip": "REPLACE_ME"
       },
       "access": {
-        "ip": "REG_MASTER_IP_ADDRESS"
+        "ip": "REPLACE_ME"
       },
       "dns1": {
-        "ip": "REG_MASTER_IP_ADDRESS"
+        "ip": "REPLACE_ME"
       },
       "dns2": {
-        "ip": "REG_SLAVE_IP_ADDRESS"
+        "ip": "REPLACE_ME"
       },
       "co1": {
-        "ip": "CORE_1_IP_ADDRESS"
+        "ip": "REPLACE_ME"
       }
     },
-    "domain_A": "SERVICE_WEBSITE_IP_ADDRESS"
+    "domain_A": "REPLACE_ME"
   },
   "net": {
     "aaservers": {
-      "CORE_HOSTING_1": [
+      "REPLACE_ME": [
         {
           "base_url": "https://co1.rec.la/",
           "authorization": "CORE_SYSTEM_KEY"
@@ -101,7 +101,7 @@
                 "fr": "Suisse"
               },
               "hostings": {
-                "CORE_HOSTING_1": {
+                "REPLACE_ME": {
                   "url": "https://hostingprovider.com",
                   "name": "Hosting provider name",
                   "description": "Hosting provider slogan",
