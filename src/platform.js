@@ -3,12 +3,17 @@
 const nconf = require('nconf');
 const store = new nconf.Provider();
 
-// 1. Values in `platform.json`
+// 1. `process.env`
+// 2. `process.argv`
 //
-store.file({ file: 'platform.json'});
+store.env().argv();
 
+// 3. Values in `platform.json`
+//
+const configFile = store.get('vars') || 'platform.json';
+store.file({ file: configFile});
 
-// 2. Any default values
+// 4. Any default values
 //
 store.defaults({
   platform: {},
