@@ -9,11 +9,8 @@
     "PLATFORM_NAME": "REPLACE_ME",
     "SUPPORT_LINK": "REPLACE_ME",
     "TERMS_OF_USE_LINK": "REPLACE_ME",
-    "cores": [
-      {
-        "CORE_1_IP_ADDRESS": "REPLACE_ME",
-        "CORE_HOSTING_1": "REPLACE_ME"
-      }
-    ]
+    "CORE_1": {
+      "ip": "REPLACE_ME"
+    }
   }
 }

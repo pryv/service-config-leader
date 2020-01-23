@@ -80,7 +80,7 @@
   },
   "net": {
     "aaservers": {
-      "REPLACE_ME": [
+      "hosting-1": [
         {
           "base_url": "https://co1.rec.la/",
           "authorization": "CORE_SYSTEM_KEY"
@@ -101,7 +101,7 @@
                 "fr": "Suisse"
               },
               "hostings": {
-                "REPLACE_ME": {
+                "hosting-1": {
                   "url": "https://hostingprovider.com",
                   "name": "Hosting provider name",
                   "description": "Hosting provider slogan",

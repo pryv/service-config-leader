@@ -47,28 +47,13 @@ module.exports = function (expressApp: express$Application, settings: Object, pl
 
     let substitutions = Object.assign({}, internalVars, platformVars);
 
-    let entries = {};
-
-    function iter(obj) {
-      Object.entries(obj).forEach(([key, val]) => {
-        if (typeof val === 'object') {
-          iter(val);
-        }
-        if (Array.isArray(val)) {
-          val.forEach(sub => {
-            iter(sub);
-          });
-        }
-        if (typeof val === 'string') {
-          entries[key] = val;
-        }
-      });
-    }
-    iter(substitutions);
-
-    const re = new RegExp(Object.keys(entries).join('|'), 'g');
+    const re = new RegExp(Object.keys(substitutions).join('|'), 'g');
     return template.replace(re, (match) => {
-      return entries[match];
+      const replacement = substitutions[match];
+      if (typeof replacement !== 'string') {
+        return JSON.stringify(replacement);
+      }
+      return replacement;
     });
   }
 

@@ -37,13 +37,13 @@ describe('GET /conf', function () {
     ['core', 'register'].forEach(component => {
       const conf = files.find(f => f.path === `/${component}/conf/${component}.json`);
       assert.isNotNull(conf);
-      assert.deepEqual(conf.content, expectedConf(follower.role, component));
+      assert.deepEqual(conf.content.replace(/\s/g, ''), expectedConf(follower.role, component));
     });
   });
 
   function expectedConf(role: string, component: string) {
     const dataFolder = settings.get('pathToData');
     const expectedConf = require(`${dataFolder}/${role}/${component}/conf/expected.json`);
-    return JSON.stringify(expectedConf, 'utf8', 2);
+    return JSON.stringify(expectedConf).replace(/\s/g, '');
   }
 });
