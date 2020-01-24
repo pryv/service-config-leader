@@ -1,5 +1,9 @@
 ## 1.0
 
+### 1.0.3
+
+- Simplify user-facing configuration and use yaml
+
 ### 1.0.2
 
 - Update node version to 12.13.1.
