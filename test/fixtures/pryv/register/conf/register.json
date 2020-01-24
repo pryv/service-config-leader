@@ -72,15 +72,13 @@
       "dns2": {
         "ip": "REG_SLAVE_IP_ADDRESS"
       },
-      "co1": {
-        "ip": "CORE_1_IP_ADDRESS"
-      }
+      "co1": CORE_1
     },
     "domain_A": "SERVICE_WEBSITE_IP_ADDRESS"
   },
   "net": {
     "aaservers": {
-      "CORE_HOSTING_1": [
+      "hosting-1": [
         {
           "base_url": "https://co1.DOMAIN/",
           "authorization": "CORE_SYSTEM_KEY"
@@ -101,7 +99,7 @@
                 "fr": "Suisse"
               },
               "hostings": {
-                "CORE_HOSTING_1": {
+                "hosting-1": {
                   "url": "https://hostingprovider.com",
                   "name": "Hosting provider name",
                   "description": "Hosting provider slogan",

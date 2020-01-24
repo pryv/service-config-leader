@@ -2,15 +2,18 @@
 
 const express = require('express');
 const middlewares = require('./middlewares');
-const nconfSettings = require('./settings');
+const nconfSettings = require('./settings.js');
+const platformSettings = require('./platform.js');
 
 class Application {
   express: express$Application;
   settings: Object;
+  platformSettings: Object;
 
   constructor() {
     this.settings = nconfSettings;
-    this.express = this.setupExpressApp(this.settings);
+    this.platformSettings = platformSettings;
+    this.express = this.setupExpressApp(this.settings, this.platformSettings);
     this.generateSecrets(this.settings);
   }
 
@@ -38,13 +41,13 @@ class Application {
     }
   }
 
-  setupExpressApp(settings: Object): express$Application {
+  setupExpressApp(settings: Object, platformSettings: Object): express$Application {
     const expressApp = express();
 
     expressApp.use(express.json());
 
-    require('./routes/conf')(expressApp, settings);
-    require('./routes/admin')(expressApp, settings);
+    require('./routes/conf')(expressApp, settings, platformSettings);
+    require('./routes/admin')(expressApp, settings, platformSettings);
 
     expressApp.use(middlewares.errors);
     

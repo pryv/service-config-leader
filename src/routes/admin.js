@@ -4,20 +4,20 @@ const request = require('superagent');
 const middlewares = require('../middlewares');
 const logger = require('../utils/logging').getLogger('admin');
 
-module.exports = function (expressApp: express$Application, settings: Object) {
+module.exports = function (expressApp: express$Application, settings: Object, platformSettings: Object) {
 
   expressApp.all('/admin/*', middlewares.authorizationAdmin(settings));
 
   // PUT /admin/settings: updates current settings and save them to disk
   expressApp.put('/admin/settings', (req: express$Request, res: express$Response, next: express$NextFunction) => {
-    const previousSettings = settings.get('platform');
+    const previousSettings = platformSettings.get('vars');
     const newSettings = Object.assign({}, previousSettings, req.body);
 
-    settings.set('platform', newSettings);
+    platformSettings.set('vars', newSettings);
 
-    settings.save((err) => {
+    platformSettings.save((err) => {
       if (err) {
-        settings.set('platform', previousSettings);
+        platformSettings.set('vars', previousSettings);
         return next(err);
       }
       res.send(newSettings);
@@ -26,7 +26,7 @@ module.exports = function (expressApp: express$Application, settings: Object) {
 
   // GET /admin/settings: returns current settings as json
   expressApp.get('/admin/settings', (req: express$Request, res: express$Response, next: express$NextFunction) => {
-    const currentSettings = settings.get('platform');
+    const currentSettings = platformSettings.get('vars');
     if (currentSettings == null) {
       next(new Error('Missing platform settings.'));
     }

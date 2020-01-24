@@ -5,7 +5,7 @@ const fs = require('fs');
 const errorsFactory = require('../utils/errorsHandling').factory;
 const middlewares = require('../middlewares');
 
-module.exports = function (expressApp: express$Application, settings: Object) {
+module.exports = function (expressApp: express$Application, settings: Object, platformSettings: Object) {
 
   expressApp.all('/conf', middlewares.authorization(settings));
 
@@ -40,19 +40,20 @@ module.exports = function (expressApp: express$Application, settings: Object) {
   });
 
   function applySubstitutions (template: string): string {
-    const platformVars = settings.get('platform');
+    const platformVars = platformSettings.get('vars');
     const internalVars = settings.get('internals');
 
     if (platformVars == null && internalVars == null) return template;
 
     let substitutions = Object.assign({}, internalVars, platformVars);
 
-    const substitutionKeys = Object.keys(substitutions).filter(key => {
-      return typeof substitutions[key] === 'string';
-    });
-    const re = new RegExp(substitutionKeys.join('|'), 'g');
+    const re = new RegExp(Object.keys(substitutions).join('|'), 'g');
     return template.replace(re, (match) => {
-      return substitutions[match];
+      const replacement = substitutions[match];
+      if (typeof replacement !== 'string') {
+        return JSON.stringify(replacement);
+      }
+      return replacement;
     });
   }
 
