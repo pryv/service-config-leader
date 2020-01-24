@@ -1,2 +1,2 @@
 #!/bin/sh
-exec chpst -u app node /app/bin/dist/server.js --config /app/conf/config-leader.json --vars /app/conf/platform.json
+exec chpst -u app node /app/bin/dist/server.js --config /app/conf/config-leader.json --platformConfig /app/conf/platform.yml

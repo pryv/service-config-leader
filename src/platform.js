@@ -10,13 +10,16 @@ store.env().argv();
 
 // 3. Values in `platform.json`
 //
-const configFile = store.get('vars') || 'platform.json';
-store.file({ file: configFile});
+const configFile = store.get('platformConfig') || 'platform.yml';
+store.file({
+  file: configFile,
+  format: require('nconf-yaml')
+});
 
 // 4. Any default values
 //
 store.defaults({
-  platform: {},
+  vars: {},
 });
 
 module.exports = store;

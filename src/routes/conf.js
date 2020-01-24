@@ -40,7 +40,7 @@ module.exports = function (expressApp: express$Application, settings: Object, pl
   });
 
   function applySubstitutions (template: string): string {
-    const platformVars = platformSettings.get('platform');
+    const platformVars = platformSettings.get('vars');
     const internalVars = settings.get('internals');
 
     if (platformVars == null && internalVars == null) return template;

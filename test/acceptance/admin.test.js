@@ -9,6 +9,7 @@ const settings = app.settings;
 const platformSettings = app.platformSettings;
 const request = require('supertest')(app.express);
 const fs = require('fs');
+const yaml = require('js-yaml');
 const mockFollowers = require('../fixtures/followersMock');
 
 const adminKey = settings.get('adminKey');
@@ -20,17 +21,19 @@ describe('GET /admin/settings', function () {
       .get('/admin/settings')
       .set('Authorization', adminKey);
 
-    const jsonFile = JSON.parse(fs.readFileSync('platform.json', 'utf8'));
+    const ymlFile = fs.readFileSync('platform.yml', 'utf8');
+    const platform = yaml.safeLoad(ymlFile);
+
     assert.strictEqual(res.status, 200);
     assert.include(res.headers['content-type'], 'application/json');
-    assert.deepEqual(res.body, jsonFile.platform);
+    assert.deepEqual(res.body, platform.vars);
   });
 });
 
 describe('PUT /admin/settings', function () {
 
   it('updates settings in memory and on disk', async () => {
-    const previousSettings = platformSettings.get('platform');
+    const previousSettings = platformSettings.get('vars');
     const update = {updatedProp: 'updatedVal'};
     const updatedSettings = Object.assign({}, previousSettings, update);
 
@@ -41,9 +44,10 @@ describe('PUT /admin/settings', function () {
 
     assert.strictEqual(res.status, 200);
     assert.deepEqual(res.body, updatedSettings);
-    assert.deepEqual(platformSettings.get('platform'), updatedSettings);
-    const jsonFile = JSON.parse(fs.readFileSync('platform.json', 'utf8'));
-    assert.deepEqual(jsonFile.platform, updatedSettings);
+    assert.deepEqual(platformSettings.get('vars'), updatedSettings);
+    const ymlFile = fs.readFileSync('platform.yml', 'utf8');
+    const platform = yaml.safeLoad(ymlFile);
+    assert.deepEqual(updatedSettings, platform.vars);
   });
 });
 

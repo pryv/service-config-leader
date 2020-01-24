@@ -10,14 +10,14 @@ module.exports = function (expressApp: express$Application, settings: Object, pl
 
   // PUT /admin/settings: updates current settings and save them to disk
   expressApp.put('/admin/settings', (req: express$Request, res: express$Response, next: express$NextFunction) => {
-    const previousSettings = platformSettings.get('platform');
+    const previousSettings = platformSettings.get('vars');
     const newSettings = Object.assign({}, previousSettings, req.body);
 
-    platformSettings.set('platform', newSettings);
+    platformSettings.set('vars', newSettings);
 
     platformSettings.save((err) => {
       if (err) {
-        platformSettings.set('platform', previousSettings);
+        platformSettings.set('vars', previousSettings);
         return next(err);
       }
       res.send(newSettings);
@@ -26,7 +26,7 @@ module.exports = function (expressApp: express$Application, settings: Object, pl
 
   // GET /admin/settings: returns current settings as json
   expressApp.get('/admin/settings', (req: express$Request, res: express$Response, next: express$NextFunction) => {
-    const currentSettings = platformSettings.get('platform');
+    const currentSettings = platformSettings.get('vars');
     if (currentSettings == null) {
       next(new Error('Missing platform settings.'));
     }
