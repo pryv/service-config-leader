@@ -4,7 +4,6 @@ const path = require('path');
 const fs = require('fs');
 const errorsFactory = require('../utils/errorsHandling').factory;
 const middlewares = require('../middlewares');
-const crypto = require('crypto');
 
 module.exports = function (expressApp: express$Application, settings: Object, platformSettings: Object) {
 
