@@ -15,7 +15,7 @@ module.exports = function (expressApp: express$Application, settings: Object, pl
   expressApp.get('/conf', (req: express$Request, res: express$Response, next: express$NextFunction) => {
     try {
       const role = req.context.role;
-      logger.info(`received request from ${role}`);
+      logger.info(`Seceived request from ${role}.`);
       const pathToData = settings.get('pathToData');
       const confFolder = path.join(pathToData, role);
 
@@ -27,6 +27,8 @@ module.exports = function (expressApp: express$Application, settings: Object, pl
       listConfFiles(confFolder, list);
 
       let fullConf = [];
+      let latestModifiedTime = 0;
+      let latestModifiedFile = '';
       list.forEach(file => {
         const templateConf = fs.readFileSync(file, 'utf8');
         const fileName = file.replace(confFolder, '');
@@ -34,8 +36,14 @@ module.exports = function (expressApp: express$Application, settings: Object, pl
           path: fileName,
           content: applySubstitutions(templateConf)
         });
+        const stats = fs.statSync(file);
+        const modifiedTime = stats.mtimeMs;
+        if (modifiedTime > latestModifiedTime) {
+          latestModifiedTime = modifiedTime;
+          latestModifiedFile = fileName;
+        }
       });
-    
+      logger.info(`Sent configuration files. Latest modification on "${latestModifiedFile}" at ${new Date(latestModifiedTime)}`);
       res.json({files: fullConf});
     } catch (err) {
       next(err);
