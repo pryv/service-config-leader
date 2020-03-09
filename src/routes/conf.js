@@ -48,13 +48,17 @@ module.exports = function (expressApp: express$Application, settings: Object, pl
     let substitutions = Object.assign({}, internalVars, platformVars);
 
     const re = new RegExp(Object.keys(substitutions).join('|'), 'g');
-    return template.replace(re, (match) => {
-      const replacement = substitutions[match];
-      if (typeof replacement !== 'string') {
-        return JSON.stringify(replacement);
-      }
-      return replacement;
-    });
+    return replaceInString(template);
+
+    function replaceInString(myString: string): string {
+      return myString.replace(re, (match) => {
+        const replacement = substitutions[match];
+        if (typeof replacement !== 'string') {
+          return replaceInString(JSON.stringify(replacement));
+        }
+        return replaceInString(replacement);
+      })
+    }
   }
 
   function listConfFiles(dir: string, files: Array<string>): void {

@@ -18,7 +18,7 @@
   },
   "auth": {
     "adminAccessKey": "CORE_ADMIN_KEY",
-    "trustedApps": "*@https://*.rec.la*, *@http://pryv.github.io*, *@https://*.rec.la*",
+    "trustedApps": "*@https://*.rec.la*",
     "sessionMaxAge": 1209600000,
     "ssoCookieDomain": ".rec.la",
     "ssoCookieSignSecret": "OVERRIDE_ME",

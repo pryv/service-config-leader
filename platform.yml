@@ -12,3 +12,4 @@ vars:
     definitions: 'https://api.pryv.com/assets-pryv.me/index.json'
   CORE_1:
     ip: REPLACE_ME
+  TRUSTED_APPS: '*@https://*.DOMAIN*'
