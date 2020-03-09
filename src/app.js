@@ -9,8 +9,10 @@ class Application {
   express: express$Application;
   settings: Object;
   platformSettings: Object;
+  logger: Object;
 
   constructor() {
+    this.logger = require('./utils/logging').getLogger('app');
     this.settings = nconfSettings;
     this.platformSettings = platformSettings;
     this.express = this.setupExpressApp(this.settings, this.platformSettings);
@@ -30,7 +32,7 @@ class Application {
 
     settings.save((err) => {
       if (err) {
-        console.log('Error when saving secrets.');
+        this.logger.error('Error when saving secrets.', err);
       }
     });
 
