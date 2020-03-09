@@ -4,8 +4,11 @@ const path = require('path');
 const fs = require('fs');
 const errorsFactory = require('../utils/errorsHandling').factory;
 const middlewares = require('../middlewares');
+const crypto = require('crypto');
 
 module.exports = function (expressApp: express$Application, settings: Object, platformSettings: Object) {
+
+  const logger = require('../utils/logging').getLogger('conf');
 
   expressApp.all('/conf', middlewares.authorization(settings));
 
@@ -13,6 +16,7 @@ module.exports = function (expressApp: express$Application, settings: Object, pl
   expressApp.get('/conf', (req: express$Request, res: express$Response, next: express$NextFunction) => {
     try {
       const role = req.context.role;
+      logger.info(`received request from ${role}`);
       const pathToData = settings.get('pathToData');
       const confFolder = path.join(pathToData, role);
 
