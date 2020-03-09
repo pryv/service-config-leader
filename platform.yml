@@ -8,5 +8,7 @@ vars:
   PLATFORM_NAME: REPLACE_ME
   SUPPORT_URL: REPLACE_ME
   TERMS_OF_USE_URL: REPLACE_ME
+  SERVICE_INFO_ASSETS:
+    definitions: 'https://api.pryv.com/assets-pryv.me/index.json'
   CORE_1:
     ip: REPLACE_ME

@@ -12,7 +12,10 @@
   "service": {
     "name": "REPLACE_ME",
     "support": "REPLACE_ME",
-    "terms": "REPLACE_ME"
+    "terms": "REPLACE_ME",
+    "assets": {
+      "definitions": "https://api.pryv.com/assets-pryv.me/index.json"
+    }
   },
   "server": {
     "ssl": "false",
