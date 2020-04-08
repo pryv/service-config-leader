@@ -15,7 +15,7 @@ module.exports = function (expressApp: express$Application, settings: Object, pl
   expressApp.get('/conf', (req: express$Request, res: express$Response, next: express$NextFunction) => {
     try {
       const role = req.context.role;
-      logger.info(`Seceived request from ${role}.`);
+      logger.info(`Received request from ${role}.`);
       const pathToData = settings.get('pathToData');
       const confFolder = path.join(pathToData, role);
 
