@@ -47,6 +47,7 @@ class Application {
     const expressApp = express();
 
     expressApp.use(express.json());
+    expressApp.use(middlewares.cors);
 
     require('./routes/conf')(expressApp, settings, platformSettings);
     require('./routes/admin')(expressApp, settings, platformSettings);
