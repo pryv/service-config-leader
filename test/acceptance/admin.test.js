@@ -77,4 +77,35 @@ describe('POST /admin/notify', function () {
       assert.isDefined(successes[key]);
     }
   });
+
+  it('responds with CORS related headers', async () => {
+    const res = await request
+      .post('/admin/notify')
+      .set('Authorization', adminKey);
+
+    const headers = res.headers;
+
+    console.log(headers);
+
+    assert.isDefined(headers['access-control-allow-origin']);
+    assert.equal(headers['access-control-allow-origin'], '*');
+
+    assert.isDefined(headers['access-control-allow-methods']);
+    assert.equal(headers['access-control-allow-methods'], 'POST, GET, PUT, OPTIONS');
+
+    assert.isDefined(headers['access-control-allow-headers']);
+    assert.equal(headers['access-control-allow-headers'], 'Authorization, Content-Type');
+
+    assert.isDefined(headers['access-control-max-age']);
+
+    assert.isDefined(headers['access-control-allow-credentials']);
+    assert.equal(headers['access-control-allow-credentials'], 'true');
+  });
+
+  it('responds with 200 to OPTIONS request', async () => {
+    const res = await request
+      .options('/');
+
+    assert.strictEqual(res.status, 200);
+  });
 });
