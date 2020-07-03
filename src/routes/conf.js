@@ -51,7 +51,7 @@ module.exports = function (expressApp: express$Application, settings: Object, pl
   });
 
   function applySubstitutions (template: string): string {
-    const platformVars = skipOneKeyLevel(platformSettings.get('vars'));
+    const platformVars = keepOnlySettingsLevel(platformSettings.get('vars'));
     const internalVars = settings.get('internals');
 
     if (platformVars == null && internalVars == null) return template;
@@ -74,15 +74,15 @@ module.exports = function (expressApp: express$Application, settings: Object, pl
       })
     }
 
-    function skipOneKeyLevel(obj: Object): Object {
-      const objLowered = {};
+    function keepOnlySettingsLevel(obj: Object): Object {
+      const settings = {};
 
-      for(let key of Object.keys(obj)) {
-        for(let lowerKey of Object.keys(obj[key])) {
-          objLowered[lowerKey] = obj[key][lowerKey];
+      for(let group of Object.keys(obj)) {
+        for(let setting of Object.keys(obj[group]['settings'])) {
+          settings[setting] = obj[group]['settings'][setting];
         }
       }
-      return objLowered;
+      return settings;
     }
   }
 
