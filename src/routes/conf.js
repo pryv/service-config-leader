@@ -51,7 +51,7 @@ module.exports = function (expressApp: express$Application, settings: Object, pl
   });
 
   function applySubstitutions (template: string): string {
-    const platformVars = platformSettings.get('vars');
+    const platformVars = skipOneKeyLevel(platformSettings.get('vars'));
     const internalVars = settings.get('internals');
 
     if (platformVars == null && internalVars == null) return template;
@@ -63,12 +63,26 @@ module.exports = function (expressApp: express$Application, settings: Object, pl
 
     function replaceInString(myString: string): string {
       return myString.replace(re, (match) => {
-        const replacement = substitutions[match];
+        let replacement = substitutions[match];
+        if(typeof substitutions[match] === 'object' && substitutions[match]['value']) {
+          replacement = substitutions[match]['value'];
+        }
         if (typeof replacement !== 'string') {
           return replaceInString(JSON.stringify(replacement));
         }
         return replaceInString(replacement);
       })
+    }
+
+    function skipOneKeyLevel(obj: Object): Object {
+      const objLowered = {};
+
+      for(let key of Object.keys(obj)) {
+        for(let lowerKey of Object.keys(obj[key])) {
+          objLowered[lowerKey] = obj[key][lowerKey];
+        }
+      }
+      return objLowered;
     }
   }
 

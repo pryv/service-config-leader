@@ -1,15 +1,28 @@
 vars:
-  DOMAIN: rec.la
-  STATIC_WEB_IP_ADDRESS: REPLACE_ME
-  REG_MASTER_IP_ADDRESS: REPLACE_ME
-  REG_MASTER_VPN_IP_ADDRESS: REPLACE_ME
-  REG_SLAVE_IP_ADDRESS: REPLACE_ME
-  SERVICE_WEBSITE_IP_ADDRESS: REPLACE_ME
-  PLATFORM_NAME: REPLACE_ME
-  SUPPORT_URL: REPLACE_ME
-  TERMS_OF_USE_URL: REPLACE_ME
-  SERVICE_INFO_ASSETS:
-    definitions: 'https://api.pryv.com/assets-pryv.me/index.json'
-  CORE_1:
-    ip: REPLACE_ME
-  TRUSTED_APPS: '*@https://*.DOMAIN*'
+  MAIN_PROPS:
+    DOMAIN: 
+      value: rec.la
+      description: ""
+    STATIC_WEB_IP_ADDRESS: REPLACE_ME
+    REG_MASTER_IP_ADDRESS: REPLACE_ME
+    REG_MASTER_VPN_IP_ADDRESS: REPLACE_ME
+    REG_SLAVE_IP_ADDRESS: REPLACE_ME
+    SERVICE_WEBSITE_IP_ADDRESS: REPLACE_ME
+    PLATFORM_NAME: REPLACE_ME
+    SUPPORT_URL: REPLACE_ME
+    TERMS_OF_USE_URL: REPLACE_ME
+    SERVICE_INFO_ASSETS:
+      definitions: 'https://api.pryv.com/assets-pryv.me/index.json'
+    CORE_1:
+      ip: REPLACE_ME
+    TRUSTED_APPS: '*@https://*.DOMAIN*'
+  DNS_SETTINGS:
+    DNS_CUSTOM_ENTRIES:
+      description: "Additional DNS entries. See the DNS configuration document: https://api.pryv.com/customer-resources/#documents.
+      Can be set to null if not used."
+      value: 
+        test:
+          ip: REPLACE_ME
+    DNS_ROOT_DOMAIN_A_RECORD: 
+      value: REPLACE_ME
+      description: "DNS A record for ${DOMAIN} (The IP adress serving an eventual web page accessible by: http://{DOMAIN})"
