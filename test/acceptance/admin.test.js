@@ -34,7 +34,7 @@ describe('PUT /admin/settings', function () {
 
   it('updates settings in memory and on disk', async () => {
     const previousSettings = platformSettings.get('vars');
-    const update = {updatedProp: 'updatedVal'};
+    const update = {updatedProp: {settings: {value: 'updatedVal'}}};
     const updatedSettings = Object.assign({}, previousSettings, update);
 
     const res = await request

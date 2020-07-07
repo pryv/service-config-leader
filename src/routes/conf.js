@@ -51,7 +51,7 @@ module.exports = function (expressApp: express$Application, settings: Object, pl
   });
 
   function applySubstitutions (template: string): string {
-    const platformVars = platformSettings.get('vars');
+    const platformVars = retrieveFlatSettings(platformSettings.get('vars'));
     const internalVars = settings.get('internals');
 
     if (platformVars == null && internalVars == null) return template;
@@ -63,12 +63,30 @@ module.exports = function (expressApp: express$Application, settings: Object, pl
 
     function replaceInString(myString: string): string {
       return myString.replace(re, (match) => {
-        const replacement = substitutions[match];
+        let replacement = substitutions[match];
+        if(isObjectWithValueProp(substitutions[match])) {
+          replacement = substitutions[match]['value'];
+        }
         if (typeof replacement !== 'string') {
           return replaceInString(JSON.stringify(replacement));
         }
         return replaceInString(replacement);
       })
+    }
+
+    function isObjectWithValueProp(obj) {
+      return typeof obj === 'object' && obj['value'];
+    }
+
+    function retrieveFlatSettings(obj: Object): Object {
+      const settings = {};
+
+      for(let group of Object.keys(obj)) {
+        for(let setting of Object.keys(obj[group]['settings'])) {
+          settings[setting] = obj[group]['settings'][setting];
+        }
+      }
+      return settings;
     }
   }
 
