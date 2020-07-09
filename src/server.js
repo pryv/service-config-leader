@@ -12,3 +12,8 @@ const ip = settings.get('http:ip');
 app.express.listen(port, ip, () => {
   logger.info(`Server running on: ${ip}:${port}`);
 });
+
+process.on('exit', () => app.disconnectFromDb());
+process.on('SIGHUP', () => process.exit(128 + 1));
+process.on('SIGINT', () => process.exit(128 + 2));
+process.on('SIGTERM', () => process.exit(128 + 15));

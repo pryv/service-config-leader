@@ -1,6 +1,6 @@
 {
   "http": {
-    "port": 7000,
+    "port": 7003,
     "ip": "127.0.0.1"
   },
   "logs": {
@@ -17,7 +17,7 @@
   "dataFolder": "test/fixtures",
   "internals": {
     "SECRET_ONE": "1234",
-    "SECRET_TWO": "SECRET"
+    "SECRET_TWO": "vniefzmuv3qvexrtuivyha1nw73hmws5"
   },
   "adminKey": "4dmink3y",
   "followers": {
@@ -29,5 +29,6 @@
       "url": "http://valid-follower",
       "role": "unexisting"
     }
-  }
+  },
+  "pathToData": "/Users/michalgil/Desktop/Pryv_repos/service-config-leader/test/fixtures"
 }
