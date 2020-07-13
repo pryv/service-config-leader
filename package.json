@@ -8,13 +8,18 @@
   "scripts": {
     "start": "node_modules/.bin/babel-node src/server.js --config dev-config.json",
     "release": "node_modules/.bin/babel src/ -d dist/",
-    "test": "node_modules/.bin/mocha --require babel-core/register --recursive test/unit/users.repository.test.js"
+    "test": "node_modules/.bin/mocha --require babel-core/register --recursive test/ --exit"
   },
   "dependencies": {
+    "@hapi/joi": "^17.1.1",
     "babel-preset-env": "^1.7.0",
     "bcryptjs": "^2.4.3",
     "better-sqlite3": "^7.1.0",
+    "cron": "^1.8.2",
+    "crypto": "^1.0.1",
     "express": "^4.17.1",
+    "express-joi-validation": "^4.0.3",
+    "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.15",
     "nconf": "^0.10.0",
     "nconf-yaml": "^1.0.2",

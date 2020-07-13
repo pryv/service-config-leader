@@ -12,6 +12,7 @@ module.exports = (settings: Object) => {
     }
     
     const authorizedFollowers = settings.get('followers');
+    console.log(authorizedFollowers);
     if (authorizedFollowers == null || authorizedFollowers[auth] == null) {
       return next(errorsFactory.unauthorized('Invalid follower key.'));
     }

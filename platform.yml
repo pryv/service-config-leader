@@ -1,10 +1,10 @@
 vars:
   MAIN_PROPS:
-    name: "Main props"
+    name: Main props
     settings:
-      DOMAIN: 
+      DOMAIN:
         value: rec.la
-        description: ""
+        description: ''
       STATIC_WEB_IP_ADDRESS: REPLACE_ME
       REG_MASTER_IP_ADDRESS: REPLACE_ME
       REG_MASTER_VPN_IP_ADDRESS: REPLACE_ME
@@ -19,14 +19,21 @@ vars:
         ip: REPLACE_ME
       TRUSTED_APPS: '*@https://*.DOMAIN*'
   DNS_SETTINGS:
-    name: "DNS settings"
+    name: DNS settings
     settings:
       DNS_CUSTOM_ENTRIES:
-        description: "Additional DNS entries. See the DNS configuration document: https://api.pryv.com/customer-resources/#documents.
-        Can be set to null if not used."
-        value: 
+        description: >-
+          Additional DNS entries. See the DNS configuration document:
+          https://api.pryv.com/customer-resources/#documents. Can be set to null
+          if not used.
+        value:
           test:
             ip: REPLACE_ME
-      DNS_ROOT_DOMAIN_A_RECORD: 
+      DNS_ROOT_DOMAIN_A_RECORD:
         value: REPLACE_ME
-        description: "DNS A record for ${DOMAIN} (The IP adress serving an eventual web page accessible by: http://{DOMAIN})"
+        description: >-
+          DNS A record for ${DOMAIN} (The IP adress serving an eventual web page
+          accessible by: http://{DOMAIN})
+  updatedProp:
+    settings:
+      value: updatedVal

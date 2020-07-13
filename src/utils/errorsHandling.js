@@ -5,20 +5,11 @@
 class ApiError extends Error {
 
   httpStatus: number;
-  message: string;
 
   constructor(status: number, msg: string) {
     super(msg);
     this.httpStatus = status;
-    this.message = msg;
   }
-
-  getPublicErrorData() {
-    return {
-      message: this.message,
-    };
-  }
-
 }
 
 // Factory class that allows to generate Api Error.
@@ -32,7 +23,7 @@ class ErrorsFactory {
 
   unauthorized(message: ?string) {
     const msg = message || 'Operation is not authorized.';
-    return new ApiError(403, msg);
+    return new ApiError(401, msg);
   }
 
   invalidParameter(message: ?string) {

@@ -19,7 +19,7 @@
     "SECRET_ONE": "1234",
     "SECRET_TWO": "vniefzmuv3qvexrtuivyha1nw73hmws5"
   },
-  "adminKey": "4dmink3y",
+  "adminKey": "singlenode-machine-key",
   "followers": {
     "singlenode-machine-key": {
       "url": "http://singlenode-follower",

@@ -1,9 +1,9 @@
 // @flow
 
-const Permission = require("./../models/permission.model").Permission;
+const Permissions = require("./permissions.model").Permissions;
 
 export interface User {
     username: string;
     password: string;
-    permissions: Permission[]
+    permissions: Permissions
 }

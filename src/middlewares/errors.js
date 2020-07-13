@@ -10,13 +10,13 @@ const logger = logging.getLogger('errors');
 // NOTE: next is not used, since the request is terminated on all errors. 
 /*eslint-disable no-unused-vars*/
 module.exports = (error: Error | ApiError, req: express$Request, res: express$Response, next: express$NextFunction) => {
-  logger.error('Error with message: ' + error.message, error);
-  
-  if (! (error instanceof ApiError)) {
+  logger.error('Error: ' + error.message, error);
+
+  if (!error.hasOwnProperty("httpStatus")) {
     error = errorsFactory.unexpectedError(error);
   }
 
   res
     .status(error.httpStatus || 500)
-    .json({error: error.getPublicErrorData()});
+    .json({error: { message: error.message }});
 };

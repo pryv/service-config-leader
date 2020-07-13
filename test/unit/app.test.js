@@ -2,6 +2,8 @@
 
 /*global describe, it */
 
+const regeneratorRuntime = require("regenerator-runtime");
+
 const assert = require('chai').assert;
 const Application = require('../../src/app');
 

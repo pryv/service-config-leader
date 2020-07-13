@@ -1,0 +1,1 @@
+console.log(JSON.parse('{"users":["read","create","delete","resetPassword","changePermissions"]}'));

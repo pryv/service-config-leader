@@ -2,6 +2,8 @@
 
 /*global describe, it, beforeEach */
 
+const regeneratorRuntime = require("regenerator-runtime");
+
 const settings = require('../../src/settings');
 const middlewares = require('../../src/middlewares');
 const authMiddleware = middlewares.authorizationAdmin(settings);
@@ -21,20 +23,20 @@ describe('Authorization-admin middleware', function () {
     settings.set('adminKey', null);
     const expectedErrorMsg = "Please provide an administration key as the 'adminKey' setting.";
     // FLOW: mocking req, res
-    authMiddleware(req, res, expectAPIError(expectedErrorMsg, 403));
+    authMiddleware(req, res, expectAPIError(expectedErrorMsg, 401));
   });
 
   it('fails if admin key is missing', async () => {
     const expectedErrorMsg = "Missing 'Authorization' header or 'auth' query parameter.";
     // FLOW: mocking req, res
-    authMiddleware(req, res, expectAPIError(expectedErrorMsg, 403));
+    authMiddleware(req, res, expectAPIError(expectedErrorMsg, 401));
   });
 
   it('fails if admin key is invalid', async () => {
     const expectedErrorMsg = 'Invalid admin key.';
     req.headers.authorization = 'unauthorized';
     // FLOW: mocking req, res
-    authMiddleware(req, res, expectAPIError(expectedErrorMsg, 403));
+    authMiddleware(req, res, expectAPIError(expectedErrorMsg, 401));
   });
 
   it('verifies admin key', async () => {
@@ -51,7 +53,7 @@ describe('Authorization-admin middleware', function () {
 function expectAPIError(msg: string, status: number) {
   return (err) => {
     assert.isNotNull(err);
-    assert.isTrue(err instanceof ApiError);
+    assert.isTrue(err.hasOwnProperty("httpStatus"));
     // FLOW: err is not null
     const [errMsg, errStatus] = [err.message, err.httpStatus];
     assert.strictEqual(errMsg, msg);
