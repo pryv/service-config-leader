@@ -75,7 +75,7 @@ module.exports = function (expressApp: express$Application, settings: Object, pl
     }
 
     function isObjectWithValueProp(obj) {
-      return typeof obj === 'object' && obj['value'];
+      return typeof obj === 'object' && Object.hasOwnProperty.call(obj, 'value');
     }
 
     function retrieveFlatSettings(obj: Object): Object {

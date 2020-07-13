@@ -5,7 +5,8 @@ vars:
       DOMAIN: 
         value: rec.la
         description: ""
-      STATIC_WEB_IP_ADDRESS: REPLACE_ME
+      STATIC_WEB_IP_ADDRESS: 
+        value: false
       REG_MASTER_IP_ADDRESS: REPLACE_ME
       REG_MASTER_VPN_IP_ADDRESS: REPLACE_ME
       REG_SLAVE_IP_ADDRESS: REPLACE_ME
