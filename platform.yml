@@ -27,7 +27,7 @@ vars:
         Can be set to null if not used."
         value: 
           test:
-            ip: REPLACE_ME
+            ip: 1.2.3.4
       DNS_ROOT_DOMAIN_A_RECORD: 
         value: REPLACE_ME
         description: "DNS A record for ${DOMAIN} (The IP adress serving an eventual web page accessible by: http://{DOMAIN})"

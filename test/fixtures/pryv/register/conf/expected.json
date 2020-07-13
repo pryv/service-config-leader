@@ -77,6 +77,9 @@
       },
       "co1": {
         "ip": "REPLACE_ME"
+      },
+      "test": {
+        "ip": "1.2.3.4"
       }
     },
     "domain_A": "REPLACE_ME"
