@@ -45,3 +45,7 @@ vars:
             'keep-nothing': Delete history, keep head as itemDeletion as it is now by default.
             'keep-authors': Keep fields 'headId', 'id', 'modified', 'modifiedBy' in head and history.
             'keep-everything': Add 'deleted' field to head item, leave history as is."
+      INVITATION_TOKENS: 
+        value: null
+        description: "Allows to define a set of invitation tokens for user creation by providing
+        # an array of strings as well as no check (null) & prevent all (empty array)"
