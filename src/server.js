@@ -1,4 +1,5 @@
 // @flow
+require('module-alias/register')
 
 const Application = require('./app');
 const logger = require('./utils/logging').getLogger('server');

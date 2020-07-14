@@ -1,6 +1,6 @@
 const { verify } = require('jsonwebtoken');
-const errorsFactory = require('../../utils/errorsHandling').factory;
-const { ITokensRepository } = require("../../repositories/tokens.repository");
+const errorsFactory = require('@utils/errorsHandling').factory;
+const { ITokensRepository } = require("@repositories/tokens.repository");
 
 export const verifyToken = function (req: Request, res: Response, next: NextFunction, tokensRepository: ITokensRepository) {
   try {

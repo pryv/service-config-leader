@@ -8,7 +8,7 @@
   "scripts": {
     "start": "node_modules/.bin/babel-node src/server.js --config dev-config.json",
     "release": "node_modules/.bin/babel src/ -d dist/",
-    "test": "node_modules/.bin/mocha --require babel-core/register --recursive test/ --exit"
+    "test": "node_modules/.bin/mocha --require babel-core/register --require module-alias/register --recursive test/ --exit"
   },
   "dependencies": {
     "@hapi/joi": "^17.1.1",
@@ -21,6 +21,7 @@
     "express-joi-validation": "^4.0.3",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.15",
+    "module-alias": "^2.2.2",
     "nconf": "^0.10.0",
     "nconf-yaml": "^1.0.2",
     "winston": "^2.3.0"
@@ -36,5 +37,13 @@
     "mocha": "^6.2.0",
     "nock": "^10.0.6",
     "supertest": "^4.0.2"
+  },
+  "_moduleAliases": {
+    "@root" : "src",
+    "@middlewares" : "src/middlewares",
+    "@models" : "src/models",
+    "@repositories" : "src/repositories",
+    "@routes" : "src/routes",
+    "@utils" : "src/utils"
   }
 }

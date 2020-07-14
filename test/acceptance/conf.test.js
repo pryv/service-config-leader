@@ -6,7 +6,7 @@ const regeneratorRuntime = require("regenerator-runtime");
 
 const fs = require('fs');
 const assert = require('chai').assert;
-const Application = require('../../src/app');
+const Application = require('@root/app');
 const app = new Application();
 const request = require('supertest')(app.express);
 const settings = app.settings;

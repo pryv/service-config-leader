@@ -3,7 +3,7 @@
 const assert = require('chai').assert;
 const Database = require('better-sqlite3');
 
-import { ITokensRepository, TokensRepository } from  "./../../src/repositories/tokens.repository";
+import { ITokensRepository, TokensRepository } from  "@repositories/tokens.repository";
 
 describe('Test Tokens Repository', function () {
   const db: Database = new Database(':memory:', { verbose: console.log }); 

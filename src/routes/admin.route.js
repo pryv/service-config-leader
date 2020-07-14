@@ -3,8 +3,8 @@
 const regeneratorRuntime = require("regenerator-runtime");
 
 const request = require('superagent');
-const middlewares = require('../middlewares');
-const logger = require('../utils/logging').getLogger('admin');
+const middlewares = require('@middlewares');
+const logger = require('@utils/logging').getLogger('admin');
 
 module.exports = function (expressApp: express$Application, settings: Object, platformSettings: Object) {
 

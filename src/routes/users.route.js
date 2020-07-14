@@ -2,10 +2,10 @@
 
 const { createValidator } = require('express-joi-validation');
 const { createUserSchema, updatePermissionsSchema } = require('./validation/user.schema');
-const { IUsersRepository } = require("./../../src/repositories/users.repository");
-const { verifyToken } = require('./../middlewares/security/token.verification');
+const { IUsersRepository } = require("@repositories/users.repository");
+const { verifyToken } = require('@middlewares/security/token.verification');
 const { validatePermissions } = require('./validation/permissions.validation');
-const { verifyPermissionsOnUsers } = require("./../middlewares/security/authorization.verification");
+const { verifyPermissionsOnUsers } = require("@middlewares/security/authorization.verification");
 
 const validator = createValidator()
 

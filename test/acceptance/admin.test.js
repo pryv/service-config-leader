@@ -5,7 +5,7 @@
 const regeneratorRuntime = require("regenerator-runtime");
 
 const assert = require('chai').assert;
-const Application = require('../../src/app');
+const Application = require('@root/app');
 const app = new Application();
 const settings = app.settings;
 const platformSettings = app.platformSettings;

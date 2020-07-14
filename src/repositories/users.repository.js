@@ -2,7 +2,7 @@
 
 const _ = require('lodash');
 const bcrypt =  require('bcryptjs');
-const User = require("./../models/user.model");
+const User = require("@models/user.model");
 const { Database, Statement } = require("better-sqlite3");
 
 interface IUsersRepository {

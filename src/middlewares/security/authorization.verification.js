@@ -1,5 +1,5 @@
-const errorsFactory = require('../../utils/errorsHandling').factory;
-const { USERS_PERMISSIONS } = require("./../../models/permissions.model");
+const errorsFactory = require('@utils/errorsHandling').factory;
+const { USERS_PERMISSIONS } = require("@models/permissions.model");
 
 export const verifyPermissionsOnUsers = function (req: Request, res: Response, next: NextFunction) {
 

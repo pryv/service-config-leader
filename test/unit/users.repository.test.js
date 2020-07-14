@@ -3,7 +3,7 @@
 const assert = require('chai').assert;
 const Database = require('better-sqlite3');
 
-import { IUsersRepository, UsersRepository } from  "./../../src/repositories/users.repository";
+import { IUsersRepository, UsersRepository } from  "@repositories/users.repository";
 
 describe('Test Users Repository', function () {
   let db: Database;

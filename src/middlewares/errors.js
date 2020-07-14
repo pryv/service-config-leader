@@ -1,9 +1,9 @@
 // @flow
 
-const errorsHandling = require('../utils/errorsHandling');
+const errorsHandling = require('@utils/errorsHandling');
 const errorsFactory = errorsHandling.factory;
 const ApiError = errorsHandling.ApiError;
-const logging = require('../utils/logging');
+const logging = require('@utils/logging');
 const logger = logging.getLogger('errors');
 
 // Error middleware.

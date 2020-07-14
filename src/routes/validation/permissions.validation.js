@@ -1,5 +1,5 @@
-const errorsFactory = require('./../../utils/errorsHandling').factory;
-const { SETTINGS_PERMISSIONS, USERS_PERMISSIONS } = require("./../../models/permissions.model");
+const errorsFactory = require('@utils/errorsHandling').factory;
+const { SETTINGS_PERMISSIONS, USERS_PERMISSIONS } = require("@models/permissions.model");
 
 export const validatePermissions = 
   function (req: express$Request, res: express$Response, next: express$NextFunction, allowedSettingsPermissionsKeys: Array) {

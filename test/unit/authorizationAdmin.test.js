@@ -4,10 +4,10 @@
 
 const regeneratorRuntime = require("regenerator-runtime");
 
-const settings = require('../../src/settings');
-const middlewares = require('../../src/middlewares');
+const settings = require('@root/settings');
+const middlewares = require('@middlewares');
 const authMiddleware = middlewares.authorizationAdmin(settings);
-const ApiError = require('../../src/utils/errorsHandling').ApiError;
+const ApiError = require('@utils/errorsHandling').ApiError;
 const assert = require('chai').assert;
 
 describe('Authorization-admin middleware', function () {

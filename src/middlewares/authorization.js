@@ -1,6 +1,6 @@
 // @flow
 
-const errorsFactory = require('../utils/errorsHandling').factory;
+const errorsFactory = require('@utils/errorsHandling').factory;
 
 // Middleware that authenticates requesting followers
 // 

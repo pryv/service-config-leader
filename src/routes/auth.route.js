@@ -2,9 +2,9 @@
 
 const { createValidator } = require('express-joi-validation');
 const { userLoginSchema } = require('./validation/user.schema');
-const { IUsersRepository } = require("./../../src/repositories/users.repository");
+const { IUsersRepository } = require("@repositories/users.repository");
 const { sign, verify } = require('jsonwebtoken');
-const { ITokensRepository } = require("./../../src/repositories/tokens.repository");
+const { ITokensRepository } = require("@repositories/tokens.repository");
 
 const validator = createValidator()
 
