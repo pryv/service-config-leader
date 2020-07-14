@@ -18,7 +18,7 @@ module.exports = function (expressApp: express$Application, settings: Object, pl
       const pathToData = settings.get('pathToData');
       const confFolder = path.join(pathToData, role);
 
-      if (! fs.existsSync(confFolder) || ! fs.lstatSync(confFolder).isDirectory()) {
+      if (!fs.existsSync(confFolder) || !fs.lstatSync(confFolder).isDirectory()) {
         throw errorsFactory.notFound(`Configuration folder not found for '${role}'.`);
       }
 
@@ -43,13 +43,14 @@ module.exports = function (expressApp: express$Application, settings: Object, pl
         }
       });
       logger.info(`Sent configuration files. Latest modification on "${latestModifiedFile}" at ${new Date(latestModifiedTime)}`);
-      res.json({files: fullConf});
+      res.json({ files: fullConf });
     } catch (err) {
+      console.error(err);
       next(err);
     }
   });
 
-  function applySubstitutions (template: string): string {
+  function applySubstitutions(template: string): string {
     const platformVars = retrieveFlatSettings(platformSettings.get('vars'));
     const internalVars = settings.get('internals');
 
@@ -63,7 +64,7 @@ module.exports = function (expressApp: express$Application, settings: Object, pl
     function replaceInString(myString: string): string {
       return myString.replace(re, (match) => {
         let replacement = substitutions[match];
-        if(isObjectWithValueProp(substitutions[match])) {
+        if (isObjectWithValueProp(substitutions[match])) {
           replacement = substitutions[match]['value'];
         }
         if (typeof replacement !== 'string') {
@@ -74,15 +75,40 @@ module.exports = function (expressApp: express$Application, settings: Object, pl
     }
 
     function isObjectWithValueProp(obj) {
-      return typeof obj === 'object' && obj['value'];
+      return typeof obj === 'object' && Object.hasOwnProperty.call(obj, 'value');
     }
 
     function retrieveFlatSettings(obj: Object): Object {
-      const settings = {};
-
-      for(let group of Object.keys(obj)) {
-        for(let setting of Object.keys(obj[group]['settings'])) {
-          settings[setting] = obj[group]['settings'][setting];
+      let settings = getAllGroupSettings(obj);
+      settings = minifySettings(settings);
+      return settings;
+    }
+    function getAllGroupSettings(groupedSettings: Object): Object {
+      let settings = {};
+      for (const group of Object.keys(groupedSettings)) {
+        for (const setting of Object.keys(groupedSettings[group]['settings'])) {
+          settings[setting] = groupedSettings[group]['settings'][setting];
+        }
+      }
+      return settings;
+    }
+    function minifySettings(settings: Object): Object {
+      for (const setting of Object.keys(settings)) {
+        if (typeof settings[setting]["value"] === "object" && settings[setting]["value"] != null) {
+          settings[setting]["value"] = removeLowerValueKeysFromSettings(settings[setting]["value"]);
+          console.log(settings[setting]["value"]);
+        }
+      }
+      return settings;
+    }
+    function removeLowerValueKeysFromSettings(settings: Object): Object {
+      for (const setting of Object.keys(settings)) {
+        if (Object.hasOwnProperty.call(settings[setting], 'value')
+          && typeof settings[setting]["value"] === "object"
+          && settings[setting]["value"] != null) {
+          settings[setting]["value"] = removeLowerValueKeysFromSettings(settings[setting]["value"]);
+        } else if (Object.hasOwnProperty.call(settings[setting], 'value')) {
+          settings[setting] = settings[setting]["value"];
         }
       }
       return settings;

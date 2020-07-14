@@ -75,6 +75,7 @@
       },
       "co1": CORE_1
     },
+    "customEntries": DNS_CUSTOM_ENTRIES,
     "domain_A": "SERVICE_WEBSITE_IP_ADDRESS"
   },
   "net": {
@@ -120,5 +121,6 @@
   "airbrake": {
     "disable": true
   },
-  "invitationTokens": null
+  "invitationTokens": INVITATION_TOKENS,
+  "versioning": VERSIONING_SETTINGS
 }

@@ -4,8 +4,9 @@ vars:
     settings:
       DOMAIN:
         value: rec.la
-        description: ''
-      STATIC_WEB_IP_ADDRESS: REPLACE_ME
+        description: ""
+      STATIC_WEB_IP_ADDRESS: 
+        value: false
       REG_MASTER_IP_ADDRESS: REPLACE_ME
       REG_MASTER_VPN_IP_ADDRESS: REPLACE_ME
       REG_SLAVE_IP_ADDRESS: REPLACE_ME
@@ -28,12 +29,25 @@ vars:
           if not used.
         value:
           test:
-            ip: REPLACE_ME
-      DNS_ROOT_DOMAIN_A_RECORD:
+            ip: 1.2.3.4
+      DNS_ROOT_DOMAIN_A_RECORD: 
         value: REPLACE_ME
-        description: >-
-          DNS A record for ${DOMAIN} (The IP adress serving an eventual web page
-          accessible by: http://{DOMAIN})
-  updatedProp:
+        description: "DNS A record for ${DOMAIN} (The IP adress serving an eventual web page accessible by: http://{DOMAIN})"
+  ADVANCED_API_SETTINGS:
+    name: "Advanced API settings"
     settings:
-      value: updatedVal
+      VERSIONING_SETTINGS:
+        value:
+          forceKeepHistory: 
+            value: false
+            description: "When true, modification history of items is stored"
+          deletionMode: 
+            value: keep-authors
+            description: "Defines the behaviour of items deletion.
+            'keep-nothing': Delete history, keep head as itemDeletion as it is now by default.
+            'keep-authors': Keep fields 'headId', 'id', 'modified', 'modifiedBy' in head and history.
+            'keep-everything': Add 'deleted' field to head item, leave history as is."
+      INVITATION_TOKENS: 
+        value: null
+        description: "Allows to define a set of invitation tokens for user creation by providing
+        # an array of strings as well as no check (null) & prevent all (empty array)"

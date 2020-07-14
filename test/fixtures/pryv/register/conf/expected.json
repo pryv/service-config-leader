@@ -58,7 +58,7 @@
     ],
     "staticDataInDomain": {
       "sw": {
-        "ip": "REPLACE_ME"
+        "ip": "false"
       },
       "reg": {
         "ip": "REPLACE_ME"
@@ -77,6 +77,11 @@
       },
       "co1": {
         "ip": "REPLACE_ME"
+      }
+    },
+    "customEntries": {
+      "test": {
+        "ip": "1.2.3.4"
       }
     },
     "domain_A": "REPLACE_ME"
@@ -124,5 +129,9 @@
   "airbrake": {
     "disable": true
   },
-  "invitationTokens": null
+  "invitationTokens": null,
+  "versioning": {
+    "forceKeepHistory": false,
+    "deletionMode": "keep-authors"
+  }
 }
