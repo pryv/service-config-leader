@@ -79,12 +79,20 @@ module.exports = function (expressApp: express$Application, settings: Object, pl
     }
 
     function retrieveFlatSettings(obj: Object): Object {
-      const settings = {};
-      for(const group of Object.keys(obj)) {
-        for(const setting of Object.keys(obj[group]['settings'])) {
-          settings[setting] = obj[group]['settings'][setting];
+      let settings = getAllGroupSettings(obj);
+      settings = minifySettings(settings);
+      return settings;
+    }
+    function getAllGroupSettings(groupedSettings: Object): Object {
+      let settings = {};
+      for(const group of Object.keys(groupedSettings)) {
+        for(const setting of Object.keys(groupedSettings[group]['settings'])) {
+          settings[setting] = groupedSettings[group]['settings'][setting];
         }
       }
+      return settings;
+    }
+    function minifySettings(settings: Object): Object {
       for(const setting of Object.keys(settings)) {
         if(typeof settings[setting]["value"] === "object") {
           settings[setting]["value"] = removeLowerValueKeysFromSettings(settings[setting]["value"]);
