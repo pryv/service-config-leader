@@ -1,18 +1,20 @@
 // @flow
 
-const regeneratorRuntime = require("regenerator-runtime");
+// eslint-disable-next-line no-unused-vars
+const regeneratorRuntime = require('regenerator-runtime');
 
 const assert = require('chai').assert;
+const { describe, before, it, afterEach, beforeEach } = require('mocha');
 const Application = require('@root/app');
 const app = new Application();
 const request = require('supertest')(app.express);
 const { sign } = require('jsonwebtoken');
-const { USERS_PERMISSIONS } = require("@root/models/permissions.model");
+const { USERS_PERMISSIONS } = require('@root/models/permissions.model');
 
 describe('Test /users endpoint', function() {
   const user = {
-    username: "nameX",
-    password: "pass",
+    username: 'nameX',
+    password: 'pass',
     permissions: { users : [ 
       USERS_PERMISSIONS.READ, 
       USERS_PERMISSIONS.CREATE, 
@@ -20,7 +22,7 @@ describe('Test /users endpoint', function() {
       USERS_PERMISSIONS.RESET_PASSWORD, 
       USERS_PERMISSIONS.CHANGE_PERMISSIONS 
     ]}
-  }
+  };
 
   let deleteAllStmt;
 
@@ -33,7 +35,7 @@ describe('Test /users endpoint', function() {
   };
 
   before(function() {
-    deleteAllStmt = app.db.prepare("DELETE FROM users;");
+    deleteAllStmt = app.db.prepare('DELETE FROM users;');
   });
 
   afterEach(function() {
@@ -41,7 +43,7 @@ describe('Test /users endpoint', function() {
   });
 
   describe('POST /users', function() {
-    const deleteUserStmt = app.db.prepare("DELETE FROM users WHERE username = ?;");
+    const deleteUserStmt = app.db.prepare('DELETE FROM users WHERE username = ?;');
 
     afterEach(function() {
       deleteUserStmt.run(user.username);
@@ -69,7 +71,7 @@ describe('Test /users endpoint', function() {
       const res = await request
         .post('/users')
         .set('Authorization', generateToken([ USERS_PERMISSIONS.CREATE ]))
-        .send({ username: "nameX" });
+        .send({ username: 'nameX' });
 
       assert.strictEqual(res.status, 400);
     });
@@ -92,7 +94,7 @@ describe('Test /users endpoint', function() {
   });
   describe('GET /users/:username', function() {
     const createUserStmt = app.db.prepare(
-      "INSERT INTO users(username, password, permissions) VALUES(@username, @password, @permissions);");
+      'INSERT INTO users(username, password, permissions) VALUES(@username, @password, @permissions);');
 
     before(function() {
       createUserStmt.run(Object.assign({}, user, { permissions: JSON.stringify(user.permissions) }));
@@ -110,7 +112,7 @@ describe('Test /users endpoint', function() {
     });
     it('should respond with 404 if requested username does not exist', async () => {
       const res = await request
-        .get(`/users/some_username`)
+        .get('/users/some_username')
         .set('Authorization', generateToken([ USERS_PERMISSIONS.READ ]));
   
       assert.strictEqual(res.status, 404);
@@ -118,7 +120,7 @@ describe('Test /users endpoint', function() {
     });
     it('should respond with 401 given token with all permisions except read', async () => {
       const res = await request
-        .get(`/users/some_username`)
+        .get('/users/some_username')
         .set('Authorization', generateToken(permissionsListExcept(USERS_PERMISSIONS.READ)));
   
       assert.strictEqual(res.status, 401);
@@ -126,17 +128,17 @@ describe('Test /users endpoint', function() {
   });
   describe('GET /users', function() {
     const createUserStmt = app.db.prepare(
-      "INSERT INTO users(username, password, permissions) VALUES(@username, @password, @permissions);");
+      'INSERT INTO users(username, password, permissions) VALUES(@username, @password, @permissions);');
 
     before(function() {
       createUserStmt.run(Object.assign({}, user, { permissions: JSON.stringify(user.permissions) }));
-      createUserStmt.run({ username: "user1", password: "some_pass1", permissions : "{}"});
-      createUserStmt.run({ username: "user2", password: "some_pass2", permissions : "{}"});
+      createUserStmt.run({ username: 'user1', password: 'some_pass1', permissions : '{}'});
+      createUserStmt.run({ username: 'user2', password: 'some_pass2', permissions : '{}'});
     });
 
     it('should respond with 200 and retrieved users list in body', async () => {
       const res = await request
-        .get(`/users`)
+        .get('/users')
         .set('Authorization', generateToken([ USERS_PERMISSIONS.READ ]));
   
       assert.strictEqual(res.status, 200);
@@ -155,7 +157,7 @@ describe('Test /users endpoint', function() {
     });
     it('should respond with 401 given token with all permisions except read', async () => {
       const res = await request
-        .get(`/users`)
+        .get('/users')
         .set('Authorization', generateToken(permissionsListExcept(USERS_PERMISSIONS.READ)));
   
       assert.strictEqual(res.status, 401);
@@ -163,7 +165,7 @@ describe('Test /users endpoint', function() {
   });
   describe('PUT /users/:username/permissions', function() {
     const createUserStmt = app.db.prepare(
-      "INSERT INTO users(username, password, permissions) VALUES(@username, @password, @permissions);");
+      'INSERT INTO users(username, password, permissions) VALUES(@username, @password, @permissions);');
 
     beforeEach(function() {
       createUserStmt.run(Object.assign({}, user, { permissions: JSON.stringify(user.permissions) }));
@@ -171,7 +173,7 @@ describe('Test /users endpoint', function() {
 
     it('should respond with 200 and updated user in body', async () => {
       const newPerms = {
-        permissions: { "users" : [ "resetPassword" ] }
+        permissions: { 'users' : [ 'resetPassword' ] }
       };
 
       const res = await request
@@ -186,7 +188,7 @@ describe('Test /users endpoint', function() {
     });
     it('should respond with 400 given invalid input', async () => {
       const invalidObj = {
-        field1: "xoxo",
+        field1: 'xoxo',
         f2: 45
       };
 
@@ -209,7 +211,7 @@ describe('Test /users endpoint', function() {
   });
   describe('POST /users/:username/reset-password', function() {
     const createUserStmt = app.db.prepare(
-      "INSERT INTO users(username, password, permissions) VALUES(@username, @password, @permissions);");
+      'INSERT INTO users(username, password, permissions) VALUES(@username, @password, @permissions);');
 
     beforeEach(function() {
       createUserStmt.run(Object.assign({}, user, { permissions: JSON.stringify(user.permissions) }));
@@ -233,7 +235,7 @@ describe('Test /users endpoint', function() {
   });
   describe('DELETE /users/:username', function() {
     const createUserStmt = app.db.prepare(
-      "INSERT INTO users(username, password, permissions) VALUES(@username, @password, @permissions);");
+      'INSERT INTO users(username, password, permissions) VALUES(@username, @password, @permissions);');
 
     beforeEach(function() {
       createUserStmt.run(Object.assign({}, user, { permissions: JSON.stringify(user.permissions) }));
@@ -249,7 +251,7 @@ describe('Test /users endpoint', function() {
     });
     it('should respond with 404 given not existing username', async () => {
       const res = await request
-        .delete(`/users/user1`)
+        .delete('/users/user1')
         .set('Authorization', generateToken([ USERS_PERMISSIONS.DELETE ]));
   
       assert.strictEqual(res.status, 404);
@@ -257,7 +259,7 @@ describe('Test /users endpoint', function() {
     });
     it('should respond with 401 given token with all permisions except delete', async () => {
       const res = await request
-        .delete(`/users/some_username`)
+        .delete('/users/some_username')
         .set('Authorization', generateToken(permissionsListExcept(USERS_PERMISSIONS.DELETE)));
   
       assert.strictEqual(res.status, 401);

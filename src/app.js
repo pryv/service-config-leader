@@ -8,8 +8,8 @@ const Database = require('better-sqlite3');
 const { randomBytes } = require('crypto');
 const CronJob = require('cron').CronJob;
 const { UsersRepository, IUsersRepository } = require('@repositories/users.repository');
-const { TokensRepository, ITokensRepository } = require("@repositories/tokens.repository");
-const { USERS_PERMISSIONS } = require("@models/permissions.model");
+const { TokensRepository, ITokensRepository } = require('@repositories/tokens.repository');
+const { USERS_PERMISSIONS } = require('@models/permissions.model');
 
 class Application {
   express: express$Application;
@@ -97,8 +97,8 @@ class Application {
 
   generateInitialUser() {
     const initialUser = {
-      username: "main_user",
-      password: "temp_pass",
+      username: 'main_user',
+      password: 'temp_pass',
       permissions: {
         users: [
           USERS_PERMISSIONS.READ, 

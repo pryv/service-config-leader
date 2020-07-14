@@ -8,7 +8,8 @@
   "scripts": {
     "start": "node_modules/.bin/babel-node src/server.js --config dev-config.json",
     "release": "node_modules/.bin/babel src/ -d dist/",
-    "test": "node_modules/.bin/mocha --require babel-core/register --require module-alias/register --recursive test/ --exit"
+    "test": "node_modules/.bin/mocha --require babel-core/register --require module-alias/register --recursive test/ --exit",
+    "lint": "./node_modules/.bin/eslint ./src ./test"
   },
   "dependencies": {
     "@hapi/joi": "^17.1.1",

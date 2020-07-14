@@ -2,7 +2,8 @@
 
 /*global describe, it */
 
-const regeneratorRuntime = require("regenerator-runtime");
+// eslint-disable-next-line no-unused-vars
+const regeneratorRuntime = require('regenerator-runtime');
 
 const assert = require('chai').assert;
 const Application = require('@root/app');

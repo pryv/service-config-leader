@@ -1,6 +1,6 @@
 // @flow
 
-const { Database, Statement } = require("better-sqlite3");
+const { Database, Statement } = require('better-sqlite3');
 
 interface ITokensRepository {
   blacklist(token: string): string;
@@ -17,16 +17,16 @@ export class TokensRepository implements ITokensRepository {
   constructor(db: Database) {
     this.db = db;
     const tableCreationStatement = this.db.prepare('CREATE TABLE IF NOT EXISTS blacklisted_tokens ' +
-      '(token TEXT NOT NULL UNIQUE);')
+      '(token TEXT NOT NULL UNIQUE);');
     tableCreationStatement.run();
 
     this.prepareStatements();
   }
 
   prepareStatements() {
-    this.addTokenStmt = this.db.prepare("INSERT INTO blacklisted_tokens(token) VALUES(?);");
-    this.getTokenStmt = this.db.prepare("SELECT * FROM blacklisted_tokens WHERE token=?;")
-    this.deleteAllStmt = this.db.prepare("DELETE FROM blacklisted_tokens;");
+    this.addTokenStmt = this.db.prepare('INSERT INTO blacklisted_tokens(token) VALUES(?);');
+    this.getTokenStmt = this.db.prepare('SELECT * FROM blacklisted_tokens WHERE token=?;');
+    this.deleteAllStmt = this.db.prepare('DELETE FROM blacklisted_tokens;');
   }
 
   blacklist(token: string): string {

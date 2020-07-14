@@ -2,12 +2,12 @@
 
 /*global describe, it, beforeEach */
 
-const regeneratorRuntime = require("regenerator-runtime");
+// eslint-disable-next-line no-unused-vars
+const regeneratorRuntime = require('regenerator-runtime');
 
 const settings = require('@root/settings');
 const middlewares = require('@middlewares');
 const authMiddleware = middlewares.authorization(settings);
-const ApiError = require('@utils/errorsHandling').ApiError;
 const assert = require('chai').assert;
 
 describe('Authorization middleware', function () {
@@ -45,7 +45,7 @@ describe('Authorization middleware', function () {
 function expectAPIError(msg: string, status: number) {
   return (err) => {
     assert.isNotNull(err);
-    assert.isTrue(err.hasOwnProperty("httpStatus"));
+    assert.isTrue(Object.hasOwnProperty.call(err, 'httpStatus'));
     // FLOW: err is not null
     const [errMsg, errStatus] = [err.message, err.httpStatus];
     assert.strictEqual(errMsg, msg);

@@ -2,7 +2,8 @@
 
 /*global describe, it, before */
 
-const regeneratorRuntime = require("regenerator-runtime");
+// eslint-disable-next-line no-unused-vars
+const regeneratorRuntime = require('regenerator-runtime');
 
 const assert = require('chai').assert;
 const Application = require('@root/app');
@@ -36,7 +37,7 @@ describe('PUT /admin/settings', function () {
 
   it('updates settings in memory and on disk', async () => {
     const previousSettings = platformSettings.get('vars');
-    const update = {updatedProp: {settings: { "SOME_SETTING": {value: 'updatedVal'}}}};
+    const update = {updatedProp: {settings: { 'SOME_SETTING': {value: 'updatedVal'}}}};
     const updatedSettings = Object.assign({}, previousSettings, update);
 
     const res = await request

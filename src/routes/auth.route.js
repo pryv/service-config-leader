@@ -2,11 +2,11 @@
 
 const { createValidator } = require('express-joi-validation');
 const { userLoginSchema } = require('./validation/user.schema');
-const { IUsersRepository } = require("@repositories/users.repository");
-const { sign, verify } = require('jsonwebtoken');
-const { ITokensRepository } = require("@repositories/tokens.repository");
+const { IUsersRepository } = require('@repositories/users.repository');
+const { sign } = require('jsonwebtoken');
+const { ITokensRepository } = require('@repositories/tokens.repository');
 
-const validator = createValidator()
+const validator = createValidator();
 
 module.exports = function (expressApp: express$Application, 
   usersRepository: IUsersRepository, 
@@ -22,7 +22,7 @@ module.exports = function (expressApp: express$Application,
 
       const passwordCorrect = usersRepository.checkPassword(req.body);
       if(!passwordCorrect) {
-        res.status(401).json(`Authentication failed`);
+        res.status(401).json('Authentication failed');
         return;
       }
 

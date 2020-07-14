@@ -1,18 +1,19 @@
 // @flow
 
 const assert = require('chai').assert;
+const { describe, beforeEach, after, it } = require('mocha');
 const Database = require('better-sqlite3');
 
-import { ITokensRepository, TokensRepository } from  "@repositories/tokens.repository";
+import { ITokensRepository, TokensRepository } from  '@repositories/tokens.repository';
 
 describe('Test Tokens Repository', function () {
   const db: Database = new Database(':memory:', { verbose: console.log }); 
   const tokensRepository: ITokensRepository = new TokensRepository(db);
-  const selectAllTokensStmt = db.prepare("SELECT * FROM blacklisted_tokens;");
-  const deleteAllTokensStmt = db.prepare("DELETE FROM blacklisted_tokens;");
-  const addTokenStmt = db.prepare("INSERT INTO blacklisted_tokens(token) VALUES(?);");
+  const selectAllTokensStmt = db.prepare('SELECT * FROM blacklisted_tokens;');
+  const deleteAllTokensStmt = db.prepare('DELETE FROM blacklisted_tokens;');
+  const addTokenStmt = db.prepare('INSERT INTO blacklisted_tokens(token) VALUES(?);');
 
-  const token = "some_token";
+  const token = 'some_token';
 
   beforeEach(function() {
     deleteAllTokensStmt.run();
@@ -45,7 +46,7 @@ describe('Test Tokens Repository', function () {
   });
   it('should remove all tokens from db', function() {
     addTokenStmt.run(token);
-    addTokenStmt.run("token2");
+    addTokenStmt.run('token2');
 
     tokensRepository.clean();
 

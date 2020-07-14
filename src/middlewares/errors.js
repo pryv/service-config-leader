@@ -12,7 +12,7 @@ const logger = logging.getLogger('errors');
 module.exports = (error: Error | ApiError, req: express$Request, res: express$Response, next: express$NextFunction) => {
   logger.error('Error: ' + error.message, error);
 
-  if (!error.hasOwnProperty("httpStatus")) {
+  if (!Object.hasOwnProperty.call(error, 'httpStatus')) {
     error = errorsFactory.unexpectedError(error);
   }
 

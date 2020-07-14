@@ -71,7 +71,7 @@ module.exports = function (expressApp: express$Application, settings: Object, pl
           return replaceInString(JSON.stringify(replacement));
         }
         return replaceInString(replacement);
-      })
+      });
     }
 
     function isObjectWithValueProp(obj) {
@@ -94,8 +94,8 @@ module.exports = function (expressApp: express$Application, settings: Object, pl
     }
     function minifySettings(settings: Object): Object {
       for (const setting of Object.keys(settings)) {
-        if (typeof settings[setting]["value"] === "object" && settings[setting]["value"] != null) {
-          settings[setting]["value"] = removeLowerValueKeysFromSettings(settings[setting]["value"]);
+        if (typeof settings[setting]['value'] === 'object' && settings[setting]['value'] != null) {
+          settings[setting]['value'] = removeLowerValueKeysFromSettings(settings[setting]['value']);
         }
       }
       return settings;
@@ -103,11 +103,11 @@ module.exports = function (expressApp: express$Application, settings: Object, pl
     function removeLowerValueKeysFromSettings(settings: Object): Object {
       for (const setting of Object.keys(settings)) {
         if (Object.hasOwnProperty.call(settings[setting], 'value')
-          && typeof settings[setting]["value"] === "object"
-          && settings[setting]["value"] != null) {
-          settings[setting]["value"] = removeLowerValueKeysFromSettings(settings[setting]["value"]);
+          && typeof settings[setting]['value'] === 'object'
+          && settings[setting]['value'] != null) {
+          settings[setting]['value'] = removeLowerValueKeysFromSettings(settings[setting]['value']);
         } else if (Object.hasOwnProperty.call(settings[setting], 'value')) {
-          settings[setting] = settings[setting]["value"];
+          settings[setting] = settings[setting]['value'];
         }
       }
       return settings;

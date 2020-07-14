@@ -1,6 +1,8 @@
+// @flow
+
 const { verify } = require('jsonwebtoken');
 const errorsFactory = require('@utils/errorsHandling').factory;
-const { ITokensRepository } = require("@repositories/tokens.repository");
+const { ITokensRepository } = require('@repositories/tokens.repository');
 
 export const verifyToken = function (req: Request, res: Response, next: NextFunction, tokensRepository: ITokensRepository) {
   try {
@@ -14,7 +16,7 @@ export const verifyToken = function (req: Request, res: Response, next: NextFunc
     res.locals.username = user.username;
     res.locals.permissions = user.permissions;
   } catch (err) {
-    throw errorsFactory.unauthorized("Invalid token");
+    throw errorsFactory.unauthorized('Invalid token');
   }
   next();
 };

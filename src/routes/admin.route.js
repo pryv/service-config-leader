@@ -1,6 +1,7 @@
 // @flow
 
-const regeneratorRuntime = require("regenerator-runtime");
+// eslint-disable-next-line no-unused-vars
+const regeneratorRuntime = require('regenerator-runtime');
 
 const request = require('superagent');
 const middlewares = require('@middlewares');

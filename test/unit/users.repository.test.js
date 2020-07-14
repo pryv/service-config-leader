@@ -2,8 +2,9 @@
 
 const assert = require('chai').assert;
 const Database = require('better-sqlite3');
+const { describe, before, it , after} = require('mocha');
 
-import { IUsersRepository, UsersRepository } from  "@repositories/users.repository";
+import { UsersRepository } from  '@repositories/users.repository';
 
 describe('Test Users Repository', function () {
   let db: Database;
@@ -11,26 +12,26 @@ describe('Test Users Repository', function () {
   let selectUserStmt;
 
   const user = {
-    username: "some_name",
-    password: "pass",
-    permissions: { some_cat : "read"}
-  }
+    username: 'some_name',
+    password: 'pass',
+    permissions: { some_cat : 'read'}
+  };
   const newUser = {
-    username : "new_name",
-    password: "new_pass"
-  }
+    username : 'new_name',
+    password: 'new_pass'
+  };
 
   before(function() {
     db = new Database(':memory:', { verbose: console.log }); 
     usersRepository = new UsersRepository(db);
-    selectUserStmt = db.prepare("SELECT * FROM users WHERE username = ?;");
+    selectUserStmt = db.prepare('SELECT * FROM users WHERE username = ?;');
   });
 
   after(function() {
     db.close();
   });
 
-  describe("Create user", function() {
+  describe('Create user', function() {
     let createdUser;
     let savedUser;
 
@@ -51,8 +52,8 @@ describe('Test Users Repository', function () {
       assert.isNotOk(createdUser.password);
       assert.deepEqual(createdUser.permissions, user.permissions);
     });
-  })
-  describe("Find user", function() {
+  });
+  describe('Find user', function() {
     let foundUser;
 
     before(function() {
@@ -67,8 +68,8 @@ describe('Test Users Repository', function () {
     it('should not return password of the user', function() {
       assert.isNotOk(foundUser.password);
     });
-  })
-  describe("Find all users", function() {
+  });
+  describe('Find all users', function() {
     let foundUsers;
     
     before(function() {
@@ -81,14 +82,14 @@ describe('Test Users Repository', function () {
       assert.isOk(foundUsers[0].username, user.username);
       assert.isOk(foundUsers[0].permissions, user.permissions);
     });
-  })
-  describe("Check password", function() {
+  });
+  describe('Check password', function() {
     let checkOfValidPassword;
     let checkOfInvalidPassword;
 
     before(function() {
       checkOfValidPassword = usersRepository.checkPassword(user);
-      checkOfInvalidPassword = usersRepository.checkPassword(Object.assign({}, user, { password : "wrong_pass" }));
+      checkOfInvalidPassword = usersRepository.checkPassword(Object.assign({}, user, { password : 'wrong_pass' }));
     });
 
     it('should return true given valid password', function() {
@@ -97,8 +98,8 @@ describe('Test Users Repository', function () {
     it('should return false given invalid password', function() {
       assert.isNotOk(checkOfInvalidPassword);
     });
-  })
-  describe("Update user", function() {
+  });
+  describe('Update user', function() {
     let updatedUser;
     let savedUser;
 
@@ -121,13 +122,12 @@ describe('Test Users Repository', function () {
       assert.equal(updatedUser.username, newUser.username);
       assert.equal(updatedUser.permissions, newUser.permissions);
     });
-  })
-  describe("Reset password", function() {
-    let updatedUser;
+  });
+  describe('Reset password', function() {
     let savedUser;
 
     before(function() {
-      updatedUser = usersRepository.resetPassword(newUser.username);
+      usersRepository.resetPassword(newUser.username);
       savedUser = selectUserStmt.get(newUser.username);
     });
 
@@ -139,8 +139,8 @@ describe('Test Users Repository', function () {
       assert.notEqual(savedUser.password, newUser.password);
       assert.equal(savedUser.permissions, JSON.stringify(user.permissions));
     });
-  })
-  describe("Delete user", function() {
+  });
+  describe('Delete user', function() {
     let deletedUsername;
     let deletedUser;
 
@@ -155,5 +155,5 @@ describe('Test Users Repository', function () {
     it('should entirely delete user from db', function() {
       assert.isNotOk(deletedUser);
     });
-  })
+  });
 });

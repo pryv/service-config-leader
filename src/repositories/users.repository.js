@@ -2,8 +2,8 @@
 
 const _ = require('lodash');
 const bcrypt =  require('bcryptjs');
-const User = require("@models/user.model");
-const { Database, Statement } = require("better-sqlite3");
+const User = require('@models/user.model');
+const { Database, Statement } = require('better-sqlite3');
 
 interface IUsersRepository {
   createUser(user: User): User;
@@ -29,18 +29,18 @@ export class UsersRepository implements IUsersRepository {
       '(id INTEGER PRIMARY KEY, ' +
       'username TEXT NOT NULL UNIQUE, ' +
       'password TEXT NOT NULL, ' +
-      'permissions TEXT);')
+      'permissions TEXT);');
     tableCreationStatement.run();
 
     this.prepareStatements();
   }
 
   prepareStatements() {
-    this.createUserStmt = this.db.prepare("INSERT INTO users(username, password, permissions) VALUES(@username, @password, @permissions);");
-    this.getUserWithPasswordStmt = this.db.prepare("SELECT username, password FROM users WHERE username = ?;");
-    this.getUserWithPermissionsStmt = this.db.prepare("SELECT username, permissions FROM users WHERE username = ?;");
-    this.getAllUsersStmt = this.db.prepare("SELECT username, permissions FROM users;")
-    this.deleteUserStmt = this.db.prepare("DELETE FROM users WHERE username = ?;");
+    this.createUserStmt = this.db.prepare('INSERT INTO users(username, password, permissions) VALUES(@username, @password, @permissions);');
+    this.getUserWithPasswordStmt = this.db.prepare('SELECT username, password FROM users WHERE username = ?;');
+    this.getUserWithPermissionsStmt = this.db.prepare('SELECT username, permissions FROM users WHERE username = ?;');
+    this.getAllUsersStmt = this.db.prepare('SELECT username, permissions FROM users;');
+    this.deleteUserStmt = this.db.prepare('DELETE FROM users WHERE username = ?;');
   }
 
   createUser(user: User): User {
@@ -71,7 +71,7 @@ export class UsersRepository implements IUsersRepository {
     const password = this.randomString();
     this.updateUser(username, { password: password });
     return { password: password };
-  };
+  }
 
   updateUser(username: string, newUser: User): User {
     const placeholders = Object.keys(newUser).map((key) => `${key} = ?`).join(', ');
@@ -100,11 +100,11 @@ export class UsersRepository implements IUsersRepository {
   }
 
   sanitizeOutput(user: User): User {
-      const sanitizedUser = _.pick(user, ['username', 'permissions']);
-      if(sanitizedUser.permissions) {
-        Object.assign(sanitizedUser, { permissions : JSON.parse(sanitizedUser.permissions)});
-      }
-      return sanitizedUser;
+    const sanitizedUser = _.pick(user, ['username', 'permissions']);
+    if(sanitizedUser.permissions) {
+      Object.assign(sanitizedUser, { permissions : JSON.parse(sanitizedUser.permissions)});
+    }
+    return sanitizedUser;
   }
 
   randomString(): string{
