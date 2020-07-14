@@ -121,5 +121,6 @@
   "airbrake": {
     "disable": true
   },
-  "invitationTokens": null
+  "invitationTokens": null,
+  "versioning": VERSIONING_SETTINGS
 }

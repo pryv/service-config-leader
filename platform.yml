@@ -31,3 +31,17 @@ vars:
       DNS_ROOT_DOMAIN_A_RECORD: 
         value: REPLACE_ME
         description: "DNS A record for ${DOMAIN} (The IP adress serving an eventual web page accessible by: http://{DOMAIN})"
+  ADVANCED_API_SETTINGS:
+    name: "Advanced API settings"
+    settings:
+      VERSIONING_SETTINGS:
+        value:
+          forceKeepHistory: 
+            value: false
+            description: "When true, modification history of items is stored"
+          deletionMode: 
+            value: keep-authors
+            description: "Defines the behaviour of items deletion.
+            'keep-nothing': Delete history, keep head as itemDeletion as it is now by default.
+            'keep-authors': Keep fields 'headId', 'id', 'modified', 'modifiedBy' in head and history.
+            'keep-everything': Add 'deleted' field to head item, leave history as is."
