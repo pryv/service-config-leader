@@ -4,7 +4,7 @@ const errorsFactory = require('@utils/errorsHandling').factory;
 const { SETTINGS_PERMISSIONS, USERS_PERMISSIONS } = require('@models/permissions.model');
 
 export const validatePermissions = 
-  function (req: express$Request, res: express$Response, next: express$NextFunction, allowedSettingsPermissionsKeys: Array) {
+  function (req: express$Request, res: express$Response, next: express$NextFunction) {
     const permissions = req.body.permissions;
     
     if(!permissions || Object.keys(permissions).length == 0) {
@@ -16,7 +16,7 @@ export const validatePermissions =
     }
 
     for(const permissionKey of Object.keys(permissions)) {
-      if(!allowedSettingsPermissionsKeys.includes(permissionKey) && permissionKey !== 'users') {
+      if(permissionKey !== 'settings' && permissionKey !== 'users') {
         throw errorsFactory.unauthorized(`Invalid permission key: ${permissionKey}`);
       }
 

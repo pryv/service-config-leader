@@ -75,8 +75,7 @@ class Application {
 
     require('./routes/conf.route')(expressApp, settings, platformSettings);
     require('./routes/admin.route')(expressApp, settings, platformSettings);
-    require('./routes/users.route')(expressApp, this.usersRepository, this.tokensRepository, 
-      this.allowedSettingsPermissionsKeys(platformSettings));
+    require('./routes/users.route')(expressApp, this.usersRepository, this.tokensRepository);
     require('./routes/auth.route')(expressApp, this.usersRepository, this.tokensRepository);
 
     expressApp.use(middlewares.errors);
@@ -89,10 +88,6 @@ class Application {
       this.tokensRepository.clean();
     }, null, false);
     job.start();
-  }
-
-  allowedSettingsPermissionsKeys(platformSettings: Object) {
-    return Object.keys(platformSettings.get('vars'));
   }
 
   generateInitialUser() {
