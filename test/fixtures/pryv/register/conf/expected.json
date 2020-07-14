@@ -79,6 +79,11 @@
         "ip": "REPLACE_ME"
       }
     },
+    "customEntries": {
+      "test": {
+        "ip": "1.2.3.4"
+      }
+    },
     "domain_A": "REPLACE_ME"
   },
   "net": {
@@ -124,5 +129,9 @@
   "airbrake": {
     "disable": true
   },
-  "invitationTokens": null
+  "invitationTokens": null,
+  "versioning": {
+    "forceKeepHistory": false,
+    "deletionMode": "keep-authors"
+  }
 }
