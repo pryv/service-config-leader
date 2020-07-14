@@ -96,7 +96,6 @@ module.exports = function (expressApp: express$Application, settings: Object, pl
       for (const setting of Object.keys(settings)) {
         if (typeof settings[setting]["value"] === "object" && settings[setting]["value"] != null) {
           settings[setting]["value"] = removeLowerValueKeysFromSettings(settings[setting]["value"]);
-          console.log(settings[setting]["value"]);
         }
       }
       return settings;

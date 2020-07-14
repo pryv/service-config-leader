@@ -87,8 +87,6 @@ describe('POST /admin/notify', function () {
 
     const headers = res.headers;
 
-    console.log(headers);
-
     assert.isDefined(headers['access-control-allow-origin']);
     assert.equal(headers['access-control-allow-origin'], '*');
 

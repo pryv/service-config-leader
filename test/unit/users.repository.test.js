@@ -117,7 +117,7 @@ describe('Test Users Repository', function () {
     });
     it('should return updated user', function() {
       assert.isOk(updatedUser);
-      assert.isOk(updatedUser.password);
+      assert.isNotOk(updatedUser.password);
       assert.equal(updatedUser.username, newUser.username);
       assert.equal(updatedUser.permissions, newUser.permissions);
     });

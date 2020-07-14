@@ -11,7 +11,7 @@ const { USERS_PERMISSIONS } = require("./../../src/models/permissions.model");
 
 describe('Test /users endpoint', function() {
   const user = {
-    username: "some_name",
+    username: "nameX",
     password: "pass",
     permissions: { users : [ 
       USERS_PERMISSIONS.READ, 
