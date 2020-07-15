@@ -14,9 +14,7 @@ module.exports = function (expressApp: express$Application,
   usersRepository: IUsersRepository,
   tokensRepository: ITokensRepository) {
 
-  expressApp.all('/users*',
-    (req: express$Request, res: express$Response, next: express$NextFunction) =>
-      verifyToken(req, res, next, tokensRepository));
+  expressApp.all('/users*', verifyToken(tokensRepository));
 
   expressApp.post('/users', verifyPermissions(USERS_PERMISSIONS.CREATE), validator.body(createUserSchema),
     validatePermissions,

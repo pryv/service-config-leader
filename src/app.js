@@ -9,7 +9,7 @@ const { randomBytes } = require('crypto');
 const CronJob = require('cron').CronJob;
 const { UsersRepository, IUsersRepository } = require('@repositories/users.repository');
 const { TokensRepository, ITokensRepository } = require('@repositories/tokens.repository');
-const { USERS_PERMISSIONS } = require('@models/permissions.model');
+const { USERS_PERMISSIONS, SETTINGS_PERMISSIONS } = require('@models/permissions.model');
 
 class Application {
   express: express$Application;
@@ -35,9 +35,9 @@ class Application {
     this.startTokensBlacklistCleanupJob();
   }
 
-  generateSecrets (settings: Object): void {
+  generateSecrets(settings: Object): void {
     const internalSettings = settings.get('internals');
- 
+
     if (internalSettings == null) return;
 
     for (const [key, value] of Object.entries(internalSettings)) {
@@ -74,17 +74,17 @@ class Application {
     expressApp.use(middlewares.cors);
 
     require('./routes/conf.route')(expressApp, settings, platformSettings);
-    require('./routes/admin.route')(expressApp, settings, platformSettings);
+    require('./routes/admin.route')(expressApp, settings, platformSettings, this.tokensRepository);
     require('./routes/users.route')(expressApp, this.usersRepository, this.tokensRepository);
     require('./routes/auth.route')(expressApp, this.usersRepository, this.tokensRepository);
 
     expressApp.use(middlewares.errors);
-    
+
     return expressApp;
   }
-  
+
   startTokensBlacklistCleanupJob() {
-    const job = new CronJob('0 0 * * 0,3,5', function() {
+    const job = new CronJob('0 0 * * 0,3,5', function () {
       this.tokensRepository.clean();
     }, null, false);
     job.start();
@@ -96,11 +96,15 @@ class Application {
       password: 'temp_pass',
       permissions: {
         users: [
-          USERS_PERMISSIONS.READ, 
-          USERS_PERMISSIONS.CREATE, 
-          USERS_PERMISSIONS.DELETE, 
-          USERS_PERMISSIONS.RESET_PASSWORD, 
+          USERS_PERMISSIONS.READ,
+          USERS_PERMISSIONS.CREATE,
+          USERS_PERMISSIONS.DELETE,
+          USERS_PERMISSIONS.RESET_PASSWORD,
           USERS_PERMISSIONS.CHANGE_PERMISSIONS
+        ],
+        settings: [
+          SETTINGS_PERMISSIONS.READ,
+          SETTINGS_PERMISSIONS.UPDATE
         ]
       }
     };
