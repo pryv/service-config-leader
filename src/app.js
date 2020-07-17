@@ -74,7 +74,7 @@ class Application {
     expressApp.use(middlewares.cors);
 
     require('./routes/conf.route')(expressApp, settings, platformSettings);
-    require('./routes/admin.route')(expressApp, settings, platformSettings, this.tokensRepository);
+    require('./routes/admin.route')(expressApp, settings, platformSettings, this.usersRepository, this.tokensRepository);
     require('./routes/users.route')(expressApp, this.usersRepository, this.tokensRepository);
     require('./routes/auth.route')(expressApp, this.usersRepository, this.tokensRepository);
 

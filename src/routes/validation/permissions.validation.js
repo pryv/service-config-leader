@@ -8,34 +8,34 @@ export const validatePermissions =
     const permissions = req.body.permissions;
     
     if(!permissions || Object.keys(permissions).length == 0) {
-      throw errorsFactory.unauthorized('Permissions property not provided');
+      throw errorsFactory.invalidInput('Permissions property not provided');
     }
 
     if(containsDuplicates(Object.keys(permissions))) {
-      throw errorsFactory.unauthorized('Permissions contain duplicate entries');
+      throw errorsFactory.invalidInput('Permissions contain duplicate entries');
     }
 
     for(const permissionKey of Object.keys(permissions)) {
       if(permissionKey !== 'settings' && permissionKey !== 'users') {
-        throw errorsFactory.unauthorized(`Invalid permission key: ${permissionKey}`);
+        throw errorsFactory.invalidInput(`Invalid permission key: ${permissionKey}`);
       }
 
       const permissionsArray = permissions[permissionKey];
       if(!Array.isArray(permissionsArray)) {
         throw errorsFactory
-          .unauthorized(`Invalid permissions format: ${permissionsArray}, for key: ${permissionKey}. Should be an array`);
+          .invalidInput(`Invalid permissions format: ${permissionsArray}, for key: ${permissionKey}. Should be an array`);
       }
 
       if(permissionKey === 'users') {
         permissionsArray.map(permissionType => {
           if(!Object.values(USERS_PERMISSIONS).includes(permissionType)) {
-            throw errorsFactory.unauthorized(`Invalid permission type: ${permissionType}, for key: ${permissionKey}`);
+            throw errorsFactory.invalidInput(`Invalid permission type: ${permissionType}, for key: ${permissionKey}`);
           }
         });
       } else {
         permissionsArray.map(permissionType => {
           if(!Object.values(SETTINGS_PERMISSIONS).includes(permissionType)) {
-            throw errorsFactory.unauthorized(`Invalid permission type: ${permissionType}, for key: ${permissionKey}`);
+            throw errorsFactory.invalidInput(`Invalid permission type: ${permissionType}, for key: ${permissionKey}`);
           }
         });
       }

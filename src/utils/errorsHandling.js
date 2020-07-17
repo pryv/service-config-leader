@@ -26,8 +26,8 @@ class ErrorsFactory {
     return new ApiError(401, msg);
   }
 
-  invalidParameter(message: ?string) {
-    const msg = message || 'Some of the provided parameters are invalid.';
+  invalidInput(message: ?string) {
+    const msg = message || 'Invalid input';
     return new ApiError(400, msg);
   }
 

@@ -5,17 +5,20 @@ const regeneratorRuntime = require('regenerator-runtime');
 
 const request = require('superagent');
 const logger = require('@utils/logging').getLogger('admin');
-const { verifyPermissions } = require('@middlewares/security/authorization.verification');
 const { SETTINGS_PERMISSIONS } = require('@models/permissions.model');
 const { verifyToken } = require('@middlewares/security/token.verification');
+const { getPermissionsVerificator, IPermissionsVerificator } = require('@middlewares/security/authorization.verification');
 
 module.exports = function (expressApp: express$Application, settings: Object, platformSettings: Object,
+  usersRepository: IUsersRepository,
   tokensRepository: ITokensRepository) {
+
+  const permissionsVerificator: IPermissionsVerificator = getPermissionsVerificator(usersRepository);
 
   expressApp.all('/admin*', verifyToken(tokensRepository));
 
   // PUT /admin/settings: updates current settings and save them to disk
-  expressApp.put('/admin/settings', verifyPermissions(SETTINGS_PERMISSIONS.UPDATE),
+  expressApp.put('/admin/settings', permissionsVerificator.hasPermission(SETTINGS_PERMISSIONS.UPDATE),
     (req: express$Request, res: express$Response, next: express$NextFunction) => {
       const previousSettings = platformSettings.get('vars');
       const newSettings = Object.assign({}, previousSettings, req.body);
@@ -32,7 +35,7 @@ module.exports = function (expressApp: express$Application, settings: Object, pl
     });
 
   // GET /admin/settings: returns current settings as json
-  expressApp.get('/admin/settings', verifyPermissions(SETTINGS_PERMISSIONS.READ),
+  expressApp.get('/admin/settings', permissionsVerificator.hasPermission(SETTINGS_PERMISSIONS.READ),
     (req: express$Request, res: express$Response, next: express$NextFunction) => {
       const currentSettings = platformSettings.get('vars');
       if (currentSettings == null) {
@@ -42,7 +45,7 @@ module.exports = function (expressApp: express$Application, settings: Object, pl
     });
 
   // GET /admin/notify: notifies followers about configuration changes
-  expressApp.post('/admin/notify', verifyPermissions(SETTINGS_PERMISSIONS.UPDATE),
+  expressApp.post('/admin/notify', permissionsVerificator.hasPermission(SETTINGS_PERMISSIONS.UPDATE),
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       const followers = settings.get('followers');
       if (followers == null) {

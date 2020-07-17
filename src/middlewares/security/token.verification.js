@@ -15,7 +15,6 @@ export const verifyToken = (tokensRepository: ITokensRepository) =>
 
       const user = verify(token, process.env.SECRET || '', { ignoreExpiration: false });
       res.locals.username = user.username;
-      res.locals.permissions = user.permissions;
     } catch (err) {
       throw errorsFactory.unauthorized('Invalid token');
     }
