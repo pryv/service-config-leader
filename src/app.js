@@ -88,7 +88,7 @@ class Application {
   startTokensBlacklistCleanupJob() {
     const job = new CronJob('0 0 * * 0,3,5', function () {
       this.tokensRepository.clean();
-    }, null, false);
+    }.bind(this), null, false);
     job.start();
   }
 
