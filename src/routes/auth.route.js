@@ -26,7 +26,7 @@ module.exports = function (expressApp: express$Application,
         return;
       }
 
-      const token = sign({ username: foundUser.username },
+      const token = sign({ username: foundUser.username, permissions: foundUser.permissions },
         process.env.SECRET, { expiresIn: '24h' });
       res.status(200).json({ token });
       next();

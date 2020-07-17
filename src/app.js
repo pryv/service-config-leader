@@ -10,6 +10,7 @@ const CronJob = require('cron').CronJob;
 const { UsersRepository, IUsersRepository } = require('@repositories/users.repository');
 const { TokensRepository, ITokensRepository } = require('@repositories/tokens.repository');
 const { USERS_PERMISSIONS, SETTINGS_PERMISSIONS } = require('@models/permissions.model');
+const morgan = require('morgan');
 
 class Application {
   express: express$Application;
@@ -71,6 +72,7 @@ class Application {
     const expressApp = express();
 
     expressApp.use(express.json());
+    expressApp.use(morgan('dev'));
     expressApp.use(middlewares.cors);
 
     require('./routes/conf.route')(expressApp, settings, platformSettings);
