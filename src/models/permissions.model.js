@@ -5,7 +5,8 @@ type UsersPermissions = "read" | "resetPassword" | "changePermissions" | "create
 type Permission = SettingsPermissions | UsersPermissions;
 
 export interface Permissions {
-  [key: string]: Permission
+  users: ?Array<Permission>,
+  settings: ?Array<Permission>,
 }
 
 export const SETTINGS_PERMISSIONS = Object.freeze({

@@ -53,7 +53,10 @@ export class UsersRepository implements IUsersRepository {
   }
 
   findAllUsers(): User[] {
-    const users = this.getAllUsersStmt.all().map(user => this.sanitizeOutput(user));
+    const users = this.getAllUsersStmt.all().map(user => {
+      const returnedUser = this.sanitizeOutput(user);
+      return new User(_.merge(returnedUser, { repository: this }));
+    });
     return users;
   }
 

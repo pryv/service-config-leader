@@ -21,7 +21,8 @@ module.exports = function (expressApp: express$Application,
   expressApp.post('/users', permissionsVerificator.hasPermission(USERS_PERMISSIONS.CREATE), validator.body(createUserSchema),
     validatePermissions,
     function (req: express$Request, res: express$Response) {
-      const createdUser = usersRepository.createUser(req.body);
+      const createdUser = new User(_.merge(req.body, { repository: usersRepository}));
+      createdUser.save();
       res.status(201).json(createdUser);
     });
 
