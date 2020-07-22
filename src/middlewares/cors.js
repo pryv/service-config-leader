@@ -8,9 +8,9 @@ module.exports = (req: express$Request, res: express$Response, next: express$Nex
   res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
   // *
   res.header('Access-Control-Allow-Methods', req.headers['access-control-request-method'] ||
-    'POST, GET, PUT, OPTIONS');
+    'POST, GET, PUT, OPTIONS, DELETE');
   // *
-  res.header('Access-Control-Allow-Headers', req.headers['access-control-request-headers'] ||
+  res.header('Access-Control-Allow-Headers', req.headers['access-control-allow-headers'] ||
     'Authorization, Content-Type');
   // *
   res.header('Access-Control-Max-Age', (60 * 60 * 24 * 365).toString());
