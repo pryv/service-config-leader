@@ -1,6 +1,6 @@
 {
   "http": {
-    "port": 7003,
+    "port": 7000,
     "ip": "127.0.0.1"
   },
   "logs": {
@@ -16,10 +16,11 @@
   },
   "dataFolder": "test/fixtures",
   "internals": {
+    "tokenSignSecret": "vgkdnnhp4js8nl8m7j1dewkn3ml0baqo",
     "SECRET_ONE": "1234",
-    "SECRET_TWO": "vniefzmuv3qvexrtuivyha1nw73hmws5"
+    "SECRET_TWO": "SECRET"
   },
-  "adminKey": "singlenode-machine-key",
+  "adminKey": "4dmink3y",
   "followers": {
     "singlenode-machine-key": {
       "url": "http://singlenode-follower",
@@ -29,6 +30,5 @@
       "url": "http://valid-follower",
       "role": "unexisting"
     }
-  },
-  "pathToData": "/Users/michalgil/Desktop/Pryv_repos/service-config-leader/test/fixtures"
+  }
 }

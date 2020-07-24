@@ -1,6 +1,19 @@
-{  
-  "presets": [
-    "babel-preset-env",
-    "flow"
+{
+  "presets": ["babel-preset-env", "flow"],
+  "plugins": [
+    [
+      "module-resolver",
+      {
+        "root": ["./src"],
+        "alias": {
+          "@root": "./src",
+          "@middlewares": "./src/middlewares",
+          "@models": "./src/models",
+          "@repositories": "./src/repositories",
+          "@routes": "./src/routes",
+          "@utils": "./src/utils"
+        }
+      }
+    ]
   ]
 }

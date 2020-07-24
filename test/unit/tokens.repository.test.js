@@ -1,58 +1,60 @@
 // @flow
 
-const assert = require('chai').assert;
-const { describe, beforeEach, after, it } = require('mocha');
-const Database = require('better-sqlite3');
+const assert = require("chai").assert;
+const { describe, beforeEach, after, it } = require("mocha");
+const Database = require("better-sqlite3");
 
-import { ITokensRepository, TokensRepository } from  '@repositories/tokens.repository';
+import { TokensRepository } from "@repositories/tokens.repository";
 
-describe('Test Tokens Repository', function () {
-  const db: Database = new Database(':memory:', { verbose: console.log }); 
-  const tokensRepository: ITokensRepository = new TokensRepository(db);
-  const selectAllTokensStmt = db.prepare('SELECT * FROM blacklisted_tokens;');
-  const deleteAllTokensStmt = db.prepare('DELETE FROM blacklisted_tokens;');
-  const addTokenStmt = db.prepare('INSERT INTO blacklisted_tokens(token) VALUES(?);');
+describe("Test Tokens Repository", function () {
+  const db: Database = new Database(":memory:", { verbose: console.log });
+  const tokensRepository: TokensRepository = new TokensRepository(db);
+  const selectAllTokensStmt = db.prepare("SELECT * FROM blacklisted_tokens;");
+  const deleteAllTokensStmt = db.prepare("DELETE FROM blacklisted_tokens;");
+  const addTokenStmt = db.prepare(
+    "INSERT INTO blacklisted_tokens(token) VALUES(?);"
+  );
 
-  const token = 'some_token';
+  const token = "some_token";
 
-  beforeEach(function() {
+  beforeEach(function () {
     deleteAllTokensStmt.run();
   });
 
-  after(function() {
+  after(function () {
     db.close();
   });
 
-  it('should save token in db', function() {
+  it("should save token in db", function () {
     tokensRepository.blacklist(token);
 
     const rows = selectAllTokensStmt.all();
 
-    assert.isOk(rows);
+    assert.exists(rows);
     assert.equal(rows.length, 1);
     assert.equal(rows[0].token, token);
   });
-  it('should return true if token exists in db', function() {
+  it("should return true if token exists in db", function () {
     addTokenStmt.run(token);
 
     const isSavedInDb = tokensRepository.contains(token);
 
-    assert.isOk(isSavedInDb);
+    assert.exists(isSavedInDb);
   });
-  it('should return false if token does not exist in db', function() {
+  it("should return false if token does not exist in db", function () {
     const isSavedInDb = tokensRepository.contains(token);
 
-    assert.isNotOk(isSavedInDb);
+    assert.isFalse(isSavedInDb);
   });
-  it('should remove all tokens from db', function() {
+  it("should remove all tokens from db", function () {
     addTokenStmt.run(token);
-    addTokenStmt.run('token2');
+    addTokenStmt.run("token2");
 
     tokensRepository.clean();
 
     const rows = selectAllTokensStmt.all();
 
-    assert.isOk(rows);
+    assert.exists(rows);
     assert.equal(rows.length, 0);
   });
 });
