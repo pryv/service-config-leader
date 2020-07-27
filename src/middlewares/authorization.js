@@ -1,6 +1,6 @@
 // @flow
 
-const errorsFactory = require("@utils/errorsHandling").factory;
+const errorsFactory = require('@utils/errorsHandling').factory;
 
 // Middleware that authenticates requesting followers
 //
@@ -14,14 +14,14 @@ module.exports = (settings: Object) => {
     if (auth == null) {
       return next(
         errorsFactory.unauthorized(
-          "Missing 'Authorization' header or 'auth' query parameter."
+          'Missing \'Authorization\' header or \'auth\' query parameter.'
         )
       );
     }
 
-    const authorizedFollowers = settings.get("followers");
+    const authorizedFollowers = settings.get('followers');
     if (authorizedFollowers == null || authorizedFollowers[auth] == null) {
-      return next(errorsFactory.unauthorized("Invalid follower key."));
+      return next(errorsFactory.unauthorized('Invalid follower key.'));
     }
 
     // Set role of authorized machine in the context

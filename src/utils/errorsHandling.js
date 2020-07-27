@@ -15,17 +15,17 @@ class ApiError extends Error {
 //
 class ErrorsFactory {
   unexpectedError(error: Error) {
-    const msg = error.message || "Unexpected error.";
+    const msg = error.message || 'Unexpected error.';
     return new ApiError(500, msg);
   }
 
   unauthorized(message: ?string) {
-    const msg = message || "Operation is not authorized.";
+    const msg = message || 'Operation is not authorized.';
     return new ApiError(401, msg);
   }
 
   invalidInput(message: ?string) {
-    const msg = message || "Invalid input";
+    const msg = message || 'Invalid input';
     return new ApiError(400, msg);
   }
 
@@ -35,7 +35,7 @@ class ErrorsFactory {
   }
 
   notFound(message: ?string): ApiError {
-    const msg = message || "Resource not found.";
+    const msg = message || 'Resource not found.';
     return new ApiError(404, msg);
   }
 }

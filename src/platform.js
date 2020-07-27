@@ -1,6 +1,6 @@
 // @flow
 
-const nconf = require("nconf");
+const nconf = require('nconf');
 const store = new nconf.Provider();
 
 // 1. `process.env`
@@ -10,10 +10,10 @@ store.env().argv();
 
 // 3. Values in `platform.json`
 //
-const configFile = store.get("platformConfig") || "platform.yml";
+const configFile = store.get('platformConfig') || 'platform.yml';
 store.file({
   file: configFile,
-  format: require("nconf-yaml"),
+  format: require('nconf-yaml'),
 });
 
 // 4. Any default values

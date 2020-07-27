@@ -1,20 +1,20 @@
 // @flow
 
-const { createValidator } = require("express-joi-validation");
+const { createValidator } = require('express-joi-validation');
 const {
   createUserSchema,
   updatePermissionsSchema,
   changePasswordSchema,
-} = require("./validation/user.schema");
-const { UsersRepository } = require("@repositories/users.repository");
-const { TokensRepository } = require("@repositories/tokens.repository");
-const { verifyToken } = require("@middlewares/security/token.verification");
+} = require('./validation/user.schema');
+const { UsersRepository } = require('@repositories/users.repository');
+const { TokensRepository } = require('@repositories/tokens.repository');
+const { verifyToken } = require('@middlewares/security/token.verification');
 const {
   getAuthorizationService,
   AuthorizationService,
-} = require("@middlewares/security/authorization.service");
-const { USERS_PERMISSIONS } = require("@models/permissions.model");
-import { User } from "@models/user.model";
+} = require('@middlewares/security/authorization.service');
+const { USERS_PERMISSIONS } = require('@models/permissions.model');
+import type { User, UserOptional } from '@models/user.model';
 
 const validator = createValidator();
 
@@ -27,10 +27,10 @@ module.exports = function (
     usersRepository
   );
 
-  expressApp.all("/users*", verifyToken(tokensRepository));
+  expressApp.all('/users*', verifyToken(tokensRepository));
 
   expressApp.post(
-    "/users",
+    '/users',
     authorizationService.verifyIsAllowedTo(USERS_PERMISSIONS.CREATE),
     validator.body(createUserSchema),
     authorizationService.verifyGivenPermissionsNotExceedOwned(),
@@ -41,7 +41,7 @@ module.exports = function (
   );
 
   expressApp.get(
-    "/users",
+    '/users',
     authorizationService.verifyIsAllowedTo(USERS_PERMISSIONS.READ),
     function (req: express$Request, res: express$Response) {
       const retrievedUsers = usersRepository.findAllUsers();
@@ -50,7 +50,7 @@ module.exports = function (
   );
 
   expressApp.get(
-    "/users/:username",
+    '/users/:username',
     authorizationService.verifyIsAllowedTo(USERS_PERMISSIONS.READ),
     function (req: express$Request, res: express$Response) {
       const retrievedUser = usersRepository.findUser(req.params.username);
@@ -63,7 +63,7 @@ module.exports = function (
   );
 
   expressApp.post(
-    "/users/:username/reset-password",
+    '/users/:username/reset-password',
     authorizationService.verifyIsAllowedTo(USERS_PERMISSIONS.RESET_PASSWORD),
     function (req: express$Request, res: express$Response) {
       const updatedUser = usersRepository.resetPassword(req.params.username);
@@ -72,13 +72,13 @@ module.exports = function (
   );
 
   expressApp.post(
-    "/users/:username/change-password",
+    '/users/:username/change-password',
     authorizationService.verifyChangesItself(),
     validator.body(changePasswordSchema),
     function (req: express$Request, res: express$Response) {
       const updatedUser = usersRepository.updateUser(
         req.params.username,
-        ((req.body: any): User)
+        ((req.body: any): UserOptional)
       );
       const token = req.headers.authorization;
       tokensRepository.blacklist(token);
@@ -87,7 +87,7 @@ module.exports = function (
   );
 
   expressApp.put(
-    "/users/:username/permissions",
+    '/users/:username/permissions',
     authorizationService.verifyIsAllowedTo(
       USERS_PERMISSIONS.CHANGE_PERMISSIONS
     ),
@@ -95,14 +95,14 @@ module.exports = function (
     function (req: express$Request, res: express$Response) {
       const updatedUser = usersRepository.updateUser(
         req.params.username,
-        ((req.body: any): User)
+        ((req.body: any): UserOptional)
       );
       res.status(200).json(updatedUser);
     }
   );
 
   expressApp.delete(
-    "/users/:username",
+    '/users/:username',
     authorizationService.verifyIsAllowedTo(USERS_PERMISSIONS.DELETE),
     function (req: express$Request, res: express$Response) {
       const deletedUserName = usersRepository.deleteUser(req.params.username);

@@ -1,21 +1,21 @@
 // @flow
 
-const path = require("path");
-const fs = require("fs");
-const errorsFactory = require("@utils/errorsHandling").factory;
-const middlewares = require("@middlewares");
-const logger = require("@utils/logging").getLogger("conf");
+const path = require('path');
+const fs = require('fs');
+const errorsFactory = require('@utils/errorsHandling').factory;
+const middlewares = require('@middlewares');
+const logger = require('@utils/logging').getLogger('conf');
 
 module.exports = function (
   expressApp: express$Application,
   settings: Object,
   platformSettings: Object
 ) {
-  expressApp.all("/conf", middlewares.authorization(settings));
+  expressApp.all('/conf', middlewares.authorization(settings));
 
   // GET /conf: serve full configuration for given Pryv.io role
   expressApp.get(
-    "/conf",
+    '/conf',
     (
       req: express$Request,
       res: express$Response,
@@ -24,7 +24,7 @@ module.exports = function (
       try {
         const role = req.context.role;
         logger.info(`Received request from ${role}.`);
-        const pathToData = settings.get("pathToData");
+        const pathToData = settings.get('pathToData');
         const confFolder = path.join(pathToData, role);
 
         if (
@@ -41,10 +41,10 @@ module.exports = function (
 
         let fullConf = [];
         let latestModifiedTime = 0;
-        let latestModifiedFile = "";
+        let latestModifiedFile = '';
         list.forEach((file) => {
-          const templateConf = fs.readFileSync(file, "utf8");
-          const fileName = file.replace(confFolder, "");
+          const templateConf = fs.readFileSync(file, 'utf8');
+          const fileName = file.replace(confFolder, '');
           fullConf.push({
             path: fileName,
             content: applySubstitutions(templateConf),
@@ -70,14 +70,14 @@ module.exports = function (
   );
 
   function applySubstitutions(template: string): string {
-    const platformVars = retrieveFlatSettings(platformSettings.get("vars"));
-    const internalVars = settings.get("internals");
+    const platformVars = retrieveFlatSettings(platformSettings.get('vars'));
+    const internalVars = settings.get('internals');
 
     if (platformVars == null && internalVars == null) return template;
 
     let substitutions = Object.assign({}, internalVars, platformVars);
 
-    const re = new RegExp(Object.keys(substitutions).join("|"), "g");
+    const re = new RegExp(Object.keys(substitutions).join('|'), 'g');
     return replaceInString(template);
 
     function replaceInString(myString: string): string {
@@ -86,7 +86,7 @@ module.exports = function (
         if (isObjectWithValueProp(substitutions[match])) {
           replacement = substitutions[match].value;
         }
-        if (typeof replacement !== "string") {
+        if (typeof replacement !== 'string') {
           return replaceInString(JSON.stringify(replacement));
         }
         return replaceInString(replacement);
@@ -95,7 +95,7 @@ module.exports = function (
 
     function isObjectWithValueProp(obj) {
       return (
-        typeof obj === "object" && Object.hasOwnProperty.call(obj, "value")
+        typeof obj === 'object' && Object.hasOwnProperty.call(obj, 'value')
       );
     }
 
@@ -107,8 +107,8 @@ module.exports = function (
     function getAllGroupSettings(groupedSettings: Object): Object {
       let settings = {};
       for (const group of Object.keys(groupedSettings)) {
-        for (const setting of Object.keys(groupedSettings[group]["settings"])) {
-          settings[setting] = groupedSettings[group]["settings"][setting];
+        for (const setting of Object.keys(groupedSettings[group]['settings'])) {
+          settings[setting] = groupedSettings[group]['settings'][setting];
         }
       }
       return settings;
@@ -116,7 +116,7 @@ module.exports = function (
     function minifySettings(settings: Object): Object {
       for (const setting of Object.keys(settings)) {
         if (
-          typeof settings[setting].value === "object" &&
+          typeof settings[setting].value === 'object' &&
           settings[setting].value != null
         ) {
           settings[setting].value = removeLowerValueKeysFromSettings(
@@ -129,14 +129,14 @@ module.exports = function (
     function removeLowerValueKeysFromSettings(settings: Object): Object {
       for (const setting of Object.keys(settings)) {
         if (
-          Object.hasOwnProperty.call(settings[setting], "value") &&
-          typeof settings[setting].value === "object" &&
+          Object.hasOwnProperty.call(settings[setting], 'value') &&
+          typeof settings[setting].value === 'object' &&
           settings[setting].value != null
         ) {
           settings[setting].value = removeLowerValueKeysFromSettings(
             settings[setting].value
           );
-        } else if (Object.hasOwnProperty.call(settings[setting], "value")) {
+        } else if (Object.hasOwnProperty.call(settings[setting], 'value')) {
           settings[setting] = settings[setting].value;
         }
       }

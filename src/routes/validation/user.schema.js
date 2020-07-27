@@ -1,4 +1,4 @@
-const joi = require("@hapi/joi");
+const joi = require('@hapi/joi');
 
 export const userLoginSchema = joi.object().keys({
   username: joi.string().required(),
@@ -12,9 +12,9 @@ export const permissionsSchema = joi.object().keys({
     .items(
       joi
         .string()
-        .valid("read", "create", "changePermissions", "resetPassword", "delete")
+        .valid('read', 'create', 'changePermissions', 'resetPassword', 'delete')
     ),
-  settings: joi.array().required().items(joi.string().valid("read", "update")),
+  settings: joi.array().required().items(joi.string().valid('read', 'update')),
 });
 
 export const createUserSchema = joi.object().keys({

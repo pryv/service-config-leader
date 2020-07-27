@@ -1,13 +1,13 @@
 // @flow
 
-const { createValidator } = require("express-joi-validation");
-const { userLoginSchema } = require("./validation/user.schema");
-const { UsersRepository } = require("@repositories/users.repository");
-const { sign } = require("jsonwebtoken");
-const { TokensRepository } = require("@repositories/tokens.repository");
-const nconfSettings = require("@root/settings.js");
-const { verifyToken } = require("@middlewares/security/token.verification");
-import { User } from "@models/user.model";
+const { createValidator } = require('express-joi-validation');
+const { userLoginSchema } = require('./validation/user.schema');
+const { UsersRepository } = require('@repositories/users.repository');
+const { sign } = require('jsonwebtoken');
+const { TokensRepository } = require('@repositories/tokens.repository');
+const nconfSettings = require('@root/settings.js');
+const { verifyToken } = require('@middlewares/security/token.verification');
+import type { User } from '@models/user.model';
 
 const validator = createValidator();
 
@@ -16,7 +16,7 @@ module.exports = function (
   usersRepository: UsersRepository,
   tokensRepository: TokensRepository
 ) {
-  expressApp.post("/auth/login", validator.body(userLoginSchema), function (
+  expressApp.post('/auth/login', validator.body(userLoginSchema), function (
     req: express$Request,
     res: express$Response,
     next: express$NextFunction
@@ -33,20 +33,20 @@ module.exports = function (
       ((req.body: any): User)
     );
     if (!passwordCorrect) {
-      res.status(401).json("Authentication failed");
+      res.status(401).json('Authentication failed');
       return;
     }
 
     const token = sign(
       { username: foundUser.username, permissions: foundUser.permissions },
-      nconfSettings.get("internals:tokenSignSecret"),
-      { expiresIn: "24h" }
+      nconfSettings.get('internals:tokenSignSecret'),
+      { expiresIn: '24h' }
     );
     res.status(200).json({ token });
     next();
   });
 
-  expressApp.post("/auth/logout", verifyToken(tokensRepository), function (
+  expressApp.post('/auth/logout', verifyToken(tokensRepository), function (
     req: express$Request,
     res: express$Response,
     next: express$NextFunction

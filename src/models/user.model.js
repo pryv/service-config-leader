@@ -1,25 +1,31 @@
 // @flow
 
-import { Permissions } from "./permissions.model";
+import type { Permissions } from './permissions.model';
 
-export interface User {
+export type User = {
   username: string;
   password: string;
   permissions: Permissions;
 }
 
-export interface UserNoPass {
+export type UserNoPass = {
   username: string;
   permissions: Permissions;
 }
 
-export interface UserNoPerms {
+export type UserNoPerms = {
   username: string;
   password: string;
 }
 
-export interface UserOptional {
-  username?: string;
-  password?: string;
-  permissions?: Permissions;
+export type UserOptional = {
+  username?: ?string;
+  password?: ?string;
+  permissions?: ?Permissions;
 }
+
+export type UserDB = {
+  username: string;
+  password: string;
+  permissions: Permissions | string;
+} 

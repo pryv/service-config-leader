@@ -1,19 +1,19 @@
 // @flow
 
-const express = require("express");
-const middlewares = require("@middlewares");
-const nconfSettings = require("./settings.js");
-const platformSettings = require("./platform.js");
-const Database = require("better-sqlite3");
-const CronJob = require("cron").CronJob;
-const { UsersRepository } = require("@repositories/users.repository");
-import { UserNoPerms } from "@models/user.model";
-const { TokensRepository } = require("@repositories/tokens.repository");
+const express = require('express');
+const middlewares = require('@middlewares');
+const nconfSettings = require('./settings.js');
+const platformSettings = require('./platform.js');
+const Database = require('better-sqlite3');
+const CronJob = require('cron').CronJob;
+const { UsersRepository } = require('@repositories/users.repository');
+import type { UserNoPerms } from '@models/user.model';
+const { TokensRepository } = require('@repositories/tokens.repository');
 const {
   USERS_PERMISSIONS,
   SETTINGS_PERMISSIONS,
-} = require("@models/permissions.model");
-const morgan = require("morgan");
+} = require('@models/permissions.model');
+const morgan = require('morgan');
 
 class Application {
   express: express$Application;
@@ -25,7 +25,7 @@ class Application {
   tokensRepository: TokensRepository;
 
   constructor() {
-    this.logger = require("./utils/logging").getLogger("app");
+    this.logger = require('./utils/logging').getLogger('app');
     this.settings = nconfSettings;
     this.platformSettings = platformSettings;
     this.db = this.connectToDb();
@@ -38,19 +38,19 @@ class Application {
   }
 
   generateSecrets(settings: Object): void {
-    const internalSettings = settings.get("internals");
+    const internalSettings = settings.get('internals');
 
     if (internalSettings == null) return;
 
     for (const [key, value] of Object.entries(internalSettings)) {
-      if (value === "SECRET") {
+      if (value === 'SECRET') {
         settings.set(`internals:${key}`, randomAlphaNumKey(32));
       }
     }
 
     settings.save((err) => {
       if (err) {
-        this.logger.error("Error when saving secrets.", err);
+        this.logger.error('Error when saving secrets.', err);
       }
     });
 
@@ -58,12 +58,12 @@ class Application {
       return Array(size)
         .fill(0)
         .map(() => Math.random().toString(36).charAt(2))
-        .join("");
+        .join('');
     }
   }
 
   connectToDb(): Database {
-    return new Database("config-user-management.db");
+    return new Database('config-user-management.db');
   }
 
   disconnectFromDb() {
@@ -77,23 +77,23 @@ class Application {
     const expressApp = express();
 
     expressApp.use(express.json());
-    expressApp.use(morgan("dev"));
+    expressApp.use(morgan('dev'));
     expressApp.use(middlewares.cors);
 
-    require("./routes/conf.route")(expressApp, settings, platformSettings);
-    require("./routes/admin.route")(
+    require('./routes/conf.route')(expressApp, settings, platformSettings);
+    require('./routes/admin.route')(
       expressApp,
       settings,
       platformSettings,
       this.usersRepository,
       this.tokensRepository
     );
-    require("./routes/users.route")(
+    require('./routes/users.route')(
       expressApp,
       this.usersRepository,
       this.tokensRepository
     );
-    require("./routes/auth.route")(
+    require('./routes/auth.route')(
       expressApp,
       this.usersRepository,
       this.tokensRepository
@@ -106,7 +106,7 @@ class Application {
 
   startTokensBlacklistCleanupJob() {
     const job = new CronJob(
-      "0 0 * * 0,3,5",
+      '0 0 * * 0,3,5',
       function () {
         this.tokensRepository.clean();
       }.bind(this),
@@ -118,8 +118,8 @@ class Application {
 
   generateInitialUser() {
     const initialUser = {
-      username: "initial_user",
-      password: "temp_pass",
+      username: 'initial_user',
+      password: 'temp_pass',
       permissions: {
         users: [
           USERS_PERMISSIONS.READ,

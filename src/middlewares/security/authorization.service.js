@@ -1,9 +1,10 @@
 // @flow
 
-const errorsFactory = require("@utils/errorsHandling").factory;
-import type { Permission } from "@models/permissions.model";
-const { UsersRepository } = require("@repositories/users.repository");
-import { User } from "@models/user.model";
+const errorsFactory = require('@utils/errorsHandling').factory;
+import type { Permission } from '@models/permissions.model';
+const { UsersRepository } = require('@repositories/users.repository');
+import type { User, UserNoPass } from '@models/user.model';
+import type { PermissionsGroup, Permissions } from '@models/permissions.model';
 
 let AUTHORIZATION_SERVICE: AuthorizationService;
 
@@ -30,19 +31,21 @@ export class AuthorizationService {
       next: express$NextFunction
     ) {
       try {
-        const permissionsGroup = req.path.startsWith("/users")
-          ? "users"
-          : "settings";
+        const permissionsGroup: PermissionsGroup = req.path.startsWith('/users')
+          ? 'users'
+          : 'settings';
         const username = ((res.locals.username: any): string);
         const user = this.usersRepository.findUser(username);
-        if (!user || !user.permissions || !user.permissions[permissionsGroup]) {
+
+        if(!user) {
           throw new Error();
         }
 
+        this.checkHasPermissionsOnGroup(user, permissionsGroup)
         this.checkHasPermission(permission, user.permissions[permissionsGroup]);
         next();
       } catch (err) {
-        next(errorsFactory.unauthorized("Insufficient permissions"));
+        next(errorsFactory.unauthorized('Insufficient permissions'));
       }
     }.bind(this);
   }
@@ -57,7 +60,7 @@ export class AuthorizationService {
       const usernameFromPath = req.params.username;
 
       if (!usernameFromToken || usernameFromToken !== usernameFromPath) {
-        throw errorsFactory.unauthorized("Insufficient permissions");
+        throw errorsFactory.unauthorized('Insufficient permissions');
       }
       next();
     };
@@ -72,12 +75,15 @@ export class AuthorizationService {
       try {
         const username = ((res.locals.username: any): string);
         const user = this.usersRepository.findUser(username);
-        if (!user || !user.permissions || !user.permissions.users) {
+
+        if(!user) {
           throw new Error();
         }
 
-        const userToCreatePermissions = ((req.body: any): User).permissions;
-        for (const permissionsGroup of ["users", "settings"]) {
+        this.checkHasPermissionsOnGroup(user, 'users')
+
+        const userToCreatePermissions: Permissions = ((req.body: any): User).permissions;
+        for (const permissionsGroup of ['users', 'settings']) {
           for (const permission of userToCreatePermissions[permissionsGroup]) {
             this.checkHasPermission(
               permission,
@@ -88,7 +94,7 @@ export class AuthorizationService {
 
         next();
       } catch (err) {
-        next(errorsFactory.unauthorized("Insufficient permissions"));
+        next(errorsFactory.unauthorized('Insufficient permissions'));
       }
     }.bind(this);
   }
@@ -98,6 +104,12 @@ export class AuthorizationService {
     permissions: Permission[]
   ) {
     if (!permissions.includes(expectedPermission)) {
+      throw new Error();
+    }
+  }
+
+  checkHasPermissionsOnGroup(user: UserNoPass, group: PermissionsGroup): void {
+    if (!user || !user.permissions || !user.permissions[group]) {
       throw new Error();
     }
   }

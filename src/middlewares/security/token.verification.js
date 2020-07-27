@@ -1,9 +1,9 @@
 // @flow
 
-const { verify } = require("jsonwebtoken");
-const errorsFactory = require("@utils/errorsHandling").factory;
-const { TokensRepository } = require("@repositories/tokens.repository");
-const nconfSettings = require("@root/settings.js");
+const { verify } = require('jsonwebtoken');
+const errorsFactory = require('@utils/errorsHandling').factory;
+const { TokensRepository } = require('@repositories/tokens.repository');
+const nconfSettings = require('@root/settings.js');
 
 export const verifyToken = (tokensRepository: TokensRepository) =>
   function (
@@ -20,14 +20,14 @@ export const verifyToken = (tokensRepository: TokensRepository) =>
 
       const user = verify(
         token,
-        nconfSettings.get("internals:tokenSignSecret") || "",
+        nconfSettings.get('internals:tokenSignSecret') || '',
         {
           ignoreExpiration: false,
         }
       );
       res.locals.username = user.username;
     } catch (err) {
-      throw errorsFactory.unauthorized("Invalid token");
+      throw errorsFactory.unauthorized('Invalid token');
     }
     next();
   };

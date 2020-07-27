@@ -1,7 +1,7 @@
 // @flow
 
-const winston = require("winston");
-const settings = require("../settings");
+const winston = require('winston');
+const settings = require('../settings');
 
 // Setup logging levels (match logging methods below)
 const levels = Object.freeze({
@@ -12,24 +12,24 @@ const levels = Object.freeze({
 });
 winston.setLevels(levels);
 winston.addColors({
-  debug: "blue",
-  info: "green",
-  warn: "yellow",
-  error: "red",
+  debug: 'blue',
+  info: 'green',
+  warn: 'yellow',
+  error: 'red',
 });
 
 // Spply settings
-const logsSettings = settings.get("logs");
+const logsSettings = settings.get('logs');
 
 // (Console transport is present by default)
-let consoleSettings = winston["default"].transports.console;
+let consoleSettings = winston['default'].transports.console;
 consoleSettings.silent = !logsSettings.console.active;
 if (logsSettings.console.active) {
   consoleSettings.level = logsSettings.console.level;
   consoleSettings.colorize = logsSettings.console.colorize;
   consoleSettings.timestamp = logsSettings.console.timestamp || true;
 }
-if (winston["default"].transports.file) {
+if (winston['default'].transports.file) {
   // In production env it seems winston already includes a file transport...
   winston.remove(winston.transports.File);
 }
@@ -51,7 +51,7 @@ const prefix = logsSettings.prefix;
 // loggers to only use one logger per component name.
 //
 module.exports.getLogger = function (componentName: string): Logger {
-  const context = prefix + ":" + componentName;
+  const context = prefix + ':' + componentName;
 
   // Return memoized instance if we have produced it before.
   const existingLogger = loggers.get(context);
@@ -77,21 +77,21 @@ class LoggerImpl implements Logger {
 
   // Creates a new logger for the given component.
   constructor(context?: string, winstonLogger) {
-    this.messagePrefix = context ? "[" + context + "] " : "";
+    this.messagePrefix = context ? '[' + context + '] ' : '';
     this.winstonLogger = winstonLogger;
   }
 
   debug(msg: string, metaData?: {}) {
-    this.log("debug", msg, metaData);
+    this.log('debug', msg, metaData);
   }
   info(msg: string, metaData?: {}) {
-    this.log("info", msg, metaData);
+    this.log('info', msg, metaData);
   }
   warn(msg: string, metaData?: {}) {
-    this.log("warn", msg, metaData);
+    this.log('warn', msg, metaData);
   }
   error(msg: string, metaData?: {}) {
-    this.log("error", msg, metaData);
+    this.log('error', msg, metaData);
   }
 
   log(level: string, message: string, metaData?: {}) {

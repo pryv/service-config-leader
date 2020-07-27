@@ -1,18 +1,18 @@
 // @flow
 
 // eslint-disable-next-line no-unused-vars
-const regeneratorRuntime = require("regenerator-runtime");
+const regeneratorRuntime = require('regenerator-runtime');
 
-const request = require("superagent");
-const logger = require("@utils/logging").getLogger("admin");
-const { SETTINGS_PERMISSIONS } = require("@models/permissions.model");
-const { verifyToken } = require("@middlewares/security/token.verification");
+const request = require('superagent');
+const logger = require('@utils/logging').getLogger('admin');
+const { SETTINGS_PERMISSIONS } = require('@models/permissions.model');
+const { verifyToken } = require('@middlewares/security/token.verification');
 const {
   getAuthorizationService,
   AuthorizationService,
-} = require("@middlewares/security/authorization.service");
-const { UsersRepository } = require("@repositories/users.repository");
-const { TokensRepository } = require("@repositories/tokens.repository");
+} = require('@middlewares/security/authorization.service');
+const { UsersRepository } = require('@repositories/users.repository');
+const { TokensRepository } = require('@repositories/tokens.repository');
 
 module.exports = function (
   expressApp: express$Application,
@@ -25,25 +25,25 @@ module.exports = function (
     usersRepository
   );
 
-  expressApp.all("/admin*", verifyToken(tokensRepository));
+  expressApp.all('/admin*', verifyToken(tokensRepository));
 
   // PUT /admin/settings: updates current settings and save them to disk
   expressApp.put(
-    "/admin/settings",
+    '/admin/settings',
     authorizationService.verifyIsAllowedTo(SETTINGS_PERMISSIONS.UPDATE),
     (
       req: express$Request,
       res: express$Response,
       next: express$NextFunction
     ) => {
-      const previousSettings = platformSettings.get("vars");
+      const previousSettings = platformSettings.get('vars');
       const newSettings = Object.assign({}, previousSettings, req.body);
 
-      platformSettings.set("vars", newSettings);
+      platformSettings.set('vars', newSettings);
 
       platformSettings.save((err) => {
         if (err) {
-          platformSettings.set("vars", previousSettings);
+          platformSettings.set('vars', previousSettings);
           return next(err);
         }
         res.send(newSettings);
@@ -53,16 +53,16 @@ module.exports = function (
 
   // GET /admin/settings: returns current settings as json
   expressApp.get(
-    "/admin/settings",
+    '/admin/settings',
     authorizationService.verifyIsAllowedTo(SETTINGS_PERMISSIONS.READ),
     (
       req: express$Request,
       res: express$Response,
       next: express$NextFunction
     ) => {
-      const currentSettings = platformSettings.get("vars");
+      const currentSettings = platformSettings.get('vars');
       if (currentSettings == null) {
-        next(new Error("Missing platform settings."));
+        next(new Error('Missing platform settings.'));
       }
       res.json(currentSettings);
     }
@@ -70,16 +70,16 @@ module.exports = function (
 
   // GET /admin/notify: notifies followers about configuration changes
   expressApp.post(
-    "/admin/notify",
+    '/admin/notify',
     authorizationService.verifyIsAllowedTo(SETTINGS_PERMISSIONS.UPDATE),
     async (
       req: express$Request,
       res: express$Response,
       next: express$NextFunction
     ) => {
-      const followers = settings.get("followers");
+      const followers = settings.get('followers');
       if (followers == null) {
-        next(new Error("Missing followers settings."));
+        next(new Error('Missing followers settings.'));
       }
 
       let successes = {};
@@ -89,10 +89,10 @@ module.exports = function (
         try {
           await request
             .post(`${followerUrl}/notify`)
-            .set("Authorization", auth);
+            .set('Authorization', auth);
           successes[auth] = follower;
         } catch (err) {
-          logger.warn("Error while notifying follower:", err);
+          logger.warn('Error while notifying follower:', err);
           failures[auth] = follower;
         }
       }
