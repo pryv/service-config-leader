@@ -7,7 +7,7 @@ import type {
   UserNoPass,
   UserNoPerms,
   UserOptional,
-  UserDB
+  UserDB,
 } from '@models/user.model';
 const { Database, Statement } = require('better-sqlite3');
 const cryptoRandomString = require('crypto-random-string');
@@ -77,9 +77,10 @@ export class UsersRepository {
     return row ? this.sanitizeOutput(row) : null;
   }
 
-  isPasswordValid(user: User): boolean {
+  isPasswordValid(user: UserNoPerms): boolean {
+    console.log(user);
     const row = this.getUserWithPasswordStmt.get(user.username);
-    return bcrypt.compareSync(user.password, row.password);
+    return row && bcrypt.compareSync(user.password, row.password);
   }
 
   resetPassword(username: string): UserNoPerms {

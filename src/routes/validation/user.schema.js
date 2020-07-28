@@ -28,5 +28,7 @@ export const updatePermissionsSchema = joi.object().keys({
 });
 
 export const changePasswordSchema = joi.object().keys({
-  password: joi.string().required(),
+  oldPassword: joi.string().required(),
+  newPassword: joi.string().required(),
+  newPasswordCheck: joi.string().required(),
 });

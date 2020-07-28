@@ -10,7 +10,7 @@ const app = new Application();
 const request = require('supertest')(app.express);
 const { sign } = require('jsonwebtoken');
 const { USERS_PERMISSIONS } = require('@root/models/permissions.model');
-import type { User, UserNoPerms } from '@models/user.model';
+import type { User, UserNoPerms, UserPasswordChange } from '@models/user.model';
 
 describe('Test /users endpoint', function () {
   const user = {
@@ -330,9 +330,24 @@ describe('Test /users endpoint', function () {
     });
   });
   describe('POST /users/:username/change-password', function () {
+    const passwordChangeInput: UserPasswordChange = {
+      oldPassword: 'oldpass',
+      newPassword: 'newPass',
+      newPasswordCheck: 'newPass',
+    };
     const usernameToChangePasswordOn = 'usernameToChangePasswordOn';
     let tokenToChangePasswordOn;
-    before(() => {
+    beforeEach(function () {
+      app.usersRepository.createUser(
+        (({
+          username: usernameToChangePasswordOn,
+          password: passwordChangeInput.oldPassword,
+          permissions: {
+            settings: [],
+            users: [],
+          },
+        }: any): User)
+      );
       tokenToChangePasswordOn = generateToken(usernameToChangePasswordOn);
     });
 
@@ -342,16 +357,40 @@ describe('Test /users endpoint', function () {
       const res = await request
         .post(`/users/${username}/change-password`)
         .set('Authorization', token)
-        .send({ password: 'some_pass' });
+        .send(passwordChangeInput);
 
       assert.strictEqual(res.status, 401);
       assert.include(res.error.text, 'Insufficient permissions');
     });
-    it('should respond with 200 and username in body', async () => {
+    it('should respond with 401 given invalid old password', async () => {
       const res = await request
         .post(`/users/${usernameToChangePasswordOn}/change-password`)
         .set('Authorization', tokenToChangePasswordOn)
-        .send({ password: 'some_pass' });
+        .send(
+          Object.assign({}, passwordChangeInput, { oldPassword: 'wrongpass' })
+        );
+
+      assert.strictEqual(res.status, 401);
+      assert.include(res.error.text, 'Invalid password');
+    });
+    it('should respond with 400 given not matching new passwords', async () => {
+      const res = await request
+        .post(`/users/${usernameToChangePasswordOn}/change-password`)
+        .set('Authorization', tokenToChangePasswordOn)
+        .send(
+          Object.assign({}, passwordChangeInput, {
+            newPasswordCheck: 'wrongpass',
+          })
+        );
+
+      assert.strictEqual(res.status, 400);
+      assert.include(res.error.text, 'Passwords do not match');
+    });
+    it('should respond with 200 and no password in body', async () => {
+      const res = await request
+        .post(`/users/${usernameToChangePasswordOn}/change-password`)
+        .set('Authorization', tokenToChangePasswordOn)
+        .send(passwordChangeInput);
 
       assert.strictEqual(res.status, 200);
       assert.notExists(res.body.password);

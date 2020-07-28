@@ -3,7 +3,12 @@
 const errorsFactory = require('@utils/errorsHandling').factory;
 import type { Permission } from '@models/permissions.model';
 const { UsersRepository } = require('@repositories/users.repository');
-import type { User, UserNoPass } from '@models/user.model';
+import type {
+  User,
+  UserNoPass,
+  UserNoPerms,
+  UserPasswordChange,
+} from '@models/user.model';
 import type { PermissionsGroup, Permissions } from '@models/permissions.model';
 
 let AUTHORIZATION_SERVICE: AuthorizationService;
@@ -37,11 +42,11 @@ export class AuthorizationService {
         const username = ((res.locals.username: any): string);
         const user = this.usersRepository.findUser(username);
 
-        if(!user) {
+        if (!user) {
           throw new Error();
         }
 
-        this.checkHasPermissionsOnGroup(user, permissionsGroup)
+        this.checkHasPermissionsOnGroup(user, permissionsGroup);
         this.checkHasPermission(permission, user.permissions[permissionsGroup]);
         next();
       } catch (err) {
@@ -66,6 +71,33 @@ export class AuthorizationService {
     };
   }
 
+  verifyOldPasswordValid() {
+    return function (
+      req: express$Request,
+      res: express$Response,
+      next: express$NextFunction
+    ) {
+      const username = (res.locals: any).username;
+      const oldPassword = ((req.body: any): UserPasswordChange).oldPassword;
+      const newPassword = ((req.body: any): UserPasswordChange).newPassword;
+      const newPasswordCheck = ((req.body: any): UserPasswordChange)
+        .newPasswordCheck;
+
+      const user: UserNoPerms = ({
+        username: username,
+        password: oldPassword,
+      }: UserNoPerms);
+      const passwordValid = this.usersRepository.isPasswordValid(user);
+      if (!passwordValid) {
+        throw errorsFactory.unauthorized('Invalid password');
+      }
+      if (newPassword !== newPasswordCheck) {
+        throw errorsFactory.invalidInput('Passwords do not match');
+      }
+      next();
+    }.bind(this);
+  }
+
   verifyGivenPermissionsNotExceedOwned() {
     return function (
       req: express$Request,
@@ -76,13 +108,14 @@ export class AuthorizationService {
         const username = ((res.locals.username: any): string);
         const user = this.usersRepository.findUser(username);
 
-        if(!user) {
+        if (!user) {
           throw new Error();
         }
 
-        this.checkHasPermissionsOnGroup(user, 'users')
+        this.checkHasPermissionsOnGroup(user, 'users');
 
-        const userToCreatePermissions: Permissions = ((req.body: any): User).permissions;
+        const userToCreatePermissions: Permissions = ((req.body: any): User)
+          .permissions;
         for (const permissionsGroup of ['users', 'settings']) {
           for (const permission of userToCreatePermissions[permissionsGroup]) {
             this.checkHasPermission(

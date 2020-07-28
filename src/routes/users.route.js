@@ -14,7 +14,11 @@ const {
   AuthorizationService,
 } = require('@middlewares/security/authorization.service');
 const { USERS_PERMISSIONS } = require('@models/permissions.model');
-import type { User, UserOptional } from '@models/user.model';
+import type {
+  User,
+  UserOptional,
+  UserPasswordChange,
+} from '@models/user.model';
 
 const validator = createValidator();
 
@@ -74,11 +78,15 @@ module.exports = function (
   expressApp.post(
     '/users/:username/change-password',
     authorizationService.verifyChangesItself(),
+    authorizationService.verifyOldPasswordValid(),
     validator.body(changePasswordSchema),
     function (req: express$Request, res: express$Response) {
+      const newPassword: UserOptional = {
+        password: ((req.body: any): UserPasswordChange).newPassword,
+      };
       const updatedUser = usersRepository.updateUser(
         req.params.username,
-        ((req.body: any): UserOptional)
+        newPassword
       );
       const token = req.headers.authorization;
       tokensRepository.blacklist(token);

@@ -13,7 +13,7 @@ module.exports = (
   // eslint-disable-next-line no-unused-vars
   next: express$NextFunction
 ) => {
-  logger.error('Error: ' + error.message, error);
+  logger.error('Error: ' + error.message);
 
   if (!Object.hasOwnProperty.call(error, 'httpStatus')) {
     error = errorsFactory.unexpectedError(error);
