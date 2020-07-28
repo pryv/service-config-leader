@@ -46,8 +46,6 @@ describe('Test /users endpoint', function () {
   };
 
   before(() => {
-    console.log(app.settings.get('internals:tokenSignSecret'));
-
     token = generateToken(user.username);
   });
 
