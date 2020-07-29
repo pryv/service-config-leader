@@ -17,3 +17,4 @@ build/build_tag
 build/release.tar
 test_results/
 .vscode/
+config-user-management.db

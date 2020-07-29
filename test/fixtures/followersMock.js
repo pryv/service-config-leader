@@ -15,8 +15,7 @@ module.exports = function (): void {
         if (headerValue === auth) {
           status = 200;
           result = 'OK';
-        }
-        else {
+        } else {
           status = 403;
           result = 'Unauthorized.';
         }

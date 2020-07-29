@@ -8,14 +8,14 @@ const levels = Object.freeze({
   debug: 3,
   info: 2,
   warn: 1,
-  error: 0
+  error: 0,
 });
 winston.setLevels(levels);
 winston.addColors({
   debug: 'blue',
   info: 'green',
   warn: 'yellow',
-  error: 'red'
+  error: 'red',
 });
 
 // Spply settings
@@ -23,7 +23,7 @@ const logsSettings = settings.get('logs');
 
 // (Console transport is present by default)
 let consoleSettings = winston['default'].transports.console;
-consoleSettings.silent = ! logsSettings.console.active;
+consoleSettings.silent = !logsSettings.console.active;
 if (logsSettings.console.active) {
   consoleSettings.level = logsSettings.console.level;
   consoleSettings.colorize = logsSettings.console.colorize;
@@ -40,7 +40,7 @@ if (logsSettings.file.active) {
     maxsize: logsSettings.file.maxFileBytes,
     maxFiles: logsSettings.file.maxNbFiles,
     timestamp: true,
-    json: false
+    json: false,
   });
 }
 
@@ -52,35 +52,35 @@ const prefix = logsSettings.prefix;
 //
 module.exports.getLogger = function (componentName: string): Logger {
   const context = prefix + ':' + componentName;
-  
+
   // Return memoized instance if we have produced it before.
   const existingLogger = loggers.get(context);
   if (existingLogger) return existingLogger;
-  
-  // Construct a new instance. We're passing winston as a logger here. 
+
+  // Construct a new instance. We're passing winston as a logger here.
   const logger = new LoggerImpl(context, winston);
   loggers.set(context, logger);
-  
-  return logger; 
+
+  return logger;
 };
 
 interface Logger {
-  debug(msg: string, metaData?: {}): void; 
+  debug(msg: string, metaData?: {}): void;
   info(msg: string, metaData?: {}): void;
-  warn(msg: string, metaData?: {}): void; 
-  error(msg: string, metaData?: {}): void; 
+  warn(msg: string, metaData?: {}): void;
+  error(msg: string, metaData?: {}): void;
 }
 
 class LoggerImpl implements Logger {
-  messagePrefix: string; 
-  winstonLogger: any; 
-  
+  messagePrefix: string;
+  winstonLogger: any;
+
   // Creates a new logger for the given component.
   constructor(context?: string, winstonLogger) {
     this.messagePrefix = context ? '[' + context + '] ' : '';
     this.winstonLogger = winstonLogger;
   }
-  
+
   debug(msg: string, metaData?: {}) {
     this.log('debug', msg, metaData);
   }
@@ -93,11 +93,11 @@ class LoggerImpl implements Logger {
   error(msg: string, metaData?: {}) {
     this.log('error', msg, metaData);
   }
-  
+
   log(level: string, message: string, metaData?: {}) {
     const msg = this.messagePrefix + message;
     const meta = metaData ? JSON.stringify(metaData) : {};
-    
+
     this.winstonLogger[level](msg, meta);
   }
 }

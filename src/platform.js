@@ -13,7 +13,7 @@ store.env().argv();
 const configFile = store.get('platformConfig') || 'platform.yml';
 store.file({
   file: configFile,
-  format: require('nconf-yaml')
+  format: require('nconf-yaml'),
 });
 
 // 4. Any default values

@@ -16,6 +16,7 @@
   },
   "dataFolder": "test/fixtures",
   "internals": {
+    "tokenSignSecret": "vgkdnnhp4js8nl8m7j1dewkn3ml0baqo",
     "SECRET_ONE": "1234",
     "SECRET_TWO": "SECRET"
   },

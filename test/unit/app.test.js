@@ -2,11 +2,13 @@
 
 /*global describe, it */
 
+// eslint-disable-next-line no-unused-vars
+const regeneratorRuntime = require('regenerator-runtime');
+
 const assert = require('chai').assert;
-const Application = require('../../src/app');
+const Application = require('@root/app');
 
 describe('Application', function () {
-
   it('generates random secrets at startup, if needed', async () => {
     const app = new Application();
     const internals = app.settings.get('internals');

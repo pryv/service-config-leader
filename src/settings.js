@@ -12,7 +12,7 @@ store.env().argv();
 // 3. Values in `config.json`
 //
 const configFile = store.get('config') || 'dev-config.json';
-store.file({ file: configFile});
+store.file({ file: configFile });
 
 // 4. Any default values
 //
@@ -26,16 +26,21 @@ store.defaults({
     console: {
       active: true,
       level: 'info',
-      colorize: true
+      colorize: true,
     },
     file: {
-      active: false
+      active: false,
     },
     dataFolder: '/app/data',
   },
-  internals: {},
+  internals: {
+    tokenSignSecret: 'SECRET',
+  },
 });
 
-store.set('pathToData', path.resolve(__dirname, '../', store.get('dataFolder')));
+store.set(
+  'pathToData',
+  path.resolve(__dirname, '../', store.get('dataFolder'))
+);
 
 module.exports = store;

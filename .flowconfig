@@ -11,5 +11,10 @@ flow-typed
 [options]
 module.use_strict=true
 suppress_comment= \\(.\\|\n\\)*FLOW
-
+module.name_mapper='@repositories' ->'<PROJECT_ROOT>/src/repositories'
+module.name_mapper='@middlewares' ->'<PROJECT_ROOT>/src/middlewares'
+module.name_mapper='@models' ->'<PROJECT_ROOT>/src/models'
+module.name_mapper='@routes' ->'<PROJECT_ROOT>/src/routes'
+module.name_mapper='@utils' ->'<PROJECT_ROOT>/src/utils'
+module.name_mapper='@root' ->'<PROJECT_ROOT>/src/'
 [strict]
