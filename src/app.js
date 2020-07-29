@@ -63,7 +63,9 @@ class Application {
   }
 
   connectToDb(): Database {
-    return new Database('config-user-management.db');
+    return new Database(
+      `${this.settings.get('dataFolder')}/config-user-management.db`
+    );
   }
 
   disconnectFromDb() {
