@@ -79,7 +79,7 @@ class Application {
     const expressApp = express();
 
     expressApp.use(express.json());
-    expressApp.use(morgan('dev'));
+    expressApp.use(morgan('combined'));
     expressApp.use(middlewares.cors);
 
     require('./routes/conf.route')(expressApp, settings, platformSettings);
@@ -139,7 +139,7 @@ class Application {
     const createdUser: UserNoPerms = this.usersRepository.resetPassword(
       initialUser.username
     );
-    console.info(
+    this.logger.info(
       `Initial user generated. Username: ${initialUser.username}, password: ${createdUser.password}`
     );
   }
