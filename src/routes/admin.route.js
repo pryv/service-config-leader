@@ -93,7 +93,7 @@ module.exports = function (
           successes[auth] = follower;
         } catch (err) {
           logger.warn('Error while notifying follower:', err);
-          failures[auth] = follower;
+          failures[auth] = Object.assign({}, follower, { error: err });
         }
       }
 
