@@ -30,7 +30,7 @@ describe('Test /admin endpoint', function () {
       password: 'pass',
       permissions: {
         settings: [SETTINGS_PERMISSIONS.READ],
-        users: []
+        users: [],
       },
     };
     const userOnlyUpdatePerm: User = {
@@ -38,7 +38,7 @@ describe('Test /admin endpoint', function () {
       password: 'pass',
       permissions: {
         settings: [SETTINGS_PERMISSIONS.UPDATE],
-        users: []
+        users: [],
       },
     };
 
@@ -165,11 +165,13 @@ describe('Test /admin endpoint', function () {
       assert.isDefined(failures);
       assert.isDefined(successes);
 
-      assert.isEmpty(failures);
-
       const followers = settings.get('followers');
       for (const key of Object.keys(followers)) {
-        assert.isDefined(successes[key]);
+        if (key === 'failing') {
+          assert.isDefined(failures[key]);
+        } else {
+          assert.isDefined(successes[key]);
+        }
       }
     });
     it('should return 401 when given token with insufficient permissions', async () => {

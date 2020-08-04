@@ -29,6 +29,10 @@
     "valid": {
       "url": "http://valid-follower",
       "role": "unexisting"
+    },
+    "failing": {
+      "url": "http://failing-follower",
+      "role": "failing"
     }
   }
 }
