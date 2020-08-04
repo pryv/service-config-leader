@@ -78,7 +78,6 @@ export class UsersRepository {
   }
 
   isPasswordValid(user: UserNoPerms): boolean {
-    console.log(user);
     const row = this.getUserWithPasswordStmt.get(user.username);
     return row && bcrypt.compareSync(user.password, row.password);
   }
