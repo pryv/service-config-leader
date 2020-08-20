@@ -16,8 +16,7 @@ minimal_apt_get_install unicode-data
 
 # Unpack the application and run npm install. 
 pushd $target_dir
-run run tar -x --owner app -f \
-  /pd_build/release.tar .
+run run tar --owner app -xf /pd_build/release.tar
 
 PYTHON=$(which python2.7) run yarn install
 
