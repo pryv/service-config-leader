@@ -24,8 +24,8 @@ module.exports = function (
       try {
         const role = req.context.role;
         logger.info(`Received request from ${role}.`);
-        const pathToData = settings.get('pathToData');
-        const confFolder = path.join(pathToData, role);
+        const dataPath = settings.get('dataPath');
+        const confFolder = path.join(dataPath, role);
 
         if (
           !fs.existsSync(confFolder) ||

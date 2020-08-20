@@ -18,7 +18,7 @@
   "internals": {
     "tokenSignSecret": "vgkdnnhp4js8nl8m7j1dewkn3ml0baqo",
     "SECRET_ONE": "1234",
-    "SECRET_TWO": "SECRET"
+    "SECRET_TWO": "4x7ff6bvjoh60rmiu41oz0f7b48uacr4"
   },
   "adminKey": "4dmink3y",
   "followers": {
@@ -34,5 +34,7 @@
       "url": "http://failing-follower",
       "role": "failing"
     }
-  }
+  },
+  "dataPath": "./test/fixtures",
+  "databasePath": "./"
 }

@@ -38,9 +38,4 @@ store.defaults({
   },
 });
 
-store.set(
-  'pathToData',
-  path.resolve(__dirname, '../', store.get('dataFolder'))
-);
-
 module.exports = store;
