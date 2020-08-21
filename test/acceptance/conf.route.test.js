@@ -50,7 +50,7 @@ describe('GET /conf', function () {
   });
 
   it('loads a fresh configuration from disk at each call', async () => {
-    let path = settings.get('dataPath') + '/pryv/core/conf/core.json';
+    let path = settings.get('templatesPath') + '/pryv/core/conf/core.json';
     let backup = fs.readFileSync(path);
     let modifiedConfig = JSON.parse(backup);
     modifiedConfig.a = 1;
@@ -66,7 +66,7 @@ describe('GET /conf', function () {
   });
 
   function expectedConf(role: string, component: string) {
-    const dataFolder = path.resolve(settings.get('dataPath'));
+    const dataFolder = path.resolve(settings.get('templatesPath'));
     const expectedConf = require(`${dataFolder}/${role}/${component}/conf/expected.json`);
     return JSON.stringify(expectedConf).replace(/\s/g, '');
   }

@@ -35,6 +35,6 @@
       "role": "failing"
     }
   },
-  "dataPath": "./test/fixtures",
+  "templatesPath": "./test/fixtures",
   "databasePath": "./"
 }
