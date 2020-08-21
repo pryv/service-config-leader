@@ -5,6 +5,7 @@
 // eslint-disable-next-line no-unused-vars
 const regeneratorRuntime = require('regenerator-runtime');
 
+const path = require('path');
 const fs = require('fs');
 const assert = require('chai').assert;
 const Application = require('@root/app');
@@ -49,7 +50,7 @@ describe('GET /conf', function () {
   });
 
   it('loads a fresh configuration from disk at each call', async () => {
-    let path = settings.get('pathToData') + '/pryv/core/conf/core.json';
+    let path = settings.get('templatesPath') + '/pryv/core/conf/core.json';
     let backup = fs.readFileSync(path);
     let modifiedConfig = JSON.parse(backup);
     modifiedConfig.a = 1;
@@ -65,7 +66,7 @@ describe('GET /conf', function () {
   });
 
   function expectedConf(role: string, component: string) {
-    const dataFolder = settings.get('pathToData');
+    const dataFolder = path.resolve(settings.get('templatesPath'));
     const expectedConf = require(`${dataFolder}/${role}/${component}/conf/expected.json`);
     return JSON.stringify(expectedConf).replace(/\s/g, '');
   }

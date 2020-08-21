@@ -14,5 +14,6 @@
       "active": false
     }
   },
-  "dataFolder": "/app/data"
+  "templatesPath": "/app/data",
+  "databasePath": "/app/database"
 }

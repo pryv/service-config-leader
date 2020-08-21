@@ -64,7 +64,7 @@ class Application {
 
   connectToDb(): Database {
     return new Database(
-      `${this.settings.get('dataFolder')}/config-user-management.db`
+      `${this.settings.get('databasePath')}/config-user-management.db`
     );
   }
 
