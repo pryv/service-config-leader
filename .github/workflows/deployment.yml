@@ -1,0 +1,46 @@
+name: PrYv Config Leader deployment workflow
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [12.13]
+
+    steps:
+      - name: Download master branch
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Install Node.js with version ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Login to the docker containers registry
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.REGISTRY_PRYV_SERVER }}
+          username: ${{ secrets.REGISTRY_PRYV_USERNAME }}
+          password: ${{ secrets.REGISTRY_PRYV_PASSWORD }}
+
+      - name: Download base image and change the tag
+        run: |
+          docker pull ${{ secrets.REGISTRY_PRYV_SERVER }}/pryv/base:1.5.1
+          docker tag "${{ secrets.REGISTRY_PRYV_SERVER }}/pryv/base:1.5.1" "pryv/base:1.5.1"
+
+      - name: Npm packages installation
+        run: yarn install
+
+      - name: Tests
+        run: yarn test
+
+      - name: Build and publish image
+        run: ./build/build 
