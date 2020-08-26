@@ -100,6 +100,11 @@ class Application {
       this.usersRepository,
       this.tokensRepository
     );
+    require('./routes/platformUsers.route')(
+      expressApp,
+      this.usersRepository,
+      this.tokensRepository
+    );
 
     expressApp.use(middlewares.errors);
 

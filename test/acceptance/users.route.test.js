@@ -4,7 +4,7 @@
 const regeneratorRuntime = require('regenerator-runtime');
 
 const assert = require('chai').assert;
-const { describe, before, it, afterEach, beforeEach } = require('mocha');
+const { describe, before, it, afterEach, beforeEach, after } = require('mocha');
 const Application = require('@root/app');
 const app = new Application();
 const request = require('supertest')(app.express);
@@ -24,6 +24,8 @@ describe('Test /users endpoint', function () {
         USERS_PERMISSIONS.RESET_PASSWORD,
         USERS_PERMISSIONS.CHANGE_PERMISSIONS,
       ],
+      settings: [],
+      platformUsers: [],
     },
   };
 
@@ -63,11 +65,15 @@ describe('Test /users endpoint', function () {
     deleteAllExceptMainStmt.run(user.username);
   });
 
+  after(function () {
+    deleteAllStmt.run(user.username);
+  });
+
   describe('POST /users', function () {
     const userToCreate = {
       username: 'someName',
       password: 'somePass',
-      permissions: { users: [], settings: [] },
+      permissions: { users: [], settings: [], platformUsers: [] },
     };
 
     afterEach(function () {
@@ -140,7 +146,11 @@ describe('Test /users endpoint', function () {
         .set('Authorization', generateToken(userLimitedPerms.username))
         .send(
           Object.assign({}, userToCreate, {
-            permissions: { users: permissionsListExcept(), settings: [] },
+            permissions: {
+              users: permissionsListExcept(),
+              settings: [],
+              platformUsers: [],
+            },
           })
         );
 
@@ -181,7 +191,11 @@ describe('Test /users endpoint', function () {
       const userNoReadPerm = {
         username: 'userNoRead',
         password: 'passx',
-        permissions: { users: permissionsListExcept(USERS_PERMISSIONS.READ) },
+        permissions: {
+          users: permissionsListExcept(USERS_PERMISSIONS.READ),
+          settings: [],
+          platformUsers: [],
+        },
       };
       app.usersRepository.createUser(userNoReadPerm);
 
@@ -245,7 +259,11 @@ describe('Test /users endpoint', function () {
 
     it('should respond with 200 and updated user in body', async () => {
       const newPerms = {
-        permissions: { users: ['resetPassword'], settings: [] },
+        permissions: {
+          users: ['resetPassword'],
+          settings: [],
+          platformUsers: [],
+        },
       };
 
       const res = await request

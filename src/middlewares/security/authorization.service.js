@@ -36,9 +36,15 @@ export class AuthorizationService {
       next: express$NextFunction
     ) {
       try {
-        const permissionsGroup: PermissionsGroup = req.path.startsWith('/users')
-          ? 'users'
-          : 'settings';
+        let permissionsGroup: PermissionsGroup;
+        if (req.path.startsWith('/users')) {
+          permissionsGroup = 'users';
+        } else if (req.path.startsWith('/platform-users')) {
+          permissionsGroup = 'platformUsers';
+        } else {
+          permissionsGroup = 'settings';
+        }
+
         const username = ((res.locals.username: any): string);
         const user = this.usersRepository.findUser(username);
 
@@ -116,7 +122,7 @@ export class AuthorizationService {
 
         const userToCreatePermissions: Permissions = ((req.body: any): User)
           .permissions;
-        for (const permissionsGroup of ['users', 'settings']) {
+        for (const permissionsGroup of ['users', 'settings', 'platformUsers']) {
           for (const permission of userToCreatePermissions[permissionsGroup]) {
             this.checkHasPermission(
               permission,
