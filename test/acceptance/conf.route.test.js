@@ -65,7 +65,7 @@ describe('GET /conf', function () {
     fs.writeFileSync(path, backup);
   });
 
-  it.only('responds with 500 given incorrect config stored', async () => {
+  it('responds with 500 given incorrect config stored', async () => {
     app.platformSettings.set('vars:DNS_SETTINGS:settings:DNS_CUSTOM_ENTRIES:value', '');
     const res = await request.get('/conf').set('Authorization', followerKey);
     assert.equal(res.status, 500);
