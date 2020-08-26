@@ -78,6 +78,7 @@ module.exports = function (
       next: express$NextFunction
     ) => {
       const followers = settings.get('followers');
+      const services = req.body.services;
       if (followers == null) {
         next(new Error('Missing followers settings.'));
       }
@@ -89,7 +90,8 @@ module.exports = function (
         try {
           await request
             .post(`${followerUrl}/notify`)
-            .set('Authorization', auth);
+            .set('Authorization', auth)
+            .send({ services: services });
           successes[auth] = follower;
         } catch (err) {
           logger.warn('Error while notifying follower:', err);
@@ -99,7 +101,7 @@ module.exports = function (
 
       res.json({
         successes: successes,
-        failures: failures,
+        failures: failures
       });
     }
   );

@@ -4,7 +4,7 @@
 
 // eslint-disable-next-line no-unused-vars
 const regeneratorRuntime = require('regenerator-runtime');
-
+const sinon = require("sinon");
 const assert = require('chai').assert;
 const Application = require('@root/app');
 const app = new Application();
@@ -14,6 +14,7 @@ const request = require('supertest')(app.express);
 const fs = require('fs');
 const yaml = require('js-yaml');
 const mockFollowers = require('../fixtures/followersMock');
+const helper = require('../fixtures/followersMockHelper');
 const { sign } = require('jsonwebtoken');
 const { SETTINGS_PERMISSIONS } = require('@models/permissions.model');
 import type { User } from '@models/user.model';
@@ -148,9 +149,9 @@ describe('Test /admin endpoint', function () {
   });
 
   describe('POST /admin/notify', function () {
-    before(async () => {
+    beforeEach(async () => {
       // Mocking followers
-      mockFollowers();
+      mockFollowers.server();
     });
 
     it('notifies followers and returns an array listing successes and failures', async () => {
@@ -164,7 +165,6 @@ describe('Test /admin endpoint', function () {
 
       assert.isDefined(failures);
       assert.isDefined(successes);
-
       const followers = settings.get('followers');
       for (const key of Object.keys(followers)) {
         if (key === 'failing') {
@@ -180,6 +180,28 @@ describe('Test /admin endpoint', function () {
         .set('Authorization', readOnlyToken);
 
       assert.strictEqual(res.status, 401);
+    });
+
+    it('notifies followers to restart some services', async () => {
+      const services = ["service1", "service2"];
+      let spy = sinon.spy(helper, 'spy');
+      const res = await request
+        .post('/admin/notify')
+        .set('Authorization', updateOnlyToken)
+        .send({ services: services });
+      assert.strictEqual(res.status, 200);
+      sinon.assert.calledWith(spy, services);
+      spy.restore();
+    });
+
+    it('notifies followers to restart all services', async () => {
+      let spy = sinon.spy(helper, 'spy');
+      const res = await request
+        .post('/admin/notify')
+        .set('Authorization', updateOnlyToken);
+      assert.strictEqual(res.status, 200);
+      sinon.assert.calledWith(spy, undefined);
+      spy.restore();
     });
   });
 });
