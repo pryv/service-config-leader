@@ -45,9 +45,15 @@ module.exports = function (
         list.forEach((file) => {
           const templateConf = fs.readFileSync(file, 'utf8');
           const fileName = file.replace(confFolder, '');
+          const newConf = applySubstitutions(templateConf);
+          if(!isJSON(newConf)) {
+            throw errorsFactory.unexpectedError(new Error(
+              `Configuration file: ${fileName} has invalid format after filling it with platform properties`)
+            );
+          }
           fullConf.push({
             path: fileName,
-            content: applySubstitutions(templateConf),
+            content: newConf,
           });
           const stats = fs.statSync(file);
           const modifiedTime = stats.mtimeMs;
@@ -154,4 +160,13 @@ module.exports = function (
       }
     });
   }
+
+  function isJSON(text: string) {
+    try {
+      JSON.parse(text);
+    } catch (e) {
+      return false;
+    }
+    return true;
+  };
 };
