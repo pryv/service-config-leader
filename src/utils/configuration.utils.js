@@ -64,7 +64,7 @@ export function applySubstitutions(
     }
     return settings;
   }
-  
+
   function removeLowerValueKeysFromSettings(settings: Object): Object {
     for (const setting of Object.keys(settings)) {
       if (
@@ -88,7 +88,7 @@ export function listConfFiles(dir: string, files: Array<string>): void {
     let fullPath = path.join(dir, file);
     if (fs.lstatSync(fullPath).isDirectory()) {
       listConfFiles(fullPath, files);
-    } else if(fullPath.split('/').pop().split('.').pop() === 'json') {
+    } else {
       files.push(fullPath);
     }
   });

@@ -55,7 +55,7 @@ module.exports = function (
             settings,
             platformSettings.get('vars')
           );
-          if (!isValidJSON(newConf)) {
+          if (fileName.split('.').pop() === 'json' && !isValidJSON(newConf)) {
             throw errorsFactory.unexpectedError(
               new Error(
                 `Configuration file: ${fileName} has invalid format after filling it with platform properties`

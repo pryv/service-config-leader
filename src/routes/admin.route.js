@@ -57,7 +57,7 @@ module.exports = function (
           settings,
           newSettings
         );
-        if (!isValidJSON(newConf)) {
+        if (file.split('/').pop().split('.').pop() === 'json' && !isValidJSON(newConf)) {
           throw errorsFactory.invalidInput(
             'Configuration format invalid'
           );
