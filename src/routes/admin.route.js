@@ -19,6 +19,7 @@ import {
   listConfFiles,
   applySubstitutions,
   isValidJSON,
+  isJSONFile
 } from '@utils/configuration.utils';
 
 module.exports = function (
@@ -57,7 +58,7 @@ module.exports = function (
           settings,
           newSettings
         );
-        if (file.split('/').pop().split('.').pop() === 'json' && !isValidJSON(newConf)) {
+        if (isJSONFile(file) && !isValidJSON(newConf)) {
           throw errorsFactory.invalidInput(
             'Configuration format invalid'
           );

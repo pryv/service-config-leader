@@ -102,3 +102,7 @@ export function isValidJSON(text: string) {
   }
   return true;
 }
+
+export function isJSONFile(file: string): boolean {
+  return file.split('/').pop().split('.').pop() === 'json';
+}

@@ -9,6 +9,7 @@ import {
   listConfFiles,
   applySubstitutions,
   isValidJSON,
+  isJSONFile
 } from '@utils/configuration.utils';
 
 module.exports = function (
@@ -55,7 +56,7 @@ module.exports = function (
             settings,
             platformSettings.get('vars')
           );
-          if (fileName.split('.').pop() === 'json' && !isValidJSON(newConf)) {
+          if (isJSONFile(file) && !isValidJSON(newConf)) {
             throw errorsFactory.unexpectedError(
               new Error(
                 `Configuration file: ${fileName} has invalid format after filling it with platform properties`
