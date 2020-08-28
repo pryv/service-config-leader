@@ -2,13 +2,15 @@
 
 const nock = require('nock');
 const settings = require('../../src/settings');
+const helper = require('./followersMockHelper');
 
-module.exports = function (): void {
+module.exports.server = () => {
   const followers = settings.get('followers');
-
   for (const [auth, follower] of Object.entries(followers)) {
     nock(follower.url)
-      .post('/notify')
+      .post('/notify', body => { 
+        return helper.spy(body.services);
+      })
       .reply(function () {
         const headerValue = this.req.headers.authorization;
         let status, result;
@@ -22,7 +24,7 @@ module.exports = function (): void {
           status = 403;
           result = 'Unauthorized.';
         }
-        return [status, result];
+        return [status, result]
       });
   }
-};
+}

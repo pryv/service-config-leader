@@ -44,10 +44,10 @@ module.exports = function (
 
         let list = [];
         listConfFiles(confFolder, list);
-
         let fullConf = [];
         let latestModifiedTime = 0;
         let latestModifiedFile = '';
+        platformSettings.load()
         list.forEach((file) => {
           const templateConf = fs.readFileSync(file, 'utf8');
           const fileName = file.replace(confFolder, '');

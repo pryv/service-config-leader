@@ -4,6 +4,7 @@
 
 // eslint-disable-next-line no-unused-vars
 const regeneratorRuntime = require('regenerator-runtime');
+const yaml = require('yamljs')
 
 const path = require('path');
 const fs = require('fs');
@@ -49,27 +50,70 @@ describe('GET /conf', function () {
     });
   });
 
-  it('loads a fresh configuration from disk at each call', async () => {
+  it('loads a fresh template from disk at each call', async () => {
+    const call1 = await request.get('/conf').set('Authorization', followerKey);
+    const files1 = call1.body.files;
+    let coreConfig1 = files1.filter((f) => f.path.indexOf('core.json') > 0)[0]
+      .content;
+    coreConfig1 = JSON.parse(coreConfig1);
+    assert.equal(coreConfig1.http.port, 9000);
+
     let path = settings.get('templatesPath') + '/pryv/core/conf/core.json';
     let backup = fs.readFileSync(path);
     let modifiedConfig = JSON.parse(backup);
-    modifiedConfig.a = 1;
+    modifiedConfig.http.port = 8000;
     fs.writeFileSync(path, JSON.stringify(modifiedConfig, null, 2));
-    const res = await request.get('/conf').set('Authorization', followerKey);
-    const files = res.body.files;
-    assert.isDefined(files);
-    let coreConfig = files.filter((f) => f.path.indexOf('core.json') > 0)[0]
+    const call2 = await request.get('/conf').set('Authorization', followerKey);
+    const files2 = call2.body.files;
+    assert.isDefined(files2);
+    let coreConfig = files2.filter((f) => f.path.indexOf('core.json') > 0)[0]
       .content;
     coreConfig = JSON.parse(coreConfig);
-    assert.equal(coreConfig.a, 1);
+    assert.equal(coreConfig.http.port, 8000);
     fs.writeFileSync(path, backup);
   });
 
+  it('loads a fresh platform parameters from disk at each call', async () => {
+    // Call first time
+    const call1 = await request.get('/conf').set('Authorization', followerKey);
+    const files1 = call1.body.files;
+    let coreConfig1 = files1.filter((f) => f.path.indexOf('substitute.json') > 0)[0].content;
+    coreConfig1 = JSON.parse(coreConfig1);
+    assert.equal(coreConfig1.domain, 'rec.la');
+
+    // Modify platform.yml
+    let path = settings.get('databasePath') + 'platform.yml';
+    let backup = fs.readFileSync(path);
+    let modifiedConfig = yaml.load(path);
+    modifiedConfig.vars.MAIN_PROPS.settings.DOMAIN.value = 'test.la';
+    fs.writeFileSync(path, yaml.stringify(modifiedConfig));
+
+    // Check if /conf give the fresh settings
+    const call2 = await request.get('/conf').set('Authorization', followerKey);
+    const files2 = call2.body.files;
+    let coreConfig2 = files2.filter((f) => f.path.indexOf('substitute.json') > 0)[0].content;
+    coreConfig2 = JSON.parse(coreConfig2);
+    assert.equal(coreConfig2.domain, 'test.la');
+
+    // Set platform.yml to the backup
+    fs.writeFileSync(path, backup);
+
+  })
+
   it('responds with 500 given incorrect config stored', async () => {
-    app.platformSettings.set('vars:DNS_SETTINGS:settings:DNS_CUSTOM_ENTRIES:value', '');
+    // Set invalid config in platform.yml
+    let path = settings.get('databasePath') + 'platform.yml';
+    let backup = fs.readFileSync(path);
+    let modifiedConfig = yaml.load(path);
+    modifiedConfig.vars.DNS_SETTINGS.settings.DNS_CUSTOM_ENTRIES.value = '';
+    fs.writeFileSync(path, yaml.stringify(modifiedConfig));
+
     const res = await request.get('/conf').set('Authorization', followerKey);
     assert.equal(res.status, 500);
     assert.isDefined(res.error);
+
+    // Set platform.yml to the backup
+    fs.writeFileSync(path, backup);
   });
 
   function expectedConf(role: string, component: string) {
