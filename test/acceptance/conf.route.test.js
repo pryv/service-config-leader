@@ -50,7 +50,7 @@ describe('GET /conf', function () {
     });
   });
 
-  it('loads a fresh configuration from disk at each call', async () => {
+  it('loads a fresh template from disk at each call', async () => {
     const call1 = await request.get('/conf').set('Authorization', followerKey);
     const files1 = call1.body.files;
     let coreConfig1 = files1.filter((f) => f.path.indexOf('core.json') > 0)[0]
@@ -73,7 +73,7 @@ describe('GET /conf', function () {
     fs.writeFileSync(path, backup);
   });
 
-  it('loads a fresh settings from disk at each call', async () => {
+  it('loads a fresh platform parameters from disk at each call', async () => {
     // Call first time
     const call1 = await request.get('/conf').set('Authorization', followerKey);
     const files1 = call1.body.files;
@@ -105,7 +105,7 @@ describe('GET /conf', function () {
     let path = settings.get('databasePath') + 'platform.yml';
     let backup = fs.readFileSync(path);
     let modifiedConfig = yaml.load(path);
-    modifiedConfig.vars.DNS_SETTINGS.settings.DNS_CUSTOM_ENTRIES.value = "";
+    modifiedConfig.vars.DNS_SETTINGS.settings.DNS_CUSTOM_ENTRIES.value = '';
     fs.writeFileSync(path, yaml.stringify(modifiedConfig));
 
     const res = await request.get('/conf').set('Authorization', followerKey);
