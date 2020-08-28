@@ -139,6 +139,27 @@ describe('Test /admin endpoint', function () {
       const platform = yaml.safeLoad(ymlFile);
       assert.deepEqual(updatedSettings, platform.vars);
     });
+    it('should respond with 400 when given properties that create invalid config', async () => {
+      const invalidProps = {
+        ADVANCED_API_SETTINGS: {
+          settings: {
+            INVITATION_TOKENS: {
+              value: '',
+            },
+            VERSIONING_SETTINGS: {
+              value: 55,
+            },
+          },
+        },
+      };
+
+      const res = await request
+        .put('/admin/settings')
+        .set('Authorization', updateOnlyToken)
+        .send(invalidProps);
+
+      assert.strictEqual(res.status, 400);
+    });
     it('should return 401 when given token with insufficient permissions', async () => {
       const res = await request
         .put('/admin/settings')
