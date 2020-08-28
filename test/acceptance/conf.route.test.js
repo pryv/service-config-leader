@@ -85,7 +85,7 @@ describe('GET /conf', function () {
     let path = settings.get('databasePath') + 'platform.yml';
     let backup = fs.readFileSync(path);
     let modifiedConfig = yaml.load(path);
-    modifiedConfig.vars.MAIN_PROPS.settings.DOMAIN.value = "test.la";
+    modifiedConfig.vars.MAIN_PROPS.settings.DOMAIN.value = 'test.la';
     fs.writeFileSync(path, yaml.stringify(modifiedConfig));
 
     // Check if /conf give the fresh settings

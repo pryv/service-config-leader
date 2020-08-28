@@ -4,7 +4,7 @@
 
 // eslint-disable-next-line no-unused-vars
 const regeneratorRuntime = require('regenerator-runtime');
-const sinon = require("sinon");
+const sinon = require('sinon');
 const assert = require('chai').assert;
 const Application = require('@root/app');
 const app = new Application();
@@ -204,7 +204,7 @@ describe('Test /admin endpoint', function () {
     });
 
     it('notifies followers to restart some services', async () => {
-      const services = ["service1", "service2"];
+      const services = ['service1', 'service2'];
       let spy = sinon.spy(helper, 'spy');
       const res = await request
         .post('/admin/notify')
