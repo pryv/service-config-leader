@@ -91,7 +91,7 @@ describe('GET /conf', function () {
     // Check if /conf give the fresh settings
     const call2 = await request.get('/conf').set('Authorization', followerKey);
     const files2 = call2.body.files;
-    let coreConfig2 = files2.filter((f) => f.path.indexOf('subsitute.json') > 0)[0].content;
+    let coreConfig2 = files2.filter((f) => f.path.indexOf('substitute.json') > 0)[0].content;
     coreConfig2 = JSON.parse(coreConfig2);
     assert.equal(coreConfig2.domain, 'test.la');
 
