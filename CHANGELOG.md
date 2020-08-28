@@ -1,5 +1,10 @@
 ## 1.0
 
+### 1.0.18
+
+- reload platform.yml parameters at each GET /conf (instead of only template files)
+- specify services to reboot on PUT /admin/settings route
+
 ### 1.0.3
 
 - Simplify user-facing configuration and use yaml
