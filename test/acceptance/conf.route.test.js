@@ -77,7 +77,7 @@ describe('GET /conf', function () {
     // Call first time
     const call1 = await request.get('/conf').set('Authorization', followerKey);
     const files1 = call1.body.files;
-    let coreConfig1 = files1.filter((f) => f.path.indexOf('subsitute.json') > 0)[0].content;
+    let coreConfig1 = files1.filter((f) => f.path.indexOf('substitute.json') > 0)[0].content;
     coreConfig1 = JSON.parse(coreConfig1);
     assert.equal(coreConfig1.domain, 'rec.la');
 
