@@ -3,8 +3,10 @@
 // eslint-disable-next-line no-unused-vars
 const regeneratorRuntime = require('regenerator-runtime');
 
+const fs = require('fs');
 const request = require('superagent');
 const logger = require('@utils/logging').getLogger('admin');
+const errorsFactory = require('@utils/errorsHandling').factory;
 const { SETTINGS_PERMISSIONS } = require('@models/permissions.model');
 const { verifyToken } = require('@middlewares/security/token.verification');
 const {
@@ -13,6 +15,12 @@ const {
 } = require('@middlewares/security/authorization.service');
 const { UsersRepository } = require('@repositories/users.repository');
 const { TokensRepository } = require('@repositories/tokens.repository');
+import {
+  listConfFiles,
+  applySubstitutions,
+  isValidJSON,
+  isJSONFile
+} from '@utils/configuration.utils';
 
 module.exports = function (
   expressApp: express$Application,
@@ -37,7 +45,25 @@ module.exports = function (
       next: express$NextFunction
     ) => {
       const previousSettings = platformSettings.get('vars');
+      const templatesPath = settings.get('templatesPath');
       const newSettings = Object.assign({}, previousSettings, req.body);
+
+      let list = [];
+      listConfFiles(templatesPath, list);
+
+      list.forEach((file) => {
+        const templateConf = fs.readFileSync(file, 'utf8');
+        const newConf = applySubstitutions(
+          templateConf,
+          settings,
+          newSettings
+        );
+        if (isJSONFile(file) && !isValidJSON(newConf)) {
+          throw errorsFactory.invalidInput(
+            'Configuration format invalid'
+          );
+        }
+      });
 
       platformSettings.set('vars', newSettings);
 
@@ -78,6 +104,7 @@ module.exports = function (
       next: express$NextFunction
     ) => {
       const followers = settings.get('followers');
+      const services = req.body.services;
       if (followers == null) {
         next(new Error('Missing followers settings.'));
       }
@@ -89,7 +116,8 @@ module.exports = function (
         try {
           await request
             .post(`${followerUrl}/notify`)
-            .set('Authorization', auth);
+            .set('Authorization', auth)
+            .send({ services: services });
           successes[auth] = follower;
         } catch (err) {
           logger.warn('Error while notifying follower:', err);
@@ -99,7 +127,7 @@ module.exports = function (
 
       res.json({
         successes: successes,
-        failures: failures,
+        failures: failures
       });
     }
   );
