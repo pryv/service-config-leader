@@ -12,6 +12,7 @@ const { TokensRepository } = require('@repositories/tokens.repository');
 const {
   USERS_PERMISSIONS,
   SETTINGS_PERMISSIONS,
+  PLATFORM_USERS_PERMISSIONS
 } = require('@models/permissions.model');
 const morgan = require('morgan');
 
@@ -137,6 +138,7 @@ class Application {
           USERS_PERMISSIONS.CHANGE_PERMISSIONS,
         ],
         settings: [SETTINGS_PERMISSIONS.READ, SETTINGS_PERMISSIONS.UPDATE],
+        platformUsers: [PLATFORM_USERS_PERMISSIONS.READ, PLATFORM_USERS_PERMISSIONS.DELETE],
       },
     };
 

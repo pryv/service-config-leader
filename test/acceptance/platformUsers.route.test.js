@@ -146,11 +146,9 @@ describe('Test /platform-users endpoint', function () {
       let res;
       before(async function () {
         nock(registerUrl)
-          .delete(`/users/${platformUser.username}`)
+          .delete(`/users/${platformUser.username}?onlyReg=true`)
           .reply(200);
-        nock(coreUrl)
-          .delete(`/users/${platformUser.username}`)
-          .reply(200);
+        nock(coreUrl).delete(`/users/${platformUser.username}`).reply(200);
         res = await request
           .delete(`/platform-users/${platformUser.username}`)
           .set('Authorization', token);
@@ -174,6 +172,21 @@ describe('Test /platform-users endpoint', function () {
       });
       it('should respond with 401', () => {
         assert.strictEqual(res.status, 401);
+      });
+    });
+    describe('when request to register returns an error', function () {
+      let res;
+      const regRespStatusCode = 423;
+      before(async function () {
+        nock(registerUrl)
+          .delete(`/users/${platformUser.username}?onlyReg=true`)
+          .reply(regRespStatusCode);
+        res = await request
+          .delete(`/platform-users/${platformUser.username}`)
+          .set('Authorization', token);
+      });
+      it('should respond with the same status code', () => {
+        assert.strictEqual(res.status, regRespStatusCode);
       });
     });
   });

@@ -72,7 +72,7 @@ module.exports = function (
 
       try {
         await request
-          .delete(`${registerUrl}/users/${req.params.username}`)
+          .delete(`${registerUrl}/users/${req.params.username}?onlyReg=true`)
           .set('Authorization', authKeyReg);
 
         const deleteFromFollowersPromises = [];
