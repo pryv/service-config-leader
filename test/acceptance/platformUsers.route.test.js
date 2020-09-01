@@ -189,5 +189,23 @@ describe('Test /platform-users endpoint', function () {
         assert.strictEqual(res.status, regRespStatusCode);
       });
     });
+    describe('when request to core returns an error', function () {
+      let res;
+      const coreRespStatusCode = 423;
+      before(async function () {
+        nock(registerUrl)
+          .delete(`/users/${platformUser.username}?onlyReg=true`)
+          .reply(200);
+        nock(coreUrl)
+          .delete(`/users/${platformUser.username}`)
+          .reply(coreRespStatusCode);
+        res = await request
+          .delete(`/platform-users/${platformUser.username}`)
+          .set('Authorization', token);
+      });
+      it('should respond with the same status code', () => {
+        assert.strictEqual(res.status, coreRespStatusCode);
+      });
+    });
   });
 });
