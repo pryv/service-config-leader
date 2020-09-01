@@ -15,5 +15,6 @@
     }
   },
   "templatesPath": "/app/data",
-  "databasePath": "/app/database"
+  "databasePath": "/app/database",
+  "registerUrl": "register"
 }

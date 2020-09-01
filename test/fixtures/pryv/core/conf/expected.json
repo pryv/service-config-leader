@@ -29,7 +29,7 @@
   "services": {
     "register": {
       "url": "https://reg.rec.la",
-      "key": "REGISTER_SYSTEM_KEY_1"
+      "key": "test-system-key"
     },
     "email": {
       "enabled": {

@@ -17,8 +17,11 @@
   "dataFolder": "test/fixtures",
   "internals": {
     "tokenSignSecret": "vgkdnnhp4js8nl8m7j1dewkn3ml0baqo",
+    "CORE_SYSTEM_KEY": "core_key",
     "SECRET_ONE": "1234",
-    "SECRET_TWO": "4x7ff6bvjoh60rmiu41oz0f7b48uacr4"
+    "SECRET_TWO": "4x7ff6bvjoh60rmiu41oz0f7b48uacr4",
+    "REGISTER_ADMIN_KEY_1": "test-admin-key",
+    "REGISTER_SYSTEM_KEY_1": "test-system-key"
   },
   "adminKey": "4dmink3y",
   "followers": {
@@ -33,8 +36,13 @@
     "failing": {
       "url": "http://failing-follower",
       "role": "failing"
+    },
+    "core": {
+      "url": "http://core",
+      "role": "core"
     }
   },
   "templatesPath": "./test/fixtures",
-  "databasePath": "./"
+  "databasePath": "./",
+  "registerUrl": "http://localhost:8082"
 }

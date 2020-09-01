@@ -23,12 +23,12 @@
   },
   "auth": {
     "authorizedKeys": {
-      "REGISTER_SYSTEM_KEY_1": {
+      "test-system-key": {
         "roles": [
           "system"
         ]
       },
-      "REGISTER_ADMIN_KEY_1": {
+      "test-admin-key": {
         "roles": [
           "admin"
         ]
@@ -91,7 +91,7 @@
       "hosting-1": [
         {
           "base_url": "https://co1.rec.la/",
-          "authorization": "CORE_SYSTEM_KEY"
+          "authorization": "core_key"
         }
       ]
     },

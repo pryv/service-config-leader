@@ -66,7 +66,7 @@ describe('Test /users endpoint', function () {
   });
 
   after(function () {
-    deleteAllStmt.run(user.username);
+    deleteAllStmt.run();
   });
 
   describe('POST /users', function () {

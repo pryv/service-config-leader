@@ -6,6 +6,7 @@ const regeneratorRuntime = require('regenerator-runtime');
 const assert = require('chai').assert;
 const { describe, before, it, afterEach, beforeEach, after } = require('mocha');
 const Chance = require('chance');
+const nock = require('nock');
 const Application = require('@root/app');
 const app = new Application();
 const request = require('supertest')(app.express);
@@ -14,7 +15,10 @@ const {
   PLATFORM_USERS_PERMISSIONS,
 } = require('@root/models/permissions.model');
 
-describe('Test /users endpoint', function () {
+describe('Test /platform-users endpoint', function () {
+  const registerUrl = app.settings.get('registerUrl');
+  const coreUrl = app.settings.get('followers:core:url');
+
   const chance = new Chance();
 
   const user = {
@@ -62,11 +66,9 @@ describe('Test /users endpoint', function () {
     );
   };
 
-  before(() => {
-    token = generateToken(user.username);
-  });
-
   before(function () {
+    token = generateToken(user.username);
+
     deleteAllStmt = app.db.prepare('DELETE FROM users;');
     deleteAllExceptMainStmt = app.db.prepare(
       'DELETE FROM users WHERE username != ?;'
@@ -81,14 +83,20 @@ describe('Test /users endpoint', function () {
   });
 
   after(function () {
-    deleteAllStmt.run(user.username);
+    deleteAllStmt.run();
   });
 
   describe('GET /platform-users', function () {
     describe('when user has sufficient permissions', function () {
       let res;
       before(async function () {
-        res = await request.get('/platform-users').set('Authorization', token);
+        nock(registerUrl)
+          .get(`/admin/users/${platformUser.username}`)
+          .reply(200, platformUser);
+
+        res = await request
+          .get(`/platform-users/${platformUser.username}`)
+          .set('Authorization', token);
       });
       it('should respond with 200', () => {
         assert.strictEqual(res.status, 200);
@@ -103,6 +111,21 @@ describe('Test /users endpoint', function () {
         assert.equal(res.body.languageCode, platformUser.languageCode);
       });
     });
+    describe('when request to register returns an error', function () {
+      let res;
+      const regRespStatusCode = 423;
+      before(async function () {
+        nock(registerUrl)
+          .get(`/admin/users/${platformUser.username}`)
+          .reply(regRespStatusCode);
+        res = await request
+          .get(`/platform-users/${platformUser.username}`)
+          .set('Authorization', token);
+      });
+      it('should respond with the same status code', () => {
+        assert.strictEqual(res.status, regRespStatusCode);
+      });
+    });
     describe('when user has insufficient permissions', function () {
       let res;
       before(async function () {
@@ -110,7 +133,7 @@ describe('Test /users endpoint', function () {
           insufficientPermsUser.username
         );
         res = await request
-          .get('/platform-users')
+          .get(`/platform-users/${platformUser.username}`)
           .set('Authorization', insufficientPermsToken);
       });
       it('should respond with 401', () => {
@@ -122,6 +145,12 @@ describe('Test /users endpoint', function () {
     describe('when user has sufficient permissions', function () {
       let res;
       before(async function () {
+        nock(registerUrl)
+          .delete(`/users/${platformUser.username}`)
+          .reply(200);
+        nock(coreUrl)
+          .delete(`/users/${platformUser.username}`)
+          .reply(200);
         res = await request
           .delete(`/platform-users/${platformUser.username}`)
           .set('Authorization', token);
@@ -129,21 +158,8 @@ describe('Test /users endpoint', function () {
       it('should respond with 200', () => {
         assert.strictEqual(res.status, 200);
       });
-      it('should respond with deleted user in body', () => {
+      it('should respond with deleted username in body', () => {
         assert.equal(res.body.username, platformUser.username);
-        assert.equal(res.body.password, platformUser.password);
-        assert.equal(res.body.email, platformUser.email);
-        assert.equal(res.body.appId, platformUser.appId);
-        assert.equal(res.body.invitationToken, platformUser.invitationToken);
-        assert.equal(res.body.referer, platformUser.referer);
-        assert.equal(res.body.languageCode, platformUser.languageCode);
-      });
-      it('should respond with 404 given not existing username', async () => {
-        res = await request
-          .delete('/platform-users/someusername')
-          .set('Authorization', token);
-
-        assert.strictEqual(res.status, 404);
       });
     });
     describe('when user has insufficient permissions', function () {

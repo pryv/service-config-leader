@@ -102,6 +102,7 @@ class Application {
     );
     require('./routes/platformUsers.route')(
       expressApp,
+      settings,
       this.usersRepository,
       this.tokensRepository
     );
