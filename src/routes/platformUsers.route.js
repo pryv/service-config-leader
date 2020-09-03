@@ -72,18 +72,17 @@ module.exports = function (
       }
 
       try {
-        const deleteFromFollowersPromises = [];
+        const deleteFromCoresPromises = [];
         for (const core of cores) {
-          deleteFromFollowersPromises.push(
+          deleteFromCoresPromises.push(
             request
               .delete(`${core.url}/users/${req.params.username}`)
               .set('Authorization', authKeyCore)
           );
         }
 
-        await bluebird.any(deleteFromFollowersPromises);
+        await bluebird.any(deleteFromCoresPromises);
       } catch (err) {
-        // cores failed
         let unexpectedError: ?{};
         err.forEach(error => {
           if (error.status != 404) {

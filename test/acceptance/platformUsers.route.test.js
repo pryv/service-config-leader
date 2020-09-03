@@ -143,13 +143,13 @@ describe('/platform-users', function () {
   });
   describe('DELETE /:username', function () {
     describe('when user has sufficient permissions', function () {
-      describe('when core and register reply with 200', () => {
+      describe('when core and register succeed', () => {
         let res;
         before(async function () {
+          nock(coreUrl).delete(`/users/${platformUser.username}`).reply(200);
           nock(registerUrl)
             .delete(`/users/${platformUser.username}?onlyReg=true`)
             .reply(200);
-          nock(coreUrl).delete(`/users/${platformUser.username}`).reply(200);
           res = await request
             .delete(`/platform-users/${platformUser.username}`)
             .set('Authorization', token);
@@ -161,7 +161,7 @@ describe('/platform-users', function () {
           assert.equal(res.body.username, platformUser.username);
         });
       });
-      describe('when core fails with 404, it should still delete in register', () => {
+      describe('when core fails with 404, it should still delete in register for idempotency', () => {
         let res;
         before(async () => {
           nock(coreUrl).delete(`/users/${platformUser.username}`).reply(404);
@@ -179,7 +179,7 @@ describe('/platform-users', function () {
           assert.equal(res.body.username, platformUser.username);
         });
       });
-      describe('XXX when core fails with not 404, it should not delete in register', () => {
+      describe('when core fails with not 404, it should not delete in register', () => {
         let res, isRegCalled = false;
         before(async () => {
           nock(coreUrl).delete(`/users/${platformUser.username}`).reply(500);
@@ -192,6 +192,10 @@ describe('/platform-users', function () {
             .delete(`/platform-users/${platformUser.username}`)
             .set('Authorization', token);
         });
+        after(() => {
+          // unregister uncalled register mock from above
+          nock.cleanAll()
+        })
         it('should respond with 500', () => {
           assert.equal(res.status, 500);
         });
@@ -218,6 +222,9 @@ describe('/platform-users', function () {
       let res;
       const regRespStatusCode = 423;
       before(async function () {
+        nock(coreUrl)
+          .delete(`/users/${platformUser.username}`)
+          .reply(200);
         nock(registerUrl)
           .delete(`/users/${platformUser.username}?onlyReg=true`)
           .reply(regRespStatusCode);
@@ -233,12 +240,12 @@ describe('/platform-users', function () {
       let res;
       const coreRespStatusCode = 423;
       before(async function () {
-        nock(registerUrl)
-          .delete(`/users/${platformUser.username}?onlyReg=true`)
-          .reply(200);
         nock(coreUrl)
           .delete(`/users/${platformUser.username}`)
           .reply(coreRespStatusCode);
+        nock(registerUrl)
+          .delete(`/users/${platformUser.username}?onlyReg=true`)
+          .reply(200);
         res = await request
           .delete(`/platform-users/${platformUser.username}`)
           .set('Authorization', token);
