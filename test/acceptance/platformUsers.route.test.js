@@ -183,7 +183,6 @@ describe('/platform-users', function () {
         let res, isRegCalled = false;
         before(async () => {
           nock(coreUrl).delete(`/users/${platformUser.username}`).reply(500);
-          // should crash because not called
           nock(registerUrl)
             .delete(`/users/${platformUser.username}?onlyReg=true`)
             .reply(200, () => {
