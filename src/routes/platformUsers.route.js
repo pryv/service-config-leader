@@ -4,6 +4,7 @@
 const regeneratorRuntime = require('regenerator-runtime');
 
 const request = require('superagent');
+const bluebird = require('bluebird');
 const logger = require('@utils/logging').getLogger('platform-users');
 const { UsersRepository } = require('@repositories/users.repository');
 const { TokensRepository } = require('@repositories/tokens.repository');
@@ -71,12 +72,7 @@ module.exports = function (
       }
 
       try {
-        await request
-          .delete(`${registerUrl}/users/${req.params.username}?onlyReg=true`)
-          .set('Authorization', authKeyReg);
-
         const deleteFromFollowersPromises = [];
-
         for (const core of cores) {
           deleteFromFollowersPromises.push(
             request
@@ -85,12 +81,31 @@ module.exports = function (
           );
         }
 
-        await Promise.all(deleteFromFollowersPromises);
+        await bluebird.any(deleteFromFollowersPromises);
       } catch (err) {
-        logger.warn('Error while deleting user:', err);
-        return res.status(err.status || 500).json(err.response || err.message);
+        // cores failed
+        let unexpectedError: ?{};
+        err.forEach(error => {
+          if (error.status != 404) {
+            unexpectedError = error;
+          }
+        });
+        if (unexpectedError != null) {
+          logger.warn('Error while deleting user:', unexpectedError);
+          return res.status(unexpectedError.status).json(unexpectedError.response || unexpectedError.message);
+        } else {
+          // continue with call to reg
+        }
       }
 
+      try {
+        await request
+          .delete(`${registerUrl}/users/${req.params.username}?onlyReg=true`)
+          .set('Authorization', authKeyReg);
+      } catch (err) {
+        return res.status(err.status).json(err.response || err.message);
+      }
+      
       res.status(200).json({username: req.params.username});
     }
   );

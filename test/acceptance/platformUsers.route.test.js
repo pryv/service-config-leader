@@ -15,7 +15,7 @@ const {
   PLATFORM_USERS_PERMISSIONS,
 } = require('@root/models/permissions.model');
 
-describe('Test /platform-users endpoint', function () {
+describe('/platform-users', function () {
   const registerUrl = app.settings.get('registerUrl');
   const coreUrl = app.settings.get('followers:core:url');
 
@@ -86,7 +86,7 @@ describe('Test /platform-users endpoint', function () {
     deleteAllStmt.run();
   });
 
-  describe('GET /platform-users', function () {
+  describe('GET /', function () {
     describe('when user has sufficient permissions', function () {
       let res;
       before(async function () {
@@ -141,23 +141,64 @@ describe('Test /platform-users endpoint', function () {
       });
     });
   });
-  describe('DELETE /platform-users/:username', function () {
+  describe('DELETE /:username', function () {
     describe('when user has sufficient permissions', function () {
-      let res;
-      before(async function () {
-        nock(registerUrl)
-          .delete(`/users/${platformUser.username}?onlyReg=true`)
-          .reply(200);
-        nock(coreUrl).delete(`/users/${platformUser.username}`).reply(200);
-        res = await request
-          .delete(`/platform-users/${platformUser.username}`)
-          .set('Authorization', token);
+      describe('when core and register reply with 200', () => {
+        let res;
+        before(async function () {
+          nock(registerUrl)
+            .delete(`/users/${platformUser.username}?onlyReg=true`)
+            .reply(200);
+          nock(coreUrl).delete(`/users/${platformUser.username}`).reply(200);
+          res = await request
+            .delete(`/platform-users/${platformUser.username}`)
+            .set('Authorization', token);
+        });
+        it('should respond with 200', () => {
+          assert.strictEqual(res.status, 200);
+        });
+        it('should respond with deleted username in body', () => {
+          assert.equal(res.body.username, platformUser.username);
+        });
       });
-      it('should respond with 200', () => {
-        assert.strictEqual(res.status, 200);
+      describe('when core fails with 404, it should still delete in register', () => {
+        let res;
+        before(async () => {
+          nock(coreUrl).delete(`/users/${platformUser.username}`).reply(404);
+          nock(registerUrl)
+            .delete(`/users/${platformUser.username}?onlyReg=true`)
+            .reply(200);
+          res = await request
+            .delete(`/platform-users/${platformUser.username}`)
+            .set('Authorization', token);
+        });
+        it('should respond with 200', () => {
+          assert.equal(res.status, 200);
+        });
+        it('should respond with deleted username in body', () => {
+          assert.equal(res.body.username, platformUser.username);
+        });
       });
-      it('should respond with deleted username in body', () => {
-        assert.equal(res.body.username, platformUser.username);
+      describe('XXX when core fails with not 404, it should not delete in register', () => {
+        let res, isRegCalled = false;
+        before(async () => {
+          nock(coreUrl).delete(`/users/${platformUser.username}`).reply(500);
+          // should crash because not called
+          nock(registerUrl)
+            .delete(`/users/${platformUser.username}?onlyReg=true`)
+            .reply(200, () => {
+              isRegCalled = true;
+            });
+          res = await request
+            .delete(`/platform-users/${platformUser.username}`)
+            .set('Authorization', token);
+        });
+        it('should respond with 500', () => {
+          assert.equal(res.status, 500);
+        });
+        it('should not call register', () => {
+          assert.isFalse(isRegCalled);
+        });
       });
     });
     describe('when user has insufficient permissions', function () {
