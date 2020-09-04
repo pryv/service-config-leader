@@ -15,7 +15,7 @@ const {
   PLATFORM_USERS_PERMISSIONS,
 } = require('@root/models/permissions.model');
 
-describe('/platform-users', function () {
+describe('/platform-users', () =>  {
   const registerUrl = app.settings.get('registerUrl');
   const coreUrl = app.settings.get('followers:core:url');
 
@@ -66,7 +66,7 @@ describe('/platform-users', function () {
     );
   };
 
-  before(function () {
+  before(() =>  {
     token = generateToken(user.username);
 
     deleteAllStmt = app.db.prepare('DELETE FROM users;');
@@ -78,18 +78,18 @@ describe('/platform-users', function () {
     app.usersRepository.createUser(user);
   });
 
-  afterEach(function () {
+  afterEach(() =>  {
     deleteAllExceptMainStmt.run(user.username);
   });
 
-  after(function () {
+  after(() =>  {
     deleteAllStmt.run();
   });
 
-  describe('GET /', function () {
-    describe('when user has sufficient permissions', function () {
+  describe('GET /', () =>  {
+    describe('when user has sufficient permissions', () =>  {
       let res;
-      before(async function () {
+      before(async () =>  {
         nock(registerUrl)
           .get(`/admin/users/${platformUser.username}`)
           .reply(200, platformUser);
@@ -111,10 +111,10 @@ describe('/platform-users', function () {
         assert.equal(res.body.languageCode, platformUser.languageCode);
       });
     });
-    describe('when request to register returns an error', function () {
+    describe('when request to register returns an error', () =>  {
       let res;
       const regRespStatusCode = 423;
-      before(async function () {
+      before(async () =>  {
         nock(registerUrl)
           .get(`/admin/users/${platformUser.username}`)
           .reply(regRespStatusCode);
@@ -126,9 +126,9 @@ describe('/platform-users', function () {
         assert.strictEqual(res.status, regRespStatusCode);
       });
     });
-    describe('when user has insufficient permissions', function () {
+    describe('when user has insufficient permissions', () =>  {
       let res;
-      before(async function () {
+      before(async () =>  {
         const insufficientPermsToken = generateToken(
           insufficientPermsUser.username
         );
@@ -141,11 +141,11 @@ describe('/platform-users', function () {
       });
     });
   });
-  describe('DELETE /:username', function () {
-    describe('when user has sufficient permissions', function () {
+  describe('DELETE /:username', () =>  {
+    describe('when user has sufficient permissions', () =>  {
       describe('when core and register succeed', () => {
         let res;
-        before(async function () {
+        before(async () =>  {
           nock(coreUrl).delete(`/users/${platformUser.username}`).reply(200);
           nock(registerUrl)
             .delete(`/users/${platformUser.username}?onlyReg=true`)
@@ -160,6 +160,9 @@ describe('/platform-users', function () {
         it('should respond with deleted username in body', () => {
           assert.equal(res.body.username, platformUser.username);
         });
+        it('should write to log file', () => {
+
+        })
       });
       describe('when core fails with 404, it should still delete in register for idempotency', () => {
         let res;
@@ -204,9 +207,9 @@ describe('/platform-users', function () {
         });
       });
     });
-    describe('when user has insufficient permissions', function () {
+    describe('when user has insufficient permissions', () =>  {
       let res;
-      before(async function () {
+      before(async () =>  {
         const insufficientPermsToken = generateToken(
           insufficientPermsUser.username
         );
@@ -218,10 +221,10 @@ describe('/platform-users', function () {
         assert.strictEqual(res.status, 401);
       });
     });
-    describe('when request to register returns an error', function () {
+    describe('when request to register returns an error', () =>  {
       let res;
       const regRespStatusCode = 423;
-      before(async function () {
+      before(async () =>  {
         nock(coreUrl)
           .delete(`/users/${platformUser.username}`)
           .reply(200);
@@ -236,10 +239,10 @@ describe('/platform-users', function () {
         assert.strictEqual(res.status, regRespStatusCode);
       });
     });
-    describe('when request to core returns an error', function () {
+    describe('when request to core returns an error', () =>  {
       let res;
       const coreRespStatusCode = 423;
-      before(async function () {
+      before(async () =>  {
         nock(coreUrl)
           .delete(`/users/${platformUser.username}`)
           .reply(coreRespStatusCode);
