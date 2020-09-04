@@ -12,6 +12,9 @@
     },
     "file": {
       "active": false
+    },
+    "audit": {
+      "filePath": "audit-log-delete-me.log"
     }
   },
   "dataFolder": "test/fixtures",

@@ -14,6 +14,7 @@ const {
   AuthorizationService,
 } = require('@middlewares/security/authorization.service');
 const { PLATFORM_USERS_PERMISSIONS } = require('@models/permissions.model');
+const { getAuditLogger, DELETE_USER_ACTION } = require('@utils/auditLogger');
 
 module.exports = function (
   expressApp: express$Application,
@@ -24,6 +25,8 @@ module.exports = function (
   const authorizationService: AuthorizationService = getAuthorizationService(
     usersRepository
   );
+
+  const auditLogger = getAuditLogger(settings.get('logs:audit:filePath'));
 
   expressApp.all('/platform-users*', verifyToken(tokensRepository));
 
@@ -53,6 +56,7 @@ module.exports = function (
       res: express$Response,
       next: express$NextFunction
     ) {
+      const usernameToDelete = req.params.username;
       const authKeyCore = settings.get('internals:CORE_SYSTEM_KEY');
       const authKeyReg = settings.get('internals:REGISTER_SYSTEM_KEY_1');
       const registerUrl = settings.get('registerUrl');
@@ -76,7 +80,7 @@ module.exports = function (
         for (const core of cores) {
           deleteFromCoresPromises.push(
             request
-              .delete(`${core.url}/users/${req.params.username}`)
+              .delete(`${core.url}/users/${usernameToDelete}`)
               .set('Authorization', authKeyCore)
           );
         }
@@ -99,13 +103,15 @@ module.exports = function (
 
       try {
         await request
-          .delete(`${registerUrl}/users/${req.params.username}?onlyReg=true`)
+          .delete(`${registerUrl}/users/${usernameToDelete}?onlyReg=true`)
           .set('Authorization', authKeyReg);
       } catch (err) {
         return res.status(err.status).json(err.response || err.message);
       }
+
+      auditLogger.appendToLogFile(res.locals.username, DELETE_USER_ACTION, usernameToDelete)
       
-      res.status(200).json({username: req.params.username});
+      res.status(200).json({username: usernameToDelete});
     }
   );
 };

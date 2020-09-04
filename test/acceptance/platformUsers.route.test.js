@@ -1,6 +1,8 @@
 // @flow
 
 // eslint-disable-next-line no-unused-vars
+const fs = require('fs');
+
 const regeneratorRuntime = require('regenerator-runtime');
 
 const assert = require('chai').assert;
@@ -18,6 +20,27 @@ const {
 describe('/platform-users', () =>  {
   const registerUrl = app.settings.get('registerUrl');
   const coreUrl = app.settings.get('followers:core:url');
+  const logFilePath = app.settings.get('logs:audit:filePath');
+
+  const auditLogPath = app.settings.get('logs:audit:filePath');
+  const { DELETE_USER_ACTION } = require('@utils/auditLogger');
+
+  function assertLog(user, action, platformUser, isWritten) {
+    if (! isWritten) {
+      return assert.isFalse(fs.existsSync(auditLogPath));
+    }
+    const logFileLines = fs.readFileSync(logFilePath).toString().split('\n');
+
+    const lastLine = logFileLines[logFileLines.length - 2];
+    console.log('testin', lastLine, 'for', `admin:${user} ${action} platformUser:${platformUser}`)
+    assert.isTrue(lastLine.includes(`admin:${user} ${action} platformUser:${platformUser}`));
+  }
+
+  function cleanupLogFileIfNeeded() {
+    if (fs.existsSync(auditLogPath)) {
+      fs.unlinkSync(auditLogPath);
+    }
+  }
 
   const chance = new Chance();
 
@@ -161,12 +184,13 @@ describe('/platform-users', () =>  {
           assert.equal(res.body.username, platformUser.username);
         });
         it('should write to log file', () => {
-
-        })
+          assertLog(user.username, DELETE_USER_ACTION, platformUser.username, true);
+        });
       });
       describe('when core fails with 404, it should still delete in register for idempotency', () => {
         let res;
         before(async () => {
+          cleanupLogFileIfNeeded()
           nock(coreUrl).delete(`/users/${platformUser.username}`).reply(404);
           nock(registerUrl)
             .delete(`/users/${platformUser.username}?onlyReg=true`)
@@ -181,10 +205,14 @@ describe('/platform-users', () =>  {
         it('should respond with deleted username in body', () => {
           assert.equal(res.body.username, platformUser.username);
         });
+        it('should write to log file', () => {
+          assertLog(user.username, DELETE_USER_ACTION, platformUser.username, true);
+        });
       });
       describe('when core fails with not 404, it should not delete in register', () => {
         let res, isRegCalled = false;
         before(async () => {
+          cleanupLogFileIfNeeded()
           nock(coreUrl).delete(`/users/${platformUser.username}`).reply(500);
           nock(registerUrl)
             .delete(`/users/${platformUser.username}?onlyReg=true`)
@@ -199,17 +227,21 @@ describe('/platform-users', () =>  {
           // unregister uncalled register mock from above
           nock.cleanAll()
         })
-        it('should respond with 500', () => {
+        it('should respond with the same status code', () => {
           assert.equal(res.status, 500);
         });
         it('should not call register', () => {
           assert.isFalse(isRegCalled);
+        });
+        it('should not write to log file', () => {
+          assertLog(user.username, DELETE_USER_ACTION, platformUser.username, false);
         });
       });
     });
     describe('when user has insufficient permissions', () =>  {
       let res;
       before(async () =>  {
+        cleanupLogFileIfNeeded()
         const insufficientPermsToken = generateToken(
           insufficientPermsUser.username
         );
@@ -220,11 +252,15 @@ describe('/platform-users', () =>  {
       it('should respond with 401', () => {
         assert.strictEqual(res.status, 401);
       });
+      it('should not write to log file', () => {
+        assertLog(user.username, DELETE_USER_ACTION, platformUser.username, false);
+      });
     });
     describe('when request to register returns an error', () =>  {
       let res;
       const regRespStatusCode = 423;
       before(async () =>  {
+        cleanupLogFileIfNeeded()
         nock(coreUrl)
           .delete(`/users/${platformUser.username}`)
           .reply(200);
@@ -238,23 +274,8 @@ describe('/platform-users', () =>  {
       it('should respond with the same status code', () => {
         assert.strictEqual(res.status, regRespStatusCode);
       });
-    });
-    describe('when request to core returns an error', () =>  {
-      let res;
-      const coreRespStatusCode = 423;
-      before(async () =>  {
-        nock(coreUrl)
-          .delete(`/users/${platformUser.username}`)
-          .reply(coreRespStatusCode);
-        nock(registerUrl)
-          .delete(`/users/${platformUser.username}?onlyReg=true`)
-          .reply(200);
-        res = await request
-          .delete(`/platform-users/${platformUser.username}`)
-          .set('Authorization', token);
-      });
-      it('should respond with the same status code', () => {
-        assert.strictEqual(res.status, coreRespStatusCode);
+      it('should not write to log file', () => {
+        assertLog(user.username, DELETE_USER_ACTION, platformUser.username, false);
       });
     });
   });
