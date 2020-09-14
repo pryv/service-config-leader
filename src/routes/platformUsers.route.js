@@ -34,7 +34,7 @@ module.exports = function (
     '/platform-users/:username',
     authorizationService.verifyIsAllowedTo(PLATFORM_USERS_PERMISSIONS.READ),
     async function (req: express$Request, res: express$Response) {
-      const authKey = settings.get('internals:REGISTER_ADMIN_KEY_1');
+      const authKey = settings.get('internals:REGISTER_SYSTEM_KEY_1');
       const registerUrl = settings.get('registerUrl');
       try {
         const getResponse = await request
