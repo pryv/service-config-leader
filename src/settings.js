@@ -34,7 +34,7 @@ store.defaults({
     dataFolder: '/app/data',
   },
   internals: {
-    tokenSignSecret: 'SECRET',
+    configLeaderTokenSecret: 'SECRET',
   },
 });
 

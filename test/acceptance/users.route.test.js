@@ -37,7 +37,7 @@ describe('Test /users endpoint', function () {
   const generateToken = function (username) {
     return sign(
       { username: username },
-      app.settings.get('internals:tokenSignSecret')
+      app.settings.get('internals:configLeaderTokenSecret')
     );
   };
 
