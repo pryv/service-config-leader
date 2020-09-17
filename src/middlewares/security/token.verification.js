@@ -20,7 +20,7 @@ export const verifyToken = (tokensRepository: TokensRepository) =>
 
       const user = verify(
         token,
-        nconfSettings.get('internals:tokenSignSecret') || '',
+        nconfSettings.get('internals:configLeaderTokenSecret') || '',
         {
           ignoreExpiration: false,
         }

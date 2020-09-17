@@ -66,7 +66,7 @@ describe('Test /auth endpoint', function () {
     before(() => {
       token = sign(
         { username: user.username },
-        app.settings.get('internals:tokenSignSecret')
+        app.settings.get('internals:configLeaderTokenSecret')
       );
     });
 
