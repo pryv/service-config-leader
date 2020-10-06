@@ -52,11 +52,11 @@ describe('Test /admin endpoint', function () {
 
     readOnlyToken = sign(
       { username: userOnlyReadPerm.username },
-      settings.get('internals:tokenSignSecret')
+      settings.get('internals:configLeaderTokenSecret')
     );
     updateOnlyToken = sign(
       { username: userOnlyUpdatePerm.username },
-      settings.get('internals:tokenSignSecret')
+      settings.get('internals:configLeaderTokenSecret')
     );
   });
 

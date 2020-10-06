@@ -39,7 +39,7 @@ module.exports = function (
 
     const token = sign(
       { username: foundUser.username, permissions: foundUser.permissions },
-      nconfSettings.get('internals:tokenSignSecret'),
+      nconfSettings.get('internals:configLeaderTokenSecret'),
       { expiresIn: '24h' }
     );
     res.status(200).json({ token });
