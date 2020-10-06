@@ -66,17 +66,19 @@ export function applySubstitutions(
   }
 
   function removeLowerValueKeysFromSettings(settings: Object): Object {
-    for (const setting of Object.keys(settings)) {
+    
+    for (const key of Object.keys(settings)) {
       if (
-        Object.hasOwnProperty.call(settings[setting], 'value') &&
-        typeof settings[setting].value === 'object' &&
-        settings[setting].value != null
+        settings[key] != null && 
+        settings[key].value != null && 
+        typeof settings[key].value === 'object'
       ) {
-        settings[setting].value = removeLowerValueKeysFromSettings(
-          settings[setting].value
-        );
-      } else if (Object.hasOwnProperty.call(settings[setting], 'value')) {
-        settings[setting] = settings[setting].value;
+        settings[key].value = removeLowerValueKeysFromSettings(settings[key].value);
+      } else if (
+        settings[key] != null && 
+        settings[key].value != null
+      ) {
+        settings[key] = settings[key].value;
       }
     }
     return settings;

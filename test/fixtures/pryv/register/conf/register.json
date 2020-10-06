@@ -122,5 +122,6 @@
     "disable": true
   },
   "invitationTokens": INVITATION_TOKENS,
-  "versioning": VERSIONING_SETTINGS
+  "versioning": VERSIONING_SETTINGS,
+  "smtp": EMAIL_SMTP_SETTINGS
 }

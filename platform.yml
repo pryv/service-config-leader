@@ -57,6 +57,17 @@ vars:
           Allows to define a set of invitation tokens for user creation by
           providing # an array of strings as well as no check (null) & prevent
           all (empty array)
+  EMAIL_CONFIGURATION_SETTINGS:
+    optional: true
+    description: "See the Emails configuration document: https://api.pryv.com/customer-resources/#documents"
+    name: "Email configuration"
+    settings:
+      EMAIL_SMTP_SETTINGS:
+        description: "If used, Host, port and credentials of the SMTP server"
+        value:
+          host: bob
+          port: 123
+          auth: null
   updatedProp:
     settings:
       SOME_SETTING:
