@@ -1,5 +1,13 @@
 ## 1.0
 
+### 1.0.20
+
+- Fix crash when embedded platform values are set to null
+
+### 1.0.19
+
+- Users delete
+
 ### 1.0.18
 
 - reload platform.yml parameters at each GET /conf (instead of only template files)
