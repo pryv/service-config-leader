@@ -2,6 +2,7 @@
 
 const express = require('express');
 const middlewares = require('@middlewares');
+const fs = require('fs');
 const nconfSettings = require('./settings.js');
 const platformSettings = require('./platform.js');
 const Database = require('better-sqlite3');
@@ -150,6 +151,11 @@ class Application {
     this.logger.info(
       `Initial user generated. Username: ${initialUser.username}, password: ${createdUser.password}`
     );
+    // also set password in the credentials volume - this directory should be set in docker-compose
+    if (!fs.existsSync('./credentials')) {
+      fs.mkdirSync('./credentials');
+    }
+    fs.writeFileSync('./credentials/credentials.txt', createdUser.password);
   }
 }
 
