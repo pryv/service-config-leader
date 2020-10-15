@@ -58,7 +58,7 @@
     ],
     "staticDataInDomain": {
       "sw": {
-        "ip": "false"
+        "ip": "REPLACE_ME"
       },
       "reg": {
         "ip": "REPLACE_ME"

@@ -32,53 +32,14 @@ export function applySubstitutions(
   }
 
   function isObjectWithValueProp(obj) {
-    return typeof obj === 'object' && Object.hasOwnProperty.call(obj, 'value');
+    return obj != null && obj.value != null;
   }
 
-  function retrieveFlatSettings(obj: Object): Object {
-    let settings = getAllGroupSettings(obj);
-    settings = minifySettings(settings);
-    return settings;
-  }
-
-  function getAllGroupSettings(groupedSettings: Object): Object {
+  function retrieveFlatSettings(rootSettings: Object): Object {
     let settings = {};
-    for (const group of Object.keys(groupedSettings)) {
-      for (const setting of Object.keys(groupedSettings[group]['settings'])) {
-        settings[setting] = groupedSettings[group]['settings'][setting];
-      }
-    }
-    return settings;
-  }
-
-  function minifySettings(settings: Object): Object {
-    for (const setting of Object.keys(settings)) {
-      if (
-        typeof settings[setting].value === 'object' &&
-        settings[setting].value != null
-      ) {
-        settings[setting].value = removeLowerValueKeysFromSettings(
-          settings[setting].value
-        );
-      }
-    }
-    return settings;
-  }
-
-  function removeLowerValueKeysFromSettings(settings: Object): Object {
-    
-    for (const key of Object.keys(settings)) {
-      if (
-        settings[key] != null && 
-        settings[key].value != null && 
-        typeof settings[key].value === 'object'
-      ) {
-        settings[key].value = removeLowerValueKeysFromSettings(settings[key].value);
-      } else if (
-        settings[key] != null && 
-        settings[key].value != null
-      ) {
-        settings[key] = settings[key].value;
+    for (const group of Object.keys(rootSettings)) {
+      for (const setting of Object.keys(rootSettings[group]['settings'])) {
+        settings[setting] = rootSettings[group]['settings'][setting].value;
       }
     }
     return settings;

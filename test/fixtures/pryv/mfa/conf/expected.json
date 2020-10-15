@@ -1,0 +1,30 @@
+{
+  "http": {
+    "port": 7000,
+    "ip": "0.0.0.0"
+  },
+  "logs": {
+    "prefix": "service-mfa",
+    "console": {
+      "active": true,
+      "level": "info",
+      "colorize": true
+    },
+    "file": {
+      "active": false
+    }
+  },
+  "core": {
+    "url": "http://core_router:1337"
+  },
+  "sms": {
+    "endpoints": {
+      "challenge": "https://challenge.api.com",
+      "verify": "https://verify.api.com"
+    },
+    "auth": "key_abcd"
+  },
+  "sessions": {
+    "ttlSeconds": 1800
+  }
+}

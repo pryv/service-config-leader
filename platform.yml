@@ -6,19 +6,29 @@ vars:
         value: rec.la
         description: ''
       STATIC_WEB_IP_ADDRESS:
-        value: false
-      REG_MASTER_IP_ADDRESS: REPLACE_ME
-      REG_MASTER_VPN_IP_ADDRESS: REPLACE_ME
-      REG_SLAVE_IP_ADDRESS: REPLACE_ME
-      SERVICE_WEBSITE_IP_ADDRESS: REPLACE_ME
-      PLATFORM_NAME: REPLACE_ME
-      SUPPORT_URL: REPLACE_ME
-      TERMS_OF_USE_URL: REPLACE_ME
+        value: REPLACE_ME
+      REG_MASTER_IP_ADDRESS: 
+        value: REPLACE_ME
+      REG_MASTER_VPN_IP_ADDRESS:
+        value: REPLACE_ME
+      REG_SLAVE_IP_ADDRESS:
+        value: REPLACE_ME
+      SERVICE_WEBSITE_IP_ADDRESS:
+        value: REPLACE_ME
+      PLATFORM_NAME:
+        value: REPLACE_ME
+      SUPPORT_URL:
+        value: REPLACE_ME
+      TERMS_OF_USE_URL:
+        value: REPLACE_ME
       SERVICE_INFO_ASSETS:
-        definitions: 'https://api.pryv.com/assets-pryv.me/index.json'
+        value:
+          definitions: 'https://api.pryv.com/assets-pryv.me/index.json'
       CORE_1:
-        ip: REPLACE_ME
-      TRUSTED_APPS: '*@https://*.DOMAIN*'
+        value:
+          ip: REPLACE_ME
+      TRUSTED_APPS: 
+        value: '*@https://*.DOMAIN*'
   DNS_SETTINGS:
     name: DNS settings
     settings:
@@ -39,18 +49,15 @@ vars:
     name: Advanced API settings
     settings:
       VERSIONING_SETTINGS:
+        description:
+          "forceKeepHistory: when true, modification history of items is stored,
+          keep-authors: defines the behaviour of items deletion:
+          - 'keep-nothing': Delete history, keep head as itemDeletion as it is now by default.
+          - 'keep-authors': Keep fields 'headId', 'id', 'modified', 'modifiedBy' in head and history.
+          - 'keep-everything': Add 'deleted' field to head item, leave history as is."
         value:
-          forceKeepHistory:
-            value: false
-            description: 'When true, modification history of items is stored'
-          deletionMode:
-            value: keep-authors
-            description: >-
-              Defines the behaviour of items deletion. 'keep-nothing': Delete
-              history, keep head as itemDeletion as it is now by default.
-              'keep-authors': Keep fields 'headId', 'id', 'modified',
-              'modifiedBy' in head and history. 'keep-everything': Add 'deleted'
-              field to head item, leave history as is.
+          forceKeepHistory: false
+          deletionMode: keep-authors
       INVITATION_TOKENS:
         value: null
         description: >-
@@ -68,6 +75,20 @@ vars:
           host: bob
           port: 123
           auth: null
+  MFA_SETTINGS:
+    optional: true
+    name: "MFA settings"
+    settings:
+      MFA_SESSIONS_TTL_SECONDS: 
+        value: 1800
+        description: "Duration in seconds after which MFA sessions are destroyed"
+      MFA_SMS_API_SETTINGS:
+        description: "Allow to define an external SMS API handling the MFA challenge. API endpoints that allow to trigger and verify the MFA challenge as well as the API key that will be passed as 'Authorization' header"
+        value:
+          endpoints:
+            challenge: https://challenge.api.com
+            verify: https://verify.api.com
+          auth: key_abcd
   updatedProp:
     settings:
       SOME_SETTING:

@@ -1,0 +1,24 @@
+{
+  "http": {
+    "port": 7000,
+    "ip": "0.0.0.0"
+  },
+  "logs": {
+    "prefix": "service-mfa",
+    "console": {
+      "active": true,
+      "level": "info",
+      "colorize": true
+    },
+    "file": {
+      "active": false
+    }
+  },
+  "core": {
+    "url": "http://core_router:1337"
+  },
+  "sms": MFA_SMS_API_SETTINGS,
+  "sessions": {
+    "ttlSeconds": 1800
+  }
+}

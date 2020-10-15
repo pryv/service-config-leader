@@ -38,7 +38,7 @@ describe('GET /conf', function () {
     const files = res.body.files;
     assert.isDefined(files);
 
-    ['core', 'register'].forEach((component) => {
+    ['core', 'register', 'mfa'].forEach((component) => {
       const conf = files.find(
         (f) => f.path === `/${component}/conf/${component}.json`
       );
