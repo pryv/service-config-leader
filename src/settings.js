@@ -31,10 +31,12 @@ store.defaults({
     file: {
       active: false,
     },
-    dataFolder: '/app/data',
   },
   internals: {
     configLeaderTokenSecret: 'SECRET',
+  },
+  credentials: {
+    filePath: '/app/credentials/credentials.txt',
   },
 });
 

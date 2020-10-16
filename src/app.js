@@ -152,10 +152,8 @@ class Application {
       `Initial user generated. Username: ${initialUser.username}, password: ${createdUser.password}`
     );
     // also set password in the credentials volume - this directory should be set in docker-compose
-    if (!fs.existsSync('./credentials')) {
-      fs.mkdirSync('./credentials');
-    }
-    fs.writeFileSync('./credentials/credentials.txt', createdUser.password);
+    const credentialsFilePath = this.settings.get('credentials:filePath');
+    fs.writeFileSync(credentialsFilePath, createdUser.password);
   }
 }
 
