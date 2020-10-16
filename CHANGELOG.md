@@ -1,5 +1,13 @@
 ## 1.0
 
+### 1.0.23
+
+Only support 1 level of platform settings (and group settings above).
+
+### 1.0.21-22
+
+rename config leader JSON web token secret in config
+
 ### 1.0.20
 
 - Fix crash when embedded platform values are set to null
