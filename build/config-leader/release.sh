@@ -5,6 +5,7 @@ source /pd_build/buildconfig
 target_dir="/app/bin"
 log_dir="/app/log"
 conf_dir="/app/conf"
+cred_dir="/app/credentials"
 
 header "Install application from release.tar"
 
@@ -30,6 +31,10 @@ run mkdir -p $conf_dir && \
 # Create the log
 run mkdir -p $log_dir && \
   run touch $log_dir/config-leader.log && run chown -R app:app $log_dir
+
+# Create the credentials dir
+run mkdir -p $cred_dir && \
+  run touch $cred_dir/credentials.txt && run chown -R app:app $cred_dir
 
 # Install the script that runs the api service
 run mkdir /etc/runit
