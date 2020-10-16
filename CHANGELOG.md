@@ -1,6 +1,6 @@
 ## 1.0
 
-### 1.0.24
+### 1.0.24-25
 
 add initial_user credentials folder to config
 
