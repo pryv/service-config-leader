@@ -1,5 +1,9 @@
 ## 1.0
 
+### 1.0.24
+
+add initial_user credentials folder to config
+
 ### 1.0.23
 
 Only support 1 level of platform settings (and group settings above).
