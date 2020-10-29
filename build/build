@@ -14,7 +14,7 @@ version=$(cat build_tag)
 # clients:
 cp ./build_tag ../.api-version
 
-host="pryvsa-docker-release.bintray.io"
+host="eu.gcr.io"
 
 # Create a release.tar that contains all the code. 
 tar cf $SCRIPT_FOLDER/config-leader/release.tar \
@@ -24,5 +24,5 @@ tar cf $SCRIPT_FOLDER/config-leader/release.tar \
   . &&
 
 echo "---------------------------- building config-leader ------------------------------"
-docker build -f $SCRIPT_FOLDER/config-leader/Dockerfile -t $host/pryv/config-leader:$version $SCRIPT_FOLDER/config-leader/.
+docker build -f $SCRIPT_FOLDER/config-leader/Dockerfile -t $host/pryvio/config-leader:$version $SCRIPT_FOLDER/config-leader/.
 docker push $host/pryv/config-leader:$version
