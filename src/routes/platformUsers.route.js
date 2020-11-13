@@ -66,7 +66,7 @@ module.exports = function (
         return next(new Error('Missing followers settings'));
       }
       const cores = Object.entries(followers)
-        .filter((follower) => follower[1].role === 'core')
+        .filter((follower) => (follower[1].role === 'core') || (follower[1].role === 'singlenode'))
         .map((core) => core[1]);
 
       if (cores == null || cores.length === 0) {
@@ -78,11 +78,19 @@ module.exports = function (
       try {
         const deleteFromCoresPromises = [];
         for (const core of cores) {
-          deleteFromCoresPromises.push(
-            request
-              .delete(`${core.url}/users/${usernameToDelete}`)
-              .set('Authorization', authKeyCore)
-          );
+          if (core.role === 'singlenode') {
+            deleteFromCoresPromises.push(
+              request
+                .delete(`http://core:3000/users/${usernameToDelete}`)
+                .set('Authorization', authKeyCore)
+            );
+          } else {
+            deleteFromCoresPromises.push(
+              request
+                .delete(`${core.url}/users/${usernameToDelete}`)
+                .set('Authorization', authKeyCore)
+            );
+          }
         }
 
         await bluebird.any(deleteFromCoresPromises);

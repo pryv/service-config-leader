@@ -26,7 +26,9 @@ class Application {
   usersRepository: UsersRepository;
   tokensRepository: TokensRepository;
 
-  constructor() {
+  constructor(settingsOverride = {}) {
+    if (settingsOverride.nconfSettings) nconfSettings.overrides(settingsOverride.nconfSettings);
+    if (settingsOverride.platformSettings) platformSettings.overrides(settingsOverride.platformSettings);
     this.logger = require('./utils/logging').getLogger('app');
     this.settings = nconfSettings;
     this.platformSettings = platformSettings;

@@ -167,24 +167,49 @@ describe('/platform-users', () =>  {
   describe('DELETE /:username', () =>  {
     describe('when user has sufficient permissions', () =>  {
       describe('when core and register succeed', () => {
-        let res;
-        before(async () =>  {
-          nock(coreUrl).delete(`/users/${platformUser.username}`).reply(200);
-          nock(registerUrl)
-            .delete(`/users/${platformUser.username}?onlyReg=true`)
-            .reply(200);
-          res = await request
-            .delete(`/platform-users/${platformUser.username}`)
-            .set('Authorization', token);
+        describe('in cluster setup', () => {
+          let res;
+          before(async () =>  {
+            nock(coreUrl).delete(`/users/${platformUser.username}`).reply(200);
+            nock(registerUrl)
+              .delete(`/users/${platformUser.username}?onlyReg=true`)
+              .reply(200);
+            res = await request
+              .delete(`/platform-users/${platformUser.username}`)
+              .set('Authorization', token);
+          });
+          it('should respond with 200', () => {
+            assert.strictEqual(res.status, 200);
+          });
+          it('should respond with deleted username in body', () => {
+            assert.equal(res.body.username, platformUser.username);
+          });
+          it('should write to log file', () => {
+            assertLog(user.username, DELETE_USER_ACTION, platformUser.username, true);
+          });
         });
-        it('should respond with 200', () => {
-          assert.strictEqual(res.status, 200);
-        });
-        it('should respond with deleted username in body', () => {
-          assert.equal(res.body.username, platformUser.username);
-        });
-        it('should write to log file', () => {
-          assertLog(user.username, DELETE_USER_ACTION, platformUser.username, true);
+        describe('in single-node setup', () => {
+          const app2 = new Application({nconfSettings: { followers: { abc: { url: 'myurl', role: 'singlenode' } }, registerUrl: 'register:9000'}});
+          const request2 = require('supertest')(app2.express);
+          let res;
+          before(async () =>  {
+            nock('core:3000').delete(`/users/${platformUser.username}`).reply(200);
+            nock('register:9000')
+              .delete(`/users/${platformUser.username}?onlyReg=true`)
+              .reply(200);
+            res = await request2
+              .delete(`/platform-users/${platformUser.username}`)
+              .set('Authorization', token);
+          });
+          it('should respond with 200', () => {
+            assert.strictEqual(res.status, 200);
+          });
+          it('should respond with deleted username in body', () => {
+            assert.equal(res.body.username, platformUser.username);
+          });
+          it('should write to log file', () => {
+            assertLog(user.username, DELETE_USER_ACTION, platformUser.username, true);
+          });
         });
       });
       describe('when core fails with 404, it should still delete in register for idempotency', () => {
