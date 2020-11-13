@@ -189,10 +189,10 @@ describe('/platform-users', () =>  {
           });
         });
         describe('in single-node setup', () => {
-          const app2 = new Application({nconfSettings: { followers: { abc: { url: 'myurl', role: 'singlenode' } }, registerUrl: 'register:9000'}});
-          const request2 = require('supertest')(app2.express);
           let res;
           before(async () =>  {
+            const app2 = new Application({nconfSettings: { followers: { abc: { url: 'myurl', role: 'singlenode' } }, registerUrl: 'register:9000'}});
+            const request2 = require('supertest')(app2.express);
             nock('core:3000').delete(`/users/${platformUser.username}`).reply(200);
             nock('register:9000')
               .delete(`/users/${platformUser.username}?onlyReg=true`)

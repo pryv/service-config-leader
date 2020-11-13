@@ -5,7 +5,7 @@
 // eslint-disable-next-line no-unused-vars
 const regeneratorRuntime = require('regenerator-runtime');
 
-const settings = require('@root/settings');
+const settings = require('@root/settings').getConfig();
 const middlewares = require('@middlewares');
 const authMiddleware = middlewares.authorization(settings);
 const assert = require('chai').assert;

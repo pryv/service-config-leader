@@ -3,7 +3,7 @@
 const { verify } = require('jsonwebtoken');
 const errorsFactory = require('@utils/errorsHandling').factory;
 const { TokensRepository } = require('@repositories/tokens.repository');
-const nconfSettings = require('@root/settings.js');
+const nconfSettings = require('@root/settings.js').getConfig();
 
 export const verifyToken = (tokensRepository: TokensRepository) =>
   function (
