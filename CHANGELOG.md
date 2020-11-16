@@ -1,5 +1,9 @@
 ## 1.0
 
+### 1.0.26
+
+Fix delete platform user for single-node setup
+
 ### 1.0.24-25
 
 add initial_user credentials folder to config
