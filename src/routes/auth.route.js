@@ -5,7 +5,7 @@ const { userLoginSchema } = require('./validation/user.schema');
 const { UsersRepository } = require('@repositories/users.repository');
 const { sign } = require('jsonwebtoken');
 const { TokensRepository } = require('@repositories/tokens.repository');
-const nconfSettings = require('@root/settings.js').getConfig();
+const nconfSettings = (new (require('@root/settings'))()).store;
 const { verifyToken } = require('@middlewares/security/token.verification');
 import type { User } from '@models/user.model';
 

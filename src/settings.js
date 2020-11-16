@@ -3,23 +3,22 @@
 const nconf = require('nconf');
 const path = require('path');
 
-function getConfig() {
-  console.log('AAAAAAAA runnin getConfig', store);
-  const store = new nconf.Provider();
+function nconfSettings() {
+  this.store = new nconf.Provider();
 
   // 1. `process.env`
   // 2. `process.argv`
   //
-  store.env().argv();
+  this.store.env().argv();
 
   // 3. Values in `config.json`
   //
-  const configFile = store.get('config') || 'dev-config.json';
-  store.file({ file: configFile });
+  const configFile = this.store.get('config') || 'dev-config.json';
+  this.store.file({ file: configFile });
 
   // 4. Any default values
   //
-  store.defaults({
+  this.store.defaults({
     http: {
       port: 7000,
       ip: '127.0.0.1',
@@ -43,7 +42,7 @@ function getConfig() {
     },
   });
 
-  return store;
+  return this;
 }
 
-module.exports.getConfig = getConfig;
+module.exports = nconfSettings;

@@ -3,8 +3,8 @@
 const express = require('express');
 const middlewares = require('@middlewares');
 const fs = require('fs');
-const nconfSettings = require('./settings.js').getConfig();
-const platformSettings = require('./platform.js');
+const nconfSettings = (new (require('./settings'))).store;
+const platformSettings = require('./platform');
 const Database = require('better-sqlite3');
 const CronJob = require('cron').CronJob;
 const { UsersRepository } = require('@repositories/users.repository');
@@ -27,11 +27,12 @@ class Application {
   tokensRepository: TokensRepository;
 
   constructor(settingsOverride = {}) {
-    if (settingsOverride.nconfSettings) nconfSettings.overrides(settingsOverride.nconfSettings);
-    if (settingsOverride.platformSettings) platformSettings.overrides(settingsOverride.platformSettings);
-    this.logger = require('./utils/logging').getLogger('app');
+    if (settingsOverride.nconfSettings) nconfSettings.merge(settingsOverride.nconfSettings);
+    if (settingsOverride.platformSettings) platformSettings.merge(settingsOverride.platformSettings);
     this.settings = nconfSettings;
     this.platformSettings = platformSettings;
+
+    this.logger = require('./utils/logging').getLogger('app');
     this.db = this.connectToDb();
     this.usersRepository = new UsersRepository(this.db);
     this.tokensRepository = new TokensRepository(this.db);

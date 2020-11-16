@@ -93,7 +93,7 @@ module.exports = function (
           }
         }
 
-        await bluebird.any(deleteFromCoresPromises);
+        const res = await bluebird.any(deleteFromCoresPromises);
       } catch (err) {
         let unexpectedError: ?{};
         err.forEach(error => {
@@ -110,7 +110,7 @@ module.exports = function (
       }
 
       try {
-        await request
+        const res = await request
           .delete(`${registerUrl}/users/${usernameToDelete}?onlyReg=true`)
           .set('Authorization', authKeyReg);
       } catch (err) {

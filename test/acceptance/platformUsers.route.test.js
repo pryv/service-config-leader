@@ -190,16 +190,23 @@ describe('/platform-users', () =>  {
         });
         describe('in single-node setup', () => {
           let res;
+          let followersBackup, registerUrlBackup;
           before(async () =>  {
-            const app2 = new Application({nconfSettings: { followers: { abc: { url: 'myurl', role: 'singlenode' } }, registerUrl: 'register:9000'}});
+            followersBackup = app.settings.get('followers');
+            registerUrlBackup = app.settings.get('registerUrl');
+            const app2 = new Application({nconfSettings: { followers: { abc: { url: 'myurl', role: 'singlenode' } }, registerUrl: 'http://register:9000'}});
             const request2 = require('supertest')(app2.express);
-            nock('core:3000').delete(`/users/${platformUser.username}`).reply(200);
-            nock('register:9000')
+            nock('http://core:3000').delete(`/users/${platformUser.username}`).reply(200);
+            nock('http://register:9000')
               .delete(`/users/${platformUser.username}?onlyReg=true`)
               .reply(200);
             res = await request2
               .delete(`/platform-users/${platformUser.username}`)
               .set('Authorization', token);
+          });
+          after(() => {
+            app.settings.set('followers', followersBackup);
+            app.settings.set('registerUrl', registerUrlBackup);
           });
           it('should respond with 200', () => {
             assert.strictEqual(res.status, 200);
