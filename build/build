@@ -25,4 +25,4 @@ tar cf $SCRIPT_FOLDER/config-leader/release.tar \
 
 echo "---------------------------- building config-leader ------------------------------"
 docker build -f $SCRIPT_FOLDER/config-leader/Dockerfile -t $host/pryvio/config-leader:$version $SCRIPT_FOLDER/config-leader/.
-docker push $host/pryv/config-leader:$version
+docker push $host/pryvio/config-leader:$version
