@@ -187,11 +187,15 @@ describe('Test /admin endpoint', function () {
       assert.isDefined(failures);
       assert.isDefined(successes);
       const followers = settings.get('followers');
-      for (const key of Object.keys(followers)) {
-        if (key === 'failing') {
-          assert.isDefined(failures[key]);
+      for (const [token, follower] of Object.entries(followers)) {
+        if (token === 'failing') {
+          const failure = failures.find(failure => failure.url === follower.url);
+          assert.exists(failure);
+          assert.equal(failure.role, follower.role);
         } else {
-          assert.isDefined(successes[key]);
+          const success = successes.find(success => success.url === follower.url);
+          assert.exists(success);
+          assert.equal(success.role, follower.role);
         }
       }
     });

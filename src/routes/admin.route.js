@@ -109,8 +109,8 @@ module.exports = function (
         next(new Error('Missing followers settings.'));
       }
 
-      let successes = {};
-      let failures = {};
+      let successes = [];
+      let failures = [];
       for (const [auth, follower] of Object.entries(followers)) {
         const followerUrl = follower.url;
         try {
@@ -118,10 +118,10 @@ module.exports = function (
             .post(`${followerUrl}/notify`)
             .set('Authorization', auth)
             .send({ services: services });
-          successes[auth] = follower;
+          successes.push(follower);
         } catch (err) {
           logger.warn('Error while notifying follower:', err);
-          failures[auth] = Object.assign({}, follower, { error: err });
+          failures.push(Object.assign({}, follower, { error: err }));
         }
       }
 

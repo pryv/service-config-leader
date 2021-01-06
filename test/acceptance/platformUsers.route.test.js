@@ -1,12 +1,10 @@
 // @flow
-
-// eslint-disable-next-line no-unused-vars
 const fs = require('fs');
 
 const regeneratorRuntime = require('regenerator-runtime');
 
 const assert = require('chai').assert;
-const { describe, before, it, afterEach, beforeEach, after } = require('mocha');
+const { describe, before, it, afterEach, after } = require('mocha');
 const Chance = require('chance');
 const nock = require('nock');
 const Application = require('@root/app');
