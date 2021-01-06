@@ -40,7 +40,7 @@ module.exports = function (
         const getResponse = await request
           .get(`${registerUrl}/admin/users/${req.params.username}`)
           .set('Authorization', authKey);
-        res.status(200).json(getResponse.body);
+        res.status(200).json({ user: getResponse.body });
       } catch (err) {
         logger.warn('Error while deleting user:', err);
         res.status(err.status || 500).json(err.response || err.message);
