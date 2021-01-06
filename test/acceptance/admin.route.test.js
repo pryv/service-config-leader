@@ -133,7 +133,7 @@ describe('Test /admin endpoint', function () {
         .set('Authorization', updateOnlyToken);
 
       assert.strictEqual(res.status, 200);
-      assert.deepEqual(res.body, updatedSettings);
+      assert.deepEqual(res.body.settings, updatedSettings);
       assert.deepEqual(platformSettings.get('vars'), updatedSettings);
       const ymlFile = fs.readFileSync('platform.yml', 'utf8');
       const platform = yaml.safeLoad(ymlFile);

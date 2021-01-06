@@ -72,7 +72,9 @@ module.exports = function (
           platformSettings.set('vars', previousSettings);
           return next(err);
         }
-        res.send(newSettings);
+        res.send({ 
+          settings: newSettings
+        });
       });
     }
   );
