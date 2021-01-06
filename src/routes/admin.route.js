@@ -90,7 +90,9 @@ module.exports = function (
       if (currentSettings == null) {
         next(new Error('Missing platform settings.'));
       }
-      res.json(currentSettings);
+      res.json({
+        settings: currentSettings
+      });
     }
   );
 

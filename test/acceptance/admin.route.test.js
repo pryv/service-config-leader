@@ -108,7 +108,7 @@ describe('Test /admin endpoint', function () {
 
       assert.strictEqual(res.status, 200);
       assert.include(res.headers['content-type'], 'application/json');
-      assert.deepEqual(res.body, platform.vars);
+      assert.deepEqual(res.body.settings, platform.vars);
     });
     it('should return 401 when given token with insufficient permissions', async () => {
       const res = await request
