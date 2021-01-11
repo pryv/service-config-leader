@@ -40,7 +40,7 @@ module.exports = function (
     authorizationService.verifyGivenPermissionsNotExceedOwned(),
     function (req: express$Request, res: express$Response) {
       const createdUser = usersRepository.createUser(((req.body: any): User));
-      res.status(201).json(createdUser);
+      res.status(201).json({ user:createdUser });
     }
   );
 
@@ -49,7 +49,7 @@ module.exports = function (
     authorizationService.verifyIsAllowedTo(USERS_PERMISSIONS.READ),
     function (req: express$Request, res: express$Response) {
       const retrievedUsers = usersRepository.findAllUsers();
-      res.status(200).json(retrievedUsers);
+      res.status(200).json({ users: retrievedUsers });
     }
   );
 
@@ -61,7 +61,7 @@ module.exports = function (
       if (!retrievedUser || Object.keys(retrievedUser).length == 0) {
         res.status(404).json(`User ${req.params.username} not found`);
       } else {
-        res.status(200).json(retrievedUser);
+        res.status(200).json({user: retrievedUser});
       }
     }
   );
@@ -82,7 +82,7 @@ module.exports = function (
     validator.body(changePasswordSchema),
     function (req: express$Request, res: express$Response) {
       const newPassword: UserOptional = {
-        password: ((req.body: any): UserPasswordChange).newPassword,
+        password: req.body.newPassword,
       };
       const updatedUser = usersRepository.updateUser(
         req.params.username,
@@ -90,7 +90,7 @@ module.exports = function (
       );
       const token = req.headers.authorization;
       tokensRepository.blacklist(token);
-      res.status(200).json(updatedUser);
+      res.status(200).json({});
     }
   );
 
@@ -105,7 +105,7 @@ module.exports = function (
         req.params.username,
         ((req.body: any): UserOptional)
       );
-      res.status(200).json(updatedUser);
+      res.status(200).json({ user: updatedUser });
     }
   );
 

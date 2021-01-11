@@ -107,7 +107,7 @@ describe('/platform-users', () =>  {
     deleteAllStmt.run();
   });
 
-  describe('GET /', () =>  {
+  describe('GET /:username', () =>  {
     describe('when user has sufficient permissions', () =>  {
       let res;
       before(async () =>  {
@@ -123,13 +123,15 @@ describe('/platform-users', () =>  {
         assert.strictEqual(res.status, 200);
       });
       it('should respond with retrieved user in body', () => {
-        assert.equal(res.body.username, platformUser.username);
-        assert.equal(res.body.password, platformUser.password);
-        assert.equal(res.body.email, platformUser.email);
-        assert.equal(res.body.appId, platformUser.appId);
-        assert.equal(res.body.invitationToken, platformUser.invitationToken);
-        assert.equal(res.body.referer, platformUser.referer);
-        assert.equal(res.body.languageCode, platformUser.languageCode);
+        assert.exists(res.body.user);
+        const user = res.body.user;
+        assert.equal(user.username, platformUser.username);
+        assert.equal(user.password, platformUser.password);
+        assert.equal(user.email, platformUser.email);
+        assert.equal(user.appId, platformUser.appId);
+        assert.equal(user.invitationToken, platformUser.invitationToken);
+        assert.equal(user.referer, platformUser.referer);
+        assert.equal(user.languageCode, platformUser.languageCode);
       });
     });
     describe('when request to register returns an error', () =>  {

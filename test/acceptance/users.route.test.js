@@ -87,9 +87,11 @@ describe('Test /users endpoint', function () {
         .send(userToCreate);
 
       assert.strictEqual(res.status, 201);
-      assert.equal(res.body.username, userToCreate.username);
-      assert.deepEqual(res.body.permissions, userToCreate.permissions);
-      assert.notExists(res.body.password);
+      assert.exists(res.body.user);
+      const user = res.body.user;
+      assert.equal(user.username, userToCreate.username);
+      assert.deepEqual(user.permissions, userToCreate.permissions);
+      assert.notExists(user.password);
     });
     it('should respond with 400 given no body was provided', async () => {
       const res = await request.post('/users').set('Authorization', token);
@@ -166,7 +168,7 @@ describe('Test /users endpoint', function () {
     };
 
     before(function () {
-      app.usersRepository.createUser(((userInDb: any): User));
+      app.usersRepository.createUser(userInDb);
     });
 
     it('should respond with 200 and retrieved user in body', async () => {
@@ -175,9 +177,11 @@ describe('Test /users endpoint', function () {
         .set('Authorization', token);
 
       assert.strictEqual(res.status, 200);
-      assert.equal(res.body.username, userInDb.username);
-      assert.deepEqual(res.body.permissions, userInDb.permissions);
-      assert.notExists(res.body.password);
+      assert.exists(res.body.user);
+      const user = res.body.user;
+      assert.equal(user.username, userInDb.username);
+      assert.deepEqual(user.permissions, userInDb.permissions);
+      assert.notExists(user.password);
     });
     it('should respond with 404 if requested username does not exist', async () => {
       const res = await request
@@ -225,10 +229,12 @@ describe('Test /users endpoint', function () {
       const res = await request.get('/users').set('Authorization', token);
 
       assert.strictEqual(res.status, 200);
-      assert.equal(res.body.length, 3);
-      assert.equal(res.body[0].username, user.username);
-      assert.deepEqual(res.body[0].permissions, user.permissions);
-      assert.notExists(res.body[0].password);
+      assert.exists(res.body.users);
+      const users = res.body.users;
+      assert.equal(users.length, 3);
+      assert.equal(users[0].username, user.username);
+      assert.deepEqual(users[0].permissions, user.permissions);
+      assert.notExists(users[0].password);
     });
     it('should respond with 401 when given token with insufficient permissions', async () => {
       const userNoReadPerm = {
@@ -272,9 +278,11 @@ describe('Test /users endpoint', function () {
         .send(newPerms);
 
       assert.strictEqual(res.status, 200);
-      assert.notExists(res.body.username);
-      assert.deepEqual(res.body.permissions, newPerms.permissions);
-      assert.notExists(res.body.password);
+      assert.exists(res.body.user);
+      const user = res.body.user;
+      assert.notExists(user.username);
+      assert.deepEqual(user.permissions, newPerms.permissions);
+      assert.notExists(user.password);
     });
     it('should respond with 400 given invalid input', async () => {
       const invalidObj = {
@@ -323,7 +331,7 @@ describe('Test /users endpoint', function () {
 
     it('should respond with 200 and new password in body', async () => {
       const res = await request
-        .post(`/users/${userToResetPassFor.username}/reset-password`)
+        .post('/users/' + userToResetPassFor.username + '/reset-password')
         .set('Authorization', token);
 
       assert.strictEqual(res.status, 200);
@@ -369,18 +377,18 @@ describe('Test /users endpoint', function () {
       tokenToChangePasswordOn = generateToken(usernameToChangePasswordOn);
     });
 
-    it('should respond with 401 given token with different username than requested', async () => {
+    it('should respond with 401 when given token with different username than requested', async () => {
       const username = 'userPX';
 
       const res = await request
-        .post(`/users/${username}/change-password`)
+        .post('/users/' + username + '/change-password')
         .set('Authorization', token)
         .send(passwordChangeInput);
 
       assert.strictEqual(res.status, 401);
       assert.include(res.error.text, 'Insufficient permissions');
     });
-    it('should respond with 401 given invalid old password', async () => {
+    it('should respond with 401 when given invalid old password', async () => {
       const res = await request
         .post(`/users/${usernameToChangePasswordOn}/change-password`)
         .set('Authorization', tokenToChangePasswordOn)
@@ -391,7 +399,7 @@ describe('Test /users endpoint', function () {
       assert.strictEqual(res.status, 401);
       assert.include(res.error.text, 'Invalid password');
     });
-    it('should respond with 400 given not matching new passwords', async () => {
+    it('should respond with 400 when given not matching new passwords', async () => {
       const res = await request
         .post(`/users/${usernameToChangePasswordOn}/change-password`)
         .set('Authorization', tokenToChangePasswordOn)
@@ -404,14 +412,14 @@ describe('Test /users endpoint', function () {
       assert.strictEqual(res.status, 400);
       assert.include(res.error.text, 'Passwords do not match');
     });
-    it('should respond with 200 and no password in body', async () => {
+
+    it('should respond with 200 and new password in body when given valid input', async () => {
       const res = await request
-        .post(`/users/${usernameToChangePasswordOn}/change-password`)
+        .post('/users/' + usernameToChangePasswordOn + '/change-password')
         .set('Authorization', tokenToChangePasswordOn)
         .send(passwordChangeInput);
 
       assert.strictEqual(res.status, 200);
-      assert.notExists(res.body.password);
     });
   });
   describe('DELETE /users/:username', function () {
@@ -427,7 +435,7 @@ describe('Test /users endpoint', function () {
 
     it('should respond with 200 and deleted username in body', async () => {
       const res = await request
-        .delete(`/users/${userToDelete.username}`)
+        .delete('/users/' + userToDelete.username)
         .set('Authorization', token);
 
       assert.strictEqual(res.status, 200);
