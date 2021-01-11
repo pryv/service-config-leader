@@ -1,5 +1,9 @@
 ## 1.0
 
+### 1.1
+
+Fix API response format for coherence with core API.
+
 ### 1.0.26
 
 Fix delete platform user for single-node setup
