@@ -66,8 +66,9 @@ describe('Test /admin endpoint', function () {
 
   it('responds with CORS related headers', async () => {
     const res = await request
-      .post('/admin/notify')
-      .set('Authorization', updateOnlyToken);
+      .put('/admin/settings')
+      .set('Authorization', updateOnlyToken)
+      .send({});
 
     const headers = res.headers;
 
