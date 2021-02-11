@@ -6,7 +6,7 @@
   "author": "Thiébaud Modoux",
   "license": "MIT",
   "scripts": {
-    "start": "node_modules/.bin/babel-node src/server.js --config dev-config.json",
+    "start": "node_modules/.bin/babel-node src/server.js --config dev-config.json  --platformConfig platform.yml",
     "start-prod": "node dist/server.js --config dev-config.json",
     "release": "node_modules/.bin/babel src/ -d dist/",
     "watch": "node_modules/.bin/babel --verbose --watch=./src --out-dir=dist/ --copy-files --source-maps both",

@@ -29,6 +29,16 @@ vars:
           ip: REPLACE_ME
       TRUSTED_APPS: 
         value: '*@https://*.DOMAIN*'
+  API_SETTINGS:
+    name: "API settings"
+    settings:
+      ACCOUNT_DELETION:
+        description: "Whether platform user account is available and by which command.
+          Available tokens:
+          - adminToken: User account deletion will become available through the admin API using the delete platform user method (https://api.pryv.com/reference-admin/#delete-user)
+          - personalToken: User account deletion will be available by the user with a personal token. Contact Pryv for the API route details."
+        value:
+          - adminToken
   DNS_SETTINGS:
     name: DNS settings
     settings:
