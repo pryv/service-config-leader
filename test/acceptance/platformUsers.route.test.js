@@ -310,5 +310,22 @@ describe('/platform-users', () =>  {
         assertLog(user.username, DELETE_USER_ACTION, platformUser.username, false);
       });
     });
+    describe('when user deletion is disabled', () => {
+      let request2, res;
+      before(() => {
+        const app2 = new Application({platformSettings: { 
+          vars: { API_SETTINGS: { settings: { ACCOUNT_DELETION: { value: []}}}}
+        }});
+        request2 = require('supertest')(app2.express);
+      });
+      before(async () => {
+        res = await request2
+          .delete('/platform-users/doesntmatter')
+          .set('Authorization', token);
+      });
+      it('should respond with 403', () => {
+        assert.equal(res.status, 403);
+      });
+    });
   });
 });

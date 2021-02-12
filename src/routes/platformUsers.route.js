@@ -19,13 +19,13 @@ const { getAuditLogger, DELETE_USER_ACTION } = require('@utils/auditLogger');
 module.exports = function (
   expressApp: express$Application,
   settings: Object,
+  platformSettings: Object,
   usersRepository: UsersRepository,
   tokensRepository: TokensRepository
 ) {
   const authorizationService: AuthorizationService = getAuthorizationService(
     usersRepository
   );
-
   const auditLogger = getAuditLogger(settings.get('logs:audit:filePath'));
 
   expressApp.all('/platform-users*', verifyToken(tokensRepository));
@@ -56,6 +56,13 @@ module.exports = function (
       res: express$Response,
       next: express$NextFunction
     ) {
+      const accountDeletions: Array<string> = platformSettings.get('vars:API_SETTINGS:settings:ACCOUNT_DELETION:value');
+      const isDeleteAllowed: boolean = accountDeletions.includes('adminToken');
+      if (! isDeleteAllowed) {
+        const error: any = new Error('Platform user deletion is disabled. Refer to your platform configuration.')
+        error.httpStatus = 403;
+        return next(error);
+      }
       const usernameToDelete = req.params.username;
       const authKeyCore = settings.get('internals:CORE_SYSTEM_KEY');
       const authKeyReg = settings.get('internals:REGISTER_SYSTEM_KEY_1');
