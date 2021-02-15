@@ -1,5 +1,10 @@
 ## 1.0
 
+### 1.1.3
+
+- add account deletion option
+- adapt to core deleting register
+
 ### 1.1
 
 Fix API response format for coherence with core API.
