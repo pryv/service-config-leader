@@ -121,7 +121,8 @@ module.exports = function (
           .delete(`${registerUrl}/users/${usernameToDelete}?onlyReg=true`)
           .set('Authorization', authKeyReg);
       } catch (err) {
-        return res.status(err.status).json(err.response || err.message);
+        // was already deleted by core
+        if (err.status !== 404) return res.status(err.status).json(err.response || err.message);
       }
 
       auditLogger.appendToLogFile(res.locals.username, DELETE_USER_ACTION, usernameToDelete)
