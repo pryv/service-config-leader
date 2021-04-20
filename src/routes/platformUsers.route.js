@@ -14,7 +14,7 @@ const {
   AuthorizationService,
 } = require('@middlewares/security/authorization.service');
 const { PLATFORM_USERS_PERMISSIONS } = require('@models/permissions.model');
-const { getAuditLogger, DELETE_USER_ACTION } = require('@utils/auditLogger');
+const { getAuditLogger, DELETE_USER_ACTION, MODIFY_USER_ACTION } = require('@utils/auditLogger');
 
 module.exports = function (
   expressApp: express$Application,
@@ -125,7 +125,7 @@ module.exports = function (
         if (err.status !== 404) return res.status(err.status).json(err.response || err.message);
       }
 
-      auditLogger.appendToLogFile(res.locals.username, DELETE_USER_ACTION, usernameToDelete)
+      auditLogger.appendToLogFile(res.locals.username, DELETE_USER_ACTION, usernameToDelete);
       
       res.status(200).json({username: usernameToDelete});
     }
@@ -163,6 +163,9 @@ module.exports = function (
         let status = err.status || 500;
         return res.status(status).json(err.response || err.message);
       }
+
+      auditLogger.appendToLogFile(res.locals.username, MODIFY_USER_ACTION, username);
+
       res.status(204).end();
   });
 };

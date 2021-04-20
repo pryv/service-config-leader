@@ -13,8 +13,13 @@ function getAuditLogger(filePath: string): AuditLogger {
 }
 
 const DELETE_USER_ACTION = 'DELETE /platform-users/:username';
+const MODIFY_USER_ACTION = 'MODIFY /platform-users/:username';
 
-module.exports = { getAuditLogger, DELETE_USER_ACTION };
+module.exports = { 
+  getAuditLogger,
+  DELETE_USER_ACTION,
+  MODIFY_USER_ACTION,
+};
 
 class AuditLogger {
 

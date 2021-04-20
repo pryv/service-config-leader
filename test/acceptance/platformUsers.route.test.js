@@ -21,7 +21,7 @@ describe('/platform-users', () =>  {
   const logFilePath = app.settings.get('logs:audit:filePath');
 
   const auditLogPath = app.settings.get('logs:audit:filePath');
-  const { DELETE_USER_ACTION } = require('@utils/auditLogger');
+  const { DELETE_USER_ACTION, MODIFY_USER_ACTION } = require('@utils/auditLogger');
 
   function assertLog(user, action, platformUser, isWritten) {
     if (! isWritten) {
@@ -346,6 +346,9 @@ describe('/platform-users', () =>  {
       it('should respond with 204', () => {
         assert.strictEqual(res.status, 204);
       });
+      it('should write to log file', () => {
+        assertLog(user.username, MODIFY_USER_ACTION, platformUser.username, true);
+      });
     });
     describe('when the request to core returns an error', () =>  {
       let res;
@@ -366,6 +369,9 @@ describe('/platform-users', () =>  {
       it('should respond with the same status code', () => {
         assert.strictEqual(res.status, coreRespStatusCode);
       });
+      it('should not write to log file', () => {
+        assertLog(user.username, MODIFY_USER_ACTION, platformUser.username, false);
+      });
     });
     describe('when user has insufficient permissions', () =>  {
       let res;
@@ -374,11 +380,14 @@ describe('/platform-users', () =>  {
           insufficientPermsUser.username
         );
         res = await request
-          .get(`/platform-users/${platformUser.username}`)
+          .delete(`/platform-users/${platformUser.username}/mfa`)
           .set('Authorization', insufficientPermsToken);
       });
       it('should respond with 401', () => {
         assert.strictEqual(res.status, 401);
+      });
+      it('should not write to log file', () => {
+        assertLog(user.username, MODIFY_USER_ACTION, platformUser.username, false);
       });
     });
   });

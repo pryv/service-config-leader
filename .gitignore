@@ -19,3 +19,4 @@ test_results/
 .vscode/
 config-user-management.db
 credentials.txt
+*.log
