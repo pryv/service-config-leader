@@ -5,7 +5,7 @@ const regeneratorRuntime = require('regenerator-runtime');
 
 const assert = require('chai').assert;
 const { describe, before, it, afterEach, after } = require('mocha');
-const Chance = require('chance');
+const charlatan = require('charlatan');
 const nock = require('nock');
 const Application = require('@root/app');
 const app = new Application();
@@ -40,24 +40,23 @@ describe('/platform-users', () =>  {
     }
   }
 
-  const chance = new Chance();
-
   const user = {
-    username: chance.last(),
-    password: chance.word(),
+    username: charlatan.Lorem.characters(9),
+    password: charlatan.Lorem.characters(9),
     permissions: {
       users: [],
       settings: [],
       platformUsers: [
         PLATFORM_USERS_PERMISSIONS.READ,
         PLATFORM_USERS_PERMISSIONS.DELETE,
+        PLATFORM_USERS_PERMISSIONS.MMODIFY,
       ],
     },
   };
 
   const insufficientPermsUser = {
-    username: chance.last(),
-    password: chance.word(),
+    username: charlatan.Lorem.characters(9),
+    password: charlatan.Lorem.characters(9),
     permissions: {
       users: [],
       settings: [],
@@ -66,13 +65,13 @@ describe('/platform-users', () =>  {
   };
 
   const platformUser = {
-    username: chance.last(),
-    password: chance.word(),
-    email: chance.email(),
-    appId: chance.fbid(),
-    invitationToken: chance.word(),
-    referer: chance.last(),
-    languageCode: chance.locale(),
+    username: charlatan.Lorem.characters(9),
+    password: charlatan.Lorem.characters(9),
+    email: charlatan.Internet.email(),
+    appId: charlatan.Lorem.characters(9),
+    invitationToken: charlatan.Lorem.characters(9),
+    referer: charlatan.Lorem.characters(9),
+    languageCode: charlatan.Lorem.characters(2),
   };
 
   let deleteAllStmt;
@@ -325,6 +324,61 @@ describe('/platform-users', () =>  {
       });
       it('should respond with 403', () => {
         assert.equal(res.status, 403);
+      });
+    });
+  });
+  describe('DELETE /:username/mfa', () => {
+    describe('when user has sufficient permissions', () =>  {
+      let res;
+      before(async () =>  {
+        nock(registerUrl)
+          .get('/cores')
+          .query({ username: platformUser.username })
+          .reply(200, { core: { url: coreUrl }});
+        nock(coreUrl)
+          .delete(`/system/users/${platformUser.username}/mfa`)
+          .reply(200, { mfaDeletion: {} });
+
+        res = await request
+          .delete(`/platform-users/${platformUser.username}/mfa`)
+          .set('Authorization', token);
+      });
+      it('should respond with 204', () => {
+        assert.strictEqual(res.status, 204);
+      });
+    });
+    describe('when the request to core returns an error', () =>  {
+      let res;
+      const coreRespStatusCode = 500;
+      const coreErrorMessage = ''
+      before(async () =>  {
+        nock(registerUrl)
+          .get('/cores')
+          .query({ username: platformUser.username })
+          .reply(200, { core: { url: coreUrl }});
+        nock(coreUrl)
+          .delete(`/system/users/${platformUser.username}/mfa`)
+          .reply(coreRespStatusCode);
+        res = await request
+          .delete(`/platform-users/${platformUser.username}/mfa`)
+          .set('Authorization', token);
+      });
+      it('should respond with the same status code', () => {
+        assert.strictEqual(res.status, coreRespStatusCode);
+      });
+    });
+    describe('when user has insufficient permissions', () =>  {
+      let res;
+      before(async () =>  {
+        const insufficientPermsToken = generateToken(
+          insufficientPermsUser.username
+        );
+        res = await request
+          .get(`/platform-users/${platformUser.username}`)
+          .set('Authorization', insufficientPermsToken);
+      });
+      it('should respond with 401', () => {
+        assert.strictEqual(res.status, 401);
       });
     });
   });

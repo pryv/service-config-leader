@@ -37,4 +37,5 @@ export const USERS_PERMISSIONS = Object.freeze({
 export const PLATFORM_USERS_PERMISSIONS = Object.freeze({
   READ: 'read',
   DELETE: 'delete',
+  MODIFY: 'modify',
 });

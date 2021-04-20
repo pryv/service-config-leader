@@ -130,4 +130,39 @@ module.exports = function (
       res.status(200).json({username: usernameToDelete});
     }
   );
+
+  expressApp.delete(
+    '/platform-users/:username/mfa',
+    authorizationService.verifyIsAllowedTo(PLATFORM_USERS_PERMISSIONS.DELETE),
+    async function (
+      req: express$Request,
+      res: express$Response,
+      next: express$NextFunction
+    ) {
+      const authKeyCore = settings.get('internals:CORE_SYSTEM_KEY');
+      const username = req.params.username;
+      let coreUrl: string;
+      // find core
+      try {
+        const registerUrl = settings.get('registerUrl');
+        const res = await request
+          .get(`${registerUrl}/cores`)
+          .query({username});
+        coreUrl = res.body.core.url;
+      } catch (err) {
+        let status = err.status || 500;
+        return res.status(status).json(err.response || err.message);
+      }
+
+      // send request
+      try {
+        const res = await request
+          .delete(`${coreUrl}/system/users/${username}/mfa`)
+          .set('authorization', authKeyCore);
+      } catch (err) {
+        let status = err.status || 500;
+        return res.status(status).json(err.response || err.message);
+      }
+      res.status(204).end();
+  });
 };

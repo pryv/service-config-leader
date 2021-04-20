@@ -41,7 +41,7 @@
     "babel-plugin-module-resolver": "^4.0.0",
     "babel-preset-flow": "^6.23.0",
     "chai": "^4.2.0",
-    "chance": "^1.1.7",
+    "charlatan": "^1.1.0",
     "eslint": "^6.1.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-import-resolver-alias": "^1.1.2",
