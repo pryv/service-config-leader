@@ -15,6 +15,7 @@ const {
 } = require('@middlewares/security/authorization.service');
 const { PLATFORM_USERS_PERMISSIONS } = require('@models/permissions.model');
 const { getAuditLogger, DELETE_USER_ACTION, MODIFY_USER_ACTION } = require('@utils/auditLogger');
+const errors = require('@utils/errorsHandling').factory;
 
 module.exports = function (
   expressApp: express$Application,
@@ -141,27 +142,26 @@ module.exports = function (
     ) {
       const authKeyCore = settings.get('internals:CORE_SYSTEM_KEY');
       const username = req.params.username;
+      const registerUrl = settings.get('registerUrl');
       let coreUrl: string;
       // find core
       try {
-        const registerUrl = settings.get('registerUrl');
+        
         const res = await request
           .get(`${registerUrl}/cores`)
           .query({username});
         coreUrl = res.body.core.url;
       } catch (err) {
-        let status = err.status || 500;
-        return res.status(status).json(err.response || err.message);
+        return next(errors.unexpectedError(new Error('Error while fetching user\'s core from register at: ' + registerUrl + '. Register error: ' + err.message)));
       }
 
       // send request
       try {
-        const res = await request
+        await request
           .delete(`${coreUrl}/system/users/${username}/mfa`)
           .set('authorization', authKeyCore);
       } catch (err) {
-        let status = err.status || 500;
-        return res.status(status).json(err.response || err.message);
+        return next(errors.unexpectedError(new Error('Error while making delete MFA request to core at: ' + coreUrl + '. Core error: ' + err.message)));
       }
 
       auditLogger.appendToLogFile(res.locals.username, MODIFY_USER_ACTION, username);

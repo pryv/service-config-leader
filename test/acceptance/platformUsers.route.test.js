@@ -30,7 +30,6 @@ describe('/platform-users', () =>  {
     const logFileLines = fs.readFileSync(logFilePath).toString().split('\n');
 
     const lastLine = logFileLines[logFileLines.length - 2];
-    console.log('testin', lastLine, 'for', `admin:${user} ${action} platformUser:${platformUser}`)
     assert.isTrue(lastLine.includes(`admin:${user} ${action} platformUser:${platformUser}`));
   }
 
@@ -343,6 +342,9 @@ describe('/platform-users', () =>  {
           .delete(`/platform-users/${platformUser.username}/mfa`)
           .set('Authorization', token);
       });
+      after(() => {
+        cleanupLogFileIfNeeded();
+      })
       it('should respond with 204', () => {
         assert.strictEqual(res.status, 204);
       });
@@ -352,8 +354,6 @@ describe('/platform-users', () =>  {
     });
     describe('when the request to core returns an error', () =>  {
       let res;
-      const coreRespStatusCode = 500;
-      const coreErrorMessage = ''
       before(async () =>  {
         nock(registerUrl)
           .get('/cores')
@@ -361,13 +361,16 @@ describe('/platform-users', () =>  {
           .reply(200, { core: { url: coreUrl }});
         nock(coreUrl)
           .delete(`/system/users/${platformUser.username}/mfa`)
-          .reply(coreRespStatusCode);
+          .reply(400);
         res = await request
           .delete(`/platform-users/${platformUser.username}/mfa`)
           .set('Authorization', token);
       });
-      it('should respond with the same status code', () => {
-        assert.strictEqual(res.status, coreRespStatusCode);
+      after(() => {
+        cleanupLogFileIfNeeded();
+      })
+      it('should respond with the 500 status code', () => {
+        assert.equal(res.status, 500);
       });
       it('should not write to log file', () => {
         assertLog(user.username, MODIFY_USER_ACTION, platformUser.username, false);
@@ -383,8 +386,11 @@ describe('/platform-users', () =>  {
           .delete(`/platform-users/${platformUser.username}/mfa`)
           .set('Authorization', insufficientPermsToken);
       });
+      after(() => {
+        cleanupLogFileIfNeeded();
+      })
       it('should respond with 401', () => {
-        assert.strictEqual(res.status, 401);
+        assert.equal(res.status, 401);
       });
       it('should not write to log file', () => {
         assertLog(user.username, MODIFY_USER_ACTION, platformUser.username, false);
