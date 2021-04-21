@@ -34,7 +34,7 @@ module.exports = function (
   expressApp.get(
     '/platform-users/:username',
     authorizationService.verifyIsAllowedTo(PLATFORM_USERS_PERMISSIONS.READ),
-    async function (req: express$Request, res: express$Response) {
+    async function (req: express$Request, res: express$Response, next: express$NextFunction) {
       const authKey = settings.get('internals:REGISTER_SYSTEM_KEY_1');
       const registerUrl = settings.get('registerUrl');
       try {
@@ -43,8 +43,7 @@ module.exports = function (
           .set('Authorization', authKey);
         res.status(200).json({ user: getResponse.body });
       } catch (err) {
-        logger.warn('Error while deleting user:', err);
-        res.status(err.status || 500).json(err.response || err.message);
+        return next(errors.unexpectedError(new Error(`Error while fetching user on register at: ${registerUrl}. Register error: ${err.message}`)));
       }
     }
   );
@@ -123,7 +122,7 @@ module.exports = function (
           .set('Authorization', authKeyReg);
       } catch (err) {
         // was already deleted by core
-        if (err.status !== 404) return res.status(err.status).json(err.response || err.message);
+        if (err.status !== 404) return next(errors.unexpectedError(new Error(`Error while deleting user on register at: ${registerUrl}. Register error: ${err.message}`)));
       }
 
       auditLogger.appendToLogFile(res.locals.username, DELETE_USER_ACTION, usernameToDelete);
@@ -152,7 +151,7 @@ module.exports = function (
           .query({username});
         coreUrl = res.body.core.url;
       } catch (err) {
-        return next(errors.unexpectedError(new Error('Error while fetching user\'s core from register at: ' + registerUrl + '. Register error: ' + err.message)));
+        return next(errors.unexpectedError(new Error(`Error while fetching user\'s core from register at: ${registerUrl}. Register error: ${err.message}`)));
       }
 
       // send request
@@ -161,7 +160,7 @@ module.exports = function (
           .delete(`${coreUrl}/system/users/${username}/mfa`)
           .set('authorization', authKeyCore);
       } catch (err) {
-        return next(errors.unexpectedError(new Error('Error while making delete MFA request to core at: ' + coreUrl + '. Core error: ' + err.message)));
+        return next(errors.unexpectedError(new Error(`Error while making delete MFA request to core at: ${coreUrl}. Core error: ${err.message}`)));
       }
 
       auditLogger.appendToLogFile(res.locals.username, MODIFY_USER_ACTION, username);

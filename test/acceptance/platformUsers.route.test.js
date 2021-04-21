@@ -134,17 +134,16 @@ describe('/platform-users', () =>  {
     });
     describe('when request to register returns an error', () =>  {
       let res;
-      const regRespStatusCode = 423;
       before(async () =>  {
         nock(registerUrl)
           .get(`/admin/users/${platformUser.username}`)
-          .reply(regRespStatusCode);
+          .reply(423);
         res = await request
           .get(`/platform-users/${platformUser.username}`)
           .set('Authorization', token);
       });
-      it('should respond with the same status code', () => {
-        assert.strictEqual(res.status, regRespStatusCode);
+      it('should respond with the 500 status code', () => {
+        assert.strictEqual(res.status, 500);
       });
     });
     describe('when user has insufficient permissions', () =>  {
@@ -288,7 +287,6 @@ describe('/platform-users', () =>  {
     });
     describe('when request to register returns an error', () =>  {
       let res;
-      const regRespStatusCode = 423;
       before(async () =>  {
         cleanupLogFileIfNeeded()
         nock(coreUrl)
@@ -296,13 +294,13 @@ describe('/platform-users', () =>  {
           .reply(200);
         nock(registerUrl)
           .delete(`/users/${platformUser.username}?onlyReg=true`)
-          .reply(regRespStatusCode);
+          .reply(423);
         res = await request
           .delete(`/platform-users/${platformUser.username}`)
           .set('Authorization', token);
       });
-      it('should respond with the same status code', () => {
-        assert.strictEqual(res.status, regRespStatusCode);
+      it('should respond with the 500 status code', () => {
+        assert.strictEqual(res.status, 500);
       });
       it('should not write to log file', () => {
         assertLog(user.username, DELETE_USER_ACTION, platformUser.username, false);
