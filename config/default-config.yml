@@ -1,0 +1,30 @@
+---
+http:
+  port: 7000
+  ip: 127.0.0.1
+logs:
+  prefix: 'config-leader'
+  console:
+    active: true
+    level: 'info'
+    colorize: true
+  file:
+    active: true
+    path: 'config-leader.log'
+  audit:
+    filePath: 'audit-log-delete-me.log'
+internals:
+  configLeaderTokenSecret: ''
+  CORE_SYSTEM_KEY: ''
+  REGISTER_ADMIN_KEY_1: ''
+  REGISTER_SYSTEM_KEY_1: ''
+adminKey: ''
+followers:
+  singlenode-machine-key:
+    url: ''
+    role: 'single-node'
+templatesPath: ''
+databasePath: ''
+registerUrl: ''
+credentials:
+  filePath: ''

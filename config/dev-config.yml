@@ -1,0 +1,42 @@
+---
+http:
+  port: 7000
+  ip: 127.0.0.1
+logs:
+  prefix: 'config-leader'
+  console:
+    active: true
+    level: 'info'
+    colorize: true
+  file:
+    active: true
+    path: 'config-leader.log'
+  audit:
+    filePath: 'audit-log-delete-me.log'
+dataFolder: 'test/fixtures'
+internals:
+  configLeaderTokenSecret: vgkdnnhp4js8nl8m7j1dewkn3ml0baqo
+  CORE_SYSTEM_KEY: core_key
+  SECRET_ONE: '1234'
+  SECRET_TWO: 4x7ff6bvjoh60rmiu41oz0f7b48uacr4
+  REGISTER_ADMIN_KEY_1: test-admin-key
+  REGISTER_SYSTEM_KEY_1: test-system-key
+adminKey: 4dmink3y
+followers:
+  singlenode-machine-key:
+    url: http://singlenode-follower
+    role: pryv
+  valid:
+    url: http://valid-follower
+    role: unexisting
+  failing:
+    url: http://failing-follower
+    role: failing
+  core:
+    url: http://core
+    role: core
+templatesPath: "./test/fixtures"
+databasePath: "./"
+registerUrl: http://localhost:8082
+credentials:
+  filePath: "./credentials.txt"

@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@hapi/joi": "^17.1.1",
+    "@pryv/boiler": "https://github.com/pryv/lib-node-boiler.git",
     "bcryptjs": "^2.4.3",
     "better-sqlite3": "^7.1.0",
     "bluebird": "^3.7.2",
