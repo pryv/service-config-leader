@@ -107,29 +107,46 @@ describe('/platform-users', () =>  {
 
   describe('GET /:username', () =>  {
     describe('when user has sufficient permissions', () =>  {
-      let res;
-      before(async () =>  {
-        nock(registerUrl)
-          .get(`/admin/users/${platformUser.username}`)
-          .reply(200, platformUser);
-
-        res = await request
-          .get(`/platform-users/${platformUser.username}`)
-          .set('Authorization', token);
+      describe('and the user exists', () => {
+        let res;
+        before(async () =>  {
+          nock(registerUrl)
+            .get(`/admin/users/${platformUser.username}`)
+            .reply(200, platformUser);
+  
+          res = await request
+            .get(`/platform-users/${platformUser.username}`)
+            .set('Authorization', token);
+        });
+        it('should respond with 200', () => {
+          assert.strictEqual(res.status, 200);
+        });
+        it('should respond with retrieved user in body', () => {
+          assert.exists(res.body.user);
+          const user = res.body.user;
+          assert.equal(user.username, platformUser.username);
+          assert.equal(user.password, platformUser.password);
+          assert.equal(user.email, platformUser.email);
+          assert.equal(user.appId, platformUser.appId);
+          assert.equal(user.invitationToken, platformUser.invitationToken);
+          assert.equal(user.referer, platformUser.referer);
+          assert.equal(user.languageCode, platformUser.languageCode);
+        });
       });
-      it('should respond with 200', () => {
-        assert.strictEqual(res.status, 200);
-      });
-      it('should respond with retrieved user in body', () => {
-        assert.exists(res.body.user);
-        const user = res.body.user;
-        assert.equal(user.username, platformUser.username);
-        assert.equal(user.password, platformUser.password);
-        assert.equal(user.email, platformUser.email);
-        assert.equal(user.appId, platformUser.appId);
-        assert.equal(user.invitationToken, platformUser.invitationToken);
-        assert.equal(user.referer, platformUser.referer);
-        assert.equal(user.languageCode, platformUser.languageCode);
+      describe('and the user does not exist', () => {
+        let res;
+        before(async () =>  {
+          nock(registerUrl)
+            .get(`/admin/users/${platformUser.username}`)
+            .reply(404, platformUser);
+  
+          res = await request
+            .get(`/platform-users/${platformUser.username}`)
+            .set('Authorization', token);
+        });
+        it('should respond with 404', () => {
+          assert.strictEqual(res.status, 404);
+        });
       });
     });
     describe('when request to register returns an error', () =>  {

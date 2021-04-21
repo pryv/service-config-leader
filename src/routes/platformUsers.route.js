@@ -37,12 +37,14 @@ module.exports = function (
     async function (req: express$Request, res: express$Response, next: express$NextFunction) {
       const authKey = settings.get('internals:REGISTER_SYSTEM_KEY_1');
       const registerUrl = settings.get('registerUrl');
+      const username = req.params.username;
       try {
         const getResponse = await request
-          .get(`${registerUrl}/admin/users/${req.params.username}`)
+          .get(`${registerUrl}/admin/users/${username}`)
           .set('Authorization', authKey);
         res.status(200).json({ user: getResponse.body });
       } catch (err) {
+        if (err.status && err.status === 404) return next(errors.notFound(`user with username: "${username}" not found on register at: ${registerUrl}. Register error: ${err.message}`));
         return next(errors.unexpectedError(new Error(`Error while fetching user on register at: ${registerUrl}. Register error: ${err.message}`)));
       }
     }
