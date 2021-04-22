@@ -48,7 +48,7 @@ describe('/platform-users', () =>  {
       platformUsers: [
         PLATFORM_USERS_PERMISSIONS.READ,
         PLATFORM_USERS_PERMISSIONS.DELETE,
-        PLATFORM_USERS_PERMISSIONS.MMODIFY,
+        PLATFORM_USERS_PERMISSIONS.MODIFY,
       ],
     },
   };

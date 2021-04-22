@@ -135,7 +135,7 @@ module.exports = function (
 
   expressApp.delete(
     '/platform-users/:username/mfa',
-    authorizationService.verifyIsAllowedTo(PLATFORM_USERS_PERMISSIONS.DELETE),
+    authorizationService.verifyIsAllowedTo(PLATFORM_USERS_PERMISSIONS.MODIFY),
     async function (
       req: express$Request,
       res: express$Response,
