@@ -1,5 +1,9 @@
 ## 1.0
 
+### 1.1.4
+
+- add Deactivate MFA route
+
 ### 1.1.3
 
 - add account deletion option
