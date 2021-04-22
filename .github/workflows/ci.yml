@@ -2,8 +2,8 @@ name: PrYv Config Leader CI
 
 on:
   pull_request:
-    branches:
-      - master
+    branches: 
+      - '*'
   push:
     branches:
       - master
