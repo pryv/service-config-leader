@@ -111,7 +111,7 @@ describe('Test /admin endpoint', function () {
       assert.include(res.headers['content-type'], 'application/json');
       assert.deepEqual(res.body.settings, platform.vars);
     });
-    it('should return 401 when given token with insufficient permissions', async () => {
+    it('must return 401 when given token with insufficient permissions', async () => {
       const res = await request
         .get('/admin/settings')
         .set('Authorization', updateOnlyToken);
@@ -140,7 +140,7 @@ describe('Test /admin endpoint', function () {
       const platform = yaml.safeLoad(ymlFile);
       assert.deepEqual(updatedSettings, platform.vars);
     });
-    it('should respond with 400 when given properties that create invalid config', async () => {
+    it('must respond with 400 when given properties that create invalid config', async () => {
       const invalidProps = {
         ADVANCED_API_SETTINGS: {
           settings: {
@@ -161,7 +161,7 @@ describe('Test /admin endpoint', function () {
 
       assert.strictEqual(res.status, 400);
     });
-    it('should return 401 when given token with insufficient permissions', async () => {
+    it('must return 401 when given token with insufficient permissions', async () => {
       const res = await request
         .put('/admin/settings')
         .set('Authorization', readOnlyToken);
@@ -200,7 +200,7 @@ describe('Test /admin endpoint', function () {
         }
       }
     });
-    it('should return 401 when given token with insufficient permissions', async () => {
+    it('must return 401 when given token with insufficient permissions', async () => {
       const res = await request
         .post('/admin/notify')
         .set('Authorization', readOnlyToken);

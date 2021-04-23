@@ -40,14 +40,14 @@ describe('Test Users Repository', function () {
       savedUser = selectUserStmt.get(user.username);
     });
 
-    it('should save user with hashed password and created id', function () {
+    it('must save user with hashed password and created id', function () {
       assert.exists(savedUser);
       assert.exists(savedUser.id);
       assert.exists(savedUser.password);
       assert.notEqual(savedUser.password, user.password);
       assert.equal(savedUser.permissions, JSON.stringify(user.permissions));
     });
-    it('should return created user without password property', function () {
+    it('must return created user without password property', function () {
       assert.exists(createdUser);
       assert.notExists(createdUser.password);
       assert.deepEqual(createdUser.permissions, user.permissions);
@@ -60,12 +60,12 @@ describe('Test Users Repository', function () {
       foundUser = usersRepository.findUser(user.username);
     });
 
-    it('should return username and permissions of the user', function () {
+    it('must return username and permissions of the user', function () {
       assert.exists(foundUser);
       assert.exists(foundUser.username);
       assert.exists(foundUser.permissions);
     });
-    it('should not return password of the user', function () {
+    it('must not return password of the user', function () {
       assert.notExists(foundUser.password);
     });
   });
@@ -76,7 +76,7 @@ describe('Test Users Repository', function () {
       foundUsers = usersRepository.findAllUsers();
     });
 
-    it('should return an array with users', function () {
+    it('must return an array with users', function () {
       assert.exists(foundUsers);
       assert.equal(foundUsers.length, 1);
       assert.exists(foundUsers[0].username, user.username);
@@ -94,10 +94,10 @@ describe('Test Users Repository', function () {
       );
     });
 
-    it('should return true given valid password', function () {
+    it('must return true given valid password', function () {
       assert.exists(checkOfValidPassword);
     });
-    it('should return false given invalid password', function () {
+    it('must return false given invalid password', function () {
       assert.isFalse(checkOfInvalidPassword);
     });
   });
@@ -110,7 +110,7 @@ describe('Test Users Repository', function () {
       savedUser = selectUserStmt.get(newUser.username);
     });
 
-    it('should update the user with provided changes', function () {
+    it('must update the user with provided changes', function () {
       assert.exists(savedUser);
       assert.exists(savedUser.id);
       assert.equal(savedUser.username, newUser.username);
@@ -118,7 +118,7 @@ describe('Test Users Repository', function () {
       assert.exists(savedUser.password);
       assert.equal(savedUser.permissions, JSON.stringify(user.permissions));
     });
-    it('should return updated user', function () {
+    it('must return updated user', function () {
       assert.exists(updatedUser);
       assert.notExists(updatedUser.password);
       assert.equal(updatedUser.username, newUser.username);
@@ -133,7 +133,7 @@ describe('Test Users Repository', function () {
       savedUser = selectUserStmt.get(newUser.username);
     });
 
-    it('should set random string as new user password', function () {
+    it('must set random string as new user password', function () {
       assert.exists(savedUser);
       assert.exists(savedUser.id);
       assert.equal(savedUser.username, newUser.username);
@@ -151,10 +151,10 @@ describe('Test Users Repository', function () {
       deletedUser = selectUserStmt.get(newUser.username);
     });
 
-    it('should return deleted user username', function () {
+    it('must return deleted user username', function () {
       assert.equal(deletedUsername, newUser.username);
     });
-    it('should entirely delete user from db', function () {
+    it('must entirely delete user from db', function () {
       assert.notExists(deletedUser);
     });
   });

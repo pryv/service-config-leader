@@ -80,7 +80,7 @@ describe('Test /users endpoint', function () {
       app.usersRepository.deleteUser(userToCreate.username);
     });
 
-    it('should respond with 201 and created user in body', async () => {
+    it('must respond with 201 and created user in body', async () => {
       const res = await request
         .post('/users')
         .set('Authorization', token)
@@ -93,12 +93,12 @@ describe('Test /users endpoint', function () {
       assert.deepEqual(user.permissions, userToCreate.permissions);
       assert.notExists(user.password);
     });
-    it('should respond with 400 given no body was provided', async () => {
+    it('must respond with 400 given no body was provided', async () => {
       const res = await request.post('/users').set('Authorization', token);
 
       assert.strictEqual(res.status, 400);
     });
-    it('should respond with 400 given user provided with missing parameter', async () => {
+    it('must respond with 400 given user provided with missing parameter', async () => {
       const res = await request
         .post('/users')
         .set('Authorization', token)
@@ -107,7 +107,7 @@ describe('Test /users endpoint', function () {
       assert.strictEqual(res.status, 400);
       assert.include(res.error.text, 'Error validating request body');
     });
-    it('should respond with 400 given user provided with extra parameters', async () => {
+    it('must respond with 400 given user provided with extra parameters', async () => {
       const res = await request
         .post('/users')
         .set('Authorization', token)
@@ -116,7 +116,7 @@ describe('Test /users endpoint', function () {
       assert.strictEqual(res.status, 400);
       assert.include(res.error.text, 'Error validating request body');
     });
-    it('should respond with 401 when given token with insufficient permissions', async () => {
+    it('must respond with 401 when given token with insufficient permissions', async () => {
       const userNoCreatePerm: UserNoPerms = {
         username: 'userNoCreate',
         password: 'passx',
@@ -132,7 +132,7 @@ describe('Test /users endpoint', function () {
       assert.strictEqual(res.status, 401);
       assert.include(res.error.text, 'Insufficient permissions');
     });
-    it('should respond with 401 when given user with more permissions than creator', async () => {
+    it('must respond with 401 when given user with more permissions than creator', async () => {
       const userLimitedPerms: UserNoPerms = {
         username: 'userLimitedPerms',
         password: 'passx',
@@ -171,7 +171,7 @@ describe('Test /users endpoint', function () {
       app.usersRepository.createUser(userInDb);
     });
 
-    it('should respond with 200 and retrieved user in body', async () => {
+    it('must respond with 200 and retrieved user in body', async () => {
       const res = await request
         .get(`/users/${userInDb.username}`)
         .set('Authorization', token);
@@ -183,7 +183,7 @@ describe('Test /users endpoint', function () {
       assert.deepEqual(user.permissions, userInDb.permissions);
       assert.notExists(user.password);
     });
-    it('should respond with 404 if requested username does not exist', async () => {
+    it('must respond with 404 if requested username does not exist', async () => {
       const res = await request
         .get('/users/some_username')
         .set('Authorization', token);
@@ -191,7 +191,7 @@ describe('Test /users endpoint', function () {
       assert.strictEqual(res.status, 404);
       assert.exists(res.body);
     });
-    it('should respond with 401 when given token with insufficient permissions', async () => {
+    it('must respond with 401 when given token with insufficient permissions', async () => {
       const userNoReadPerm = {
         username: 'userNoRead',
         password: 'passx',
@@ -225,7 +225,7 @@ describe('Test /users endpoint', function () {
       });
     });
 
-    it('should respond with 200 and retrieved users list in body', async () => {
+    it('must respond with 200 and retrieved users list in body', async () => {
       const res = await request.get('/users').set('Authorization', token);
 
       assert.strictEqual(res.status, 200);
@@ -236,7 +236,7 @@ describe('Test /users endpoint', function () {
       assert.deepEqual(users[0].permissions, user.permissions);
       assert.notExists(users[0].password);
     });
-    it('should respond with 401 when given token with insufficient permissions', async () => {
+    it('must respond with 401 when given token with insufficient permissions', async () => {
       const userNoReadPerm = {
         username: 'userNoRead',
         password: 'passx',
@@ -263,7 +263,7 @@ describe('Test /users endpoint', function () {
       app.usersRepository.createUser(((userToUpdate: any): User));
     });
 
-    it('should respond with 200 and updated user in body', async () => {
+    it('must respond with 200 and updated user in body', async () => {
       const newPerms = {
         permissions: {
           users: ['resetPassword'],
@@ -284,7 +284,7 @@ describe('Test /users endpoint', function () {
       assert.deepEqual(user.permissions, newPerms.permissions);
       assert.notExists(user.password);
     });
-    it('should respond with 400 given invalid input', async () => {
+    it('must respond with 400 given invalid input', async () => {
       const invalidObj = {
         field1: 'xoxo',
         f2: 45,
@@ -299,7 +299,7 @@ describe('Test /users endpoint', function () {
       assert.exists(res.body);
       assert.include(res.error.text, 'Error validating request body');
     });
-    it('should respond with 401 when given token with insufficient permissions', async () => {
+    it('must respond with 401 when given token with insufficient permissions', async () => {
       const userNoChangePermsPerm = {
         username: 'userNoChangePerms',
         password: 'passx',
@@ -329,15 +329,15 @@ describe('Test /users endpoint', function () {
       app.usersRepository.createUser(((userToResetPassFor: any): User));
     });
 
-    it('should respond with 200 and new password in body', async () => {
+    it('must respond with 200 and new password in body', async () => {
       const res = await request
         .post('/users/' + userToResetPassFor.username + '/reset-password')
         .set('Authorization', token);
 
-      assert.strictEqual(res.status, 200);
+      assert.equal(res.status, 200);
       assert.exists(res.body.password);
     });
-    it('should respond with 401 when given token with insufficient permissions', async () => {
+    it('must respond with 401 when given token with insufficient permissions', async () => {
       const userNoResetPassPerm = {
         username: 'userNoResetPassPerm',
         password: 'passx',
@@ -377,7 +377,7 @@ describe('Test /users endpoint', function () {
       tokenToChangePasswordOn = generateToken(usernameToChangePasswordOn);
     });
 
-    it('should respond with 401 when given token with different username than requested', async () => {
+    it('must respond with 401 when given token with different username than requested', async () => {
       const username = 'userPX';
 
       const res = await request
@@ -388,7 +388,7 @@ describe('Test /users endpoint', function () {
       assert.strictEqual(res.status, 401);
       assert.include(res.error.text, 'Insufficient permissions');
     });
-    it('should respond with 401 when given invalid old password', async () => {
+    it('must respond with 401 when given invalid old password', async () => {
       const res = await request
         .post(`/users/${usernameToChangePasswordOn}/change-password`)
         .set('Authorization', tokenToChangePasswordOn)
@@ -399,7 +399,7 @@ describe('Test /users endpoint', function () {
       assert.strictEqual(res.status, 401);
       assert.include(res.error.text, 'Invalid password');
     });
-    it('should respond with 400 when given not matching new passwords', async () => {
+    it('must respond with 400 when given not matching new passwords', async () => {
       const res = await request
         .post(`/users/${usernameToChangePasswordOn}/change-password`)
         .set('Authorization', tokenToChangePasswordOn)
@@ -413,7 +413,7 @@ describe('Test /users endpoint', function () {
       assert.include(res.error.text, 'Passwords do not match');
     });
 
-    it('should respond with 200 and new password in body when given valid input', async () => {
+    it('must respond with 200 and new password in body when given valid input', async () => {
       const res = await request
         .post('/users/' + usernameToChangePasswordOn + '/change-password')
         .set('Authorization', tokenToChangePasswordOn)
@@ -433,7 +433,7 @@ describe('Test /users endpoint', function () {
       app.usersRepository.createUser(((userToDelete: any): User));
     });
 
-    it('should respond with 200 and deleted username in body', async () => {
+    it('must respond with 200 and deleted username in body', async () => {
       const res = await request
         .delete('/users/' + userToDelete.username)
         .set('Authorization', token);
@@ -441,7 +441,7 @@ describe('Test /users endpoint', function () {
       assert.strictEqual(res.status, 200);
       assert.equal(res.body.username, userToDelete.username);
     });
-    it('should respond with 404 given not existing username', async () => {
+    it('must respond with 404 given not existing username', async () => {
       const res = await request
         .delete('/users/notexistingname')
         .set('Authorization', token);
@@ -449,7 +449,7 @@ describe('Test /users endpoint', function () {
       assert.strictEqual(res.status, 404);
       assert.exists(res.body);
     });
-    it('should respond with 401 when given token with insufficient permissions', async () => {
+    it('must respond with 401 when given token with insufficient permissions', async () => {
       const userNoDelPerm = {
         username: 'userNoDelPerm',
         password: 'passx',

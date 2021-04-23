@@ -118,10 +118,10 @@ describe('/platform-users', () =>  {
             .get(`/platform-users/${platformUser.username}`)
             .set('Authorization', token);
         });
-        it('should respond with 200', () => {
+        it('must respond with 200', () => {
           assert.strictEqual(res.status, 200);
         });
-        it('should respond with retrieved user in body', () => {
+        it('must respond with retrieved user in body', () => {
           assert.exists(res.body.user);
           const user = res.body.user;
           assert.equal(user.username, platformUser.username);
@@ -144,7 +144,7 @@ describe('/platform-users', () =>  {
             .get(`/platform-users/${platformUser.username}`)
             .set('Authorization', token);
         });
-        it('should respond with 404', () => {
+        it('must respond with 404', () => {
           assert.strictEqual(res.status, 404);
         });
       });
@@ -159,7 +159,7 @@ describe('/platform-users', () =>  {
           .get(`/platform-users/${platformUser.username}`)
           .set('Authorization', token);
       });
-      it('should respond with the 500 status code', () => {
+      it('must respond with the 500 status code', () => {
         assert.strictEqual(res.status, 500);
       });
     });
@@ -173,7 +173,7 @@ describe('/platform-users', () =>  {
           .get(`/platform-users/${platformUser.username}`)
           .set('Authorization', insufficientPermsToken);
       });
-      it('should respond with 401', () => {
+      it('must respond with 401', () => {
         assert.strictEqual(res.status, 401);
       });
     });
@@ -192,13 +192,13 @@ describe('/platform-users', () =>  {
               .delete(`/platform-users/${platformUser.username}`)
               .set('Authorization', token);
           });
-          it('should respond with 200', () => {
+          it('must respond with 200', () => {
             assert.strictEqual(res.status, 200);
           });
-          it('should respond with deleted username in body', () => {
+          it('must respond with deleted username in body', () => {
             assert.equal(res.body.username, platformUser.username);
           });
-          it('should write to log file', () => {
+          it('must write to log file', () => {
             assertLog(user.username, DELETE_USER_ACTION, platformUser.username, true);
           });
         });
@@ -222,18 +222,18 @@ describe('/platform-users', () =>  {
             app.settings.set('followers', followersBackup);
             app.settings.set('registerUrl', registerUrlBackup);
           });
-          it('should respond with 200', () => {
+          it('must respond with 200', () => {
             assert.strictEqual(res.status, 200);
           });
-          it('should respond with deleted username in body', () => {
+          it('must respond with deleted username in body', () => {
             assert.equal(res.body.username, platformUser.username);
           });
-          it('should write to log file', () => {
+          it('must write to log file', () => {
             assertLog(user.username, DELETE_USER_ACTION, platformUser.username, true);
           });
         });
       });
-      describe('when core fails with 404, it should still delete in register for idempotency', () => {
+      describe('when core fails with 404, it must still delete in register for idempotency', () => {
         let res;
         before(async () => {
           cleanupLogFileIfNeeded()
@@ -245,17 +245,17 @@ describe('/platform-users', () =>  {
             .delete(`/platform-users/${platformUser.username}`)
             .set('Authorization', token);
         });
-        it('should respond with 200', () => {
+        it('must respond with 200', () => {
           assert.equal(res.status, 200);
         });
-        it('should respond with deleted username in body', () => {
+        it('must respond with deleted username in body', () => {
           assert.equal(res.body.username, platformUser.username);
         });
-        it('should write to log file', () => {
+        it('must write to log file', () => {
           assertLog(user.username, DELETE_USER_ACTION, platformUser.username, true);
         });
       });
-      describe('when core fails with not 404, it should not delete in register', () => {
+      describe('when core fails with not 404, it must not delete in register', () => {
         let res, isRegCalled = false;
         before(async () => {
           cleanupLogFileIfNeeded()
@@ -273,13 +273,13 @@ describe('/platform-users', () =>  {
           // unregister uncalled register mock from above
           nock.cleanAll()
         })
-        it('should respond with the same status code', () => {
+        it('must respond with the same status code', () => {
           assert.equal(res.status, 500);
         });
-        it('should not call register', () => {
+        it('must not call register', () => {
           assert.isFalse(isRegCalled);
         });
-        it('should not write to log file', () => {
+        it('must not write to log file', () => {
           assertLog(user.username, DELETE_USER_ACTION, platformUser.username, false);
         });
       });
@@ -295,10 +295,10 @@ describe('/platform-users', () =>  {
           .delete(`/platform-users/${platformUser.username}`)
           .set('Authorization', insufficientPermsToken);
       });
-      it('should respond with 401', () => {
+      it('must respond with 401', () => {
         assert.strictEqual(res.status, 401);
       });
-      it('should not write to log file', () => {
+      it('must not write to log file', () => {
         assertLog(user.username, DELETE_USER_ACTION, platformUser.username, false);
       });
     });
@@ -316,10 +316,10 @@ describe('/platform-users', () =>  {
           .delete(`/platform-users/${platformUser.username}`)
           .set('Authorization', token);
       });
-      it('should respond with the 500 status code', () => {
+      it('must respond with the 500 status code', () => {
         assert.strictEqual(res.status, 500);
       });
-      it('should not write to log file', () => {
+      it('must not write to log file', () => {
         assertLog(user.username, DELETE_USER_ACTION, platformUser.username, false);
       });
     });
@@ -336,7 +336,7 @@ describe('/platform-users', () =>  {
           .delete('/platform-users/doesntmatter')
           .set('Authorization', token);
       });
-      it('should respond with 403', () => {
+      it('must respond with 403', () => {
         assert.equal(res.status, 403);
       });
     });
@@ -360,10 +360,10 @@ describe('/platform-users', () =>  {
       after(() => {
         cleanupLogFileIfNeeded();
       })
-      it('should respond with 204', () => {
+      it('must respond with 204', () => {
         assert.strictEqual(res.status, 204);
       });
-      it('should write to log file', () => {
+      it('must write to log file', () => {
         assertLog(user.username, MODIFY_USER_ACTION, platformUser.username, true);
       });
     });
@@ -384,10 +384,10 @@ describe('/platform-users', () =>  {
       after(() => {
         cleanupLogFileIfNeeded();
       })
-      it('should respond with the 500 status code', () => {
+      it('must respond with the 500 status code', () => {
         assert.equal(res.status, 500);
       });
-      it('should not write to log file', () => {
+      it('must not write to log file', () => {
         assertLog(user.username, MODIFY_USER_ACTION, platformUser.username, false);
       });
     });
@@ -404,10 +404,10 @@ describe('/platform-users', () =>  {
       after(() => {
         cleanupLogFileIfNeeded();
       })
-      it('should respond with 401', () => {
+      it('must respond with 401', () => {
         assert.equal(res.status, 401);
       });
-      it('should not write to log file', () => {
+      it('must not write to log file', () => {
         assertLog(user.username, MODIFY_USER_ACTION, platformUser.username, false);
       });
     });

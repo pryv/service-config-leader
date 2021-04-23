@@ -37,13 +37,13 @@ describe('Test /auth endpoint', function () {
   });
 
   describe('POST /auth/login', function () {
-    it('should respond with 200 and token in body given valid user data', async () => {
+    it('must respond with 200 and token in body given valid user data', async () => {
       const res = await request.post('/auth/login').send(user);
 
       assert.strictEqual(res.status, 200);
       assert.exists(res.body.token);
     });
-    it('should respond with 401 given invalid user password', async () => {
+    it('must respond with 401 given invalid user password', async () => {
       const res = await request
         .post('/auth/login')
         .send({ username: user.username, password: 'invalid_pass' });
@@ -51,7 +51,7 @@ describe('Test /auth endpoint', function () {
       assert.strictEqual(res.status, 401);
       assert.notExists(res.body.token);
     });
-    it('should respond with 404 given not existing username', async () => {
+    it('must respond with 404 given not existing username', async () => {
       const res = await request
         .post('/auth/login')
         .send({ username: 'not_existing_name', password: 'some_pass' });
@@ -70,7 +70,7 @@ describe('Test /auth endpoint', function () {
       );
     });
 
-    it('should respond with 200 and save token in db', async () => {
+    it('must respond with 200 and save token in db', async () => {
       const res = await request
         .post('/auth/logout')
         .set('Authorization', token);
@@ -81,7 +81,7 @@ describe('Test /auth endpoint', function () {
       assert.equal(savedTokens.length, 1);
       assert.equal(savedTokens[0].token, token);
     });
-    it('should respond with 401 when given invalid token', async () => {
+    it('must respond with 401 when given invalid token', async () => {
       const invalidToken = 'some_token';
       app.tokensRepository.blacklist(invalidToken);
 
@@ -96,7 +96,7 @@ describe('Test /auth endpoint', function () {
 
       assert.equal(savedTokens.length, 2);
     });
-    it('should respond with 404 when given not existing user', async () => {
+    it('must respond with 404 when given not existing user', async () => {
       app.tokensRepository.clean();
       app.usersRepository.deleteUser(user.username);
 

@@ -25,7 +25,7 @@ describe('Test Tokens Repository', function () {
     db.close();
   });
 
-  it('should save token in db', function () {
+  it('must save token in db', function () {
     tokensRepository.blacklist(token);
 
     const rows = selectAllTokensStmt.all();
@@ -34,19 +34,19 @@ describe('Test Tokens Repository', function () {
     assert.equal(rows.length, 1);
     assert.equal(rows[0].token, token);
   });
-  it('should return true if token exists in db', function () {
+  it('must return true if token exists in db', function () {
     addTokenStmt.run(token);
 
     const isSavedInDb = tokensRepository.contains(token);
 
     assert.exists(isSavedInDb);
   });
-  it('should return false if token does not exist in db', function () {
+  it('must return false if token does not exist in db', function () {
     const isSavedInDb = tokensRepository.contains(token);
 
     assert.isFalse(isSavedInDb);
   });
-  it('should remove all tokens from db', function () {
+  it('must remove all tokens from db', function () {
     addTokenStmt.run(token);
     addTokenStmt.run('token2');
 
