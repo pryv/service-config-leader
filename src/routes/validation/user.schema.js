@@ -18,7 +18,7 @@ export const permissionsSchema = joi.object().keys({
   platformUsers: joi
     .array()
     .required()
-    .items(joi.string().valid('read', 'delete')),
+    .items(joi.string().valid('read', 'modify', 'delete')),
 });
 
 export const createUserSchema = joi.object().keys({
