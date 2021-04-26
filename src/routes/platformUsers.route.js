@@ -159,7 +159,6 @@ module.exports = function (
 
       // send request
       try {
-        logger.info('coreUrl', coreUrl, 'path', `/system/users/${username}/mfa`, 'together', url.resolve(coreUrl, `/system/users/${username}/mfa`))
         await request
           .delete(url.resolve(coreUrl, `/system/users/${username}/mfa`))
           .set('authorization', authKeyCore);
