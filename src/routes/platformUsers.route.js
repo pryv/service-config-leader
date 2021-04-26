@@ -3,6 +3,7 @@
 // eslint-disable-next-line no-unused-vars
 const regeneratorRuntime = require('regenerator-runtime');
 
+const url = require('url');
 const request = require('superagent');
 const bluebird = require('bluebird');
 const logger = require('@utils/logging').getLogger('platform-users');
@@ -40,7 +41,7 @@ module.exports = function (
       const username = req.params.username;
       try {
         const getResponse = await request
-          .get(`${registerUrl}/admin/users/${username}`)
+          .get(url.resolve(registerUrl ,`/admin/users/${username}`))
           .set('Authorization', authKey);
         res.status(200).json({ user: getResponse.body });
       } catch (err) {
@@ -96,7 +97,7 @@ module.exports = function (
           } else {
             deleteFromCoresPromises.push(
               request
-                .delete(`${core.url}/users/${usernameToDelete}`)
+                .delete(url.resolve(core.url, `/users/${usernameToDelete}`))
                 .set('Authorization', authKeyCore)
             );
           }
@@ -120,7 +121,7 @@ module.exports = function (
 
       try {
         const res = await request
-          .delete(`${registerUrl}/users/${usernameToDelete}?onlyReg=true`)
+          .delete(url.resolve(registerUrl, `/users/${usernameToDelete}?onlyReg=true`))
           .set('Authorization', authKeyReg);
       } catch (err) {
         // was already deleted by core
@@ -149,7 +150,7 @@ module.exports = function (
       try {
         
         const res = await request
-          .get(`${registerUrl}/cores`)
+          .get(url.resolve(registerUrl, '/cores'))
           .query({username});
         coreUrl = res.body.core.url;
       } catch (err) {
@@ -158,8 +159,9 @@ module.exports = function (
 
       // send request
       try {
+        logger.info('coreUrl', coreUrl, 'path', `/system/users/${username}/mfa`, 'together', url.resolve(coreUrl, `/system/users/${username}/mfa`))
         await request
-          .delete(`${coreUrl}/system/users/${username}/mfa`)
+          .delete(url.resolve(coreUrl, `/system/users/${username}/mfa`))
           .set('authorization', authKeyCore);
       } catch (err) {
         return next(errors.unexpectedError(new Error(`Error while making delete MFA request to core at: ${coreUrl}. Core error: ${err.message}`)));
