@@ -230,4 +230,13 @@ describe('Test /admin endpoint', function () {
       spy.restore();
     });
   });
+
+  describe('GET /admin/update', function () {
+
+
+  });
+
+  describe('POST /admin/update', function () {
+
+  });
 });
