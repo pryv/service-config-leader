@@ -176,7 +176,7 @@ describe('Test /admin endpoint', function () {
       mockFollowers.server();
     });
 
-    it('notifies followers and returns an array listing successes and failures', async () => {
+    it('must notify followers and returns an array listing successes and failures', async () => {
       const res = await request
         .post('/admin/notify')
         .set('Authorization', updateOnlyToken);
@@ -208,7 +208,7 @@ describe('Test /admin endpoint', function () {
       assert.strictEqual(res.status, 401);
     });
 
-    it('notifies followers to restart some services', async () => {
+    it('must notify followers to restart some services', async () => {
       const services = ['service1', 'service2'];
       let spy = sinon.spy(helper, 'spy');
       const res = await request
@@ -220,7 +220,7 @@ describe('Test /admin endpoint', function () {
       spy.restore();
     });
 
-    it('notifies followers to restart all services', async () => {
+    it('must notify followers to restart all services', async () => {
       let spy = sinon.spy(helper, 'spy');
       const res = await request
         .post('/admin/notify')
