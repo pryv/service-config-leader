@@ -50,5 +50,9 @@
   "registerUrl": "http://localhost:8082",
   "credentials": {
     "filePath": "./credentials.txt"
+  },
+  "platformSettings": {
+    "platformConfig": "./platform.yml",
+    "platformTemplate": "./platform.yml"
   }
 }
