@@ -231,12 +231,46 @@ describe('Test /admin endpoint', function () {
     });
   });
 
-  describe('GET /admin/update', function () {
+  describe('GET /admin/migration', function () {
 
+    describe('when there is an update', () => {
+
+      before(() => {
+
+      });
+
+      describe('when the user has sufficient permissions', () => {
+        it('must return the list of migrations to perform', async () => {
+          const res = await request
+            .get('/admin/migration')
+            .set('Authorization', );
+          assert.equal(res.status, 200);
+          const migrations = res.body.migrations;
+          assert.exists(migrations);
+          assert.isArray(migrations);
+          assert.equal(migrations.length, 2);
+        });
+      });
+      describe('when the user has insufficient permissions', () => {
+        it('must return a 401 error', () => {
+
+        });
+      });
+    });
+    describe('when there is no update', () => {
+      describe('when the user has sufficient permissions', () => {
+        it('must return an empty list', () => {
+
+        });
+      });
+    });
 
   });
 
   describe('POST /admin/update', function () {
 
+    describe('', () => {
+
+    });
   });
 });

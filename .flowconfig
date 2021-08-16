@@ -17,4 +17,5 @@ module.name_mapper='@models' ->'<PROJECT_ROOT>/src/models'
 module.name_mapper='@routes' ->'<PROJECT_ROOT>/src/routes'
 module.name_mapper='@utils' ->'<PROJECT_ROOT>/src/utils'
 module.name_mapper='@root' ->'<PROJECT_ROOT>/src/'
+esproposal.optional_chaining=enable
 [strict]
