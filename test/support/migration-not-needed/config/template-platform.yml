@@ -336,4 +336,4 @@ vars:
         description: "Whether log rotation is active or not. Currently available for: core, hfs, preview, webhooks."
       LOG_ROTATION_DAYS:
         value: 60
-        description: "How many days of logs to keep.""
+        description: "How many days of logs to keep."

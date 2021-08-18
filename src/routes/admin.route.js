@@ -5,6 +5,7 @@ const regeneratorRuntime = require('regenerator-runtime');
 
 const fs = require('fs');
 const request = require('superagent');
+const yaml = require('js-yaml')
 const logger = require('@utils/logging').getLogger('admin');
 const errorsFactory = require('@utils/errorsHandling').factory;
 const { SETTINGS_PERMISSIONS } = require('@models/permissions.model');
@@ -21,6 +22,7 @@ import {
   isValidJSON,
   isJSONFile
 } from '@utils/configuration.utils';
+const { loadPlatformTemplate } = require('../controller/migration');
 
 module.exports = function (
   expressApp: express$Application,
@@ -32,10 +34,11 @@ module.exports = function (
   const authorizationService: AuthorizationService = getAuthorizationService(
     usersRepository
   );
+  const platformTemplate: {} = loadPlatformTemplate(settings);
 
   expressApp.all('/admin*', verifyToken(tokensRepository));
 
-  // PUT /admin/settings: updates current settings and save them to disk
+  // updates current settings and save them to disk
   expressApp.put(
     '/admin/settings',
     authorizationService.verifyIsAllowedTo(SETTINGS_PERMISSIONS.UPDATE),
@@ -79,7 +82,7 @@ module.exports = function (
     }
   );
 
-  // GET /admin/settings: returns current settings as json
+  // returns current settings as json
   expressApp.get(
     '/admin/settings',
     authorizationService.verifyIsAllowedTo(SETTINGS_PERMISSIONS.READ),
@@ -98,7 +101,7 @@ module.exports = function (
     }
   );
 
-  // GET /admin/notify: notifies followers about configuration changes
+  // notifies followers about configuration changes
   expressApp.post(
     '/admin/notify',
     authorizationService.verifyIsAllowedTo(SETTINGS_PERMISSIONS.UPDATE),
@@ -112,6 +115,41 @@ module.exports = function (
       if (followers == null) {
         next(new Error('Missing followers settings.'));
       }
+
+      let successes = [];
+      let failures = [];
+      for (const [auth, follower] of Object.entries(followers)) {
+        const followerUrl = follower.url;
+        try {
+          await request
+            .post(`${followerUrl}/notify`)
+            .set('Authorization', auth)
+            .send({ services: services });
+          successes.push(follower);
+        } catch (err) {
+          logger.warn('Error while notifying follower:', err);
+          failures.push(Object.assign({}, follower, { error: err }));
+        }
+      }
+
+      res.json({
+        successes: successes,
+        failures: failures
+      });
+    });
+
+    // returns list of available config migrations
+  expressApp.get(
+    '/admin/migrations',
+    authorizationService.verifyIsAllowedTo(SETTINGS_PERMISSIONS.READ),
+    async (
+      req: express$Request,
+      res: express$Response,
+      next: express$NextFunction
+    ) => {
+      const currentVersion: string = platformSettings.vars.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value;
+      
+      settings.platformSettings.platformTemplate
 
       let successes = [];
       let failures = [];

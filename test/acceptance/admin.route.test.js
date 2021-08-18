@@ -6,11 +6,13 @@
 const regeneratorRuntime = require('regenerator-runtime');
 const sinon = require('sinon');
 const assert = require('chai').assert;
+const path = require('path');
 const Application = require('@root/app');
 const app = new Application();
 const settings = app.settings;
 const platformSettings = app.platformSettings;
-const request = require('supertest')(app.express);
+const supertest = require('supertest');
+const request = supertest(app.express);
 const fs = require('fs');
 const yaml = require('js-yaml');
 const mockFollowers = require('../fixtures/followersMock');
@@ -231,19 +233,28 @@ describe('Test /admin endpoint', function () {
     });
   });
 
-  describe('GET /admin/migration', function () {
+  describe('GET /admin/migrations', function () {
 
     describe('when there is an update', () => {
 
+      let request;
       before(() => {
-
+        const app = new Application({
+          nconfSettings: {
+            platformSettings: {
+              platformConfig: path.resolve(__dirname, '../support/migration-needed/config/platform.yml'),
+              platformTemplate: path.resolve(__dirname, '../support/migration-needed/config/template-platform.yml'),
+          }
+        }
+        });
+        request = supertest(app.express);
       });
 
       describe('when the user has sufficient permissions', () => {
         it('must return the list of migrations to perform', async () => {
           const res = await request
             .get('/admin/migration')
-            .set('Authorization', );
+            .set('Authorization', readOnlyToken);
           assert.equal(res.status, 200);
           const migrations = res.body.migrations;
           assert.exists(migrations);

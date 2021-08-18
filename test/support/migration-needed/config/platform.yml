@@ -13,7 +13,7 @@ vars:
         description: "IP address of register master machine"
       REGISTER_ADMIN_KEY: 
         value: Jihh3Qwn4qGthD6v4wj2VCu8EkqfsnCMrNBVtNWj8PGAi
-        description: "Admin Key for register machine, see: https://api.pryv.com/reference-system/#admin. Please set a strong cryptographic key. Alphanumeric of length 20 to 50."
+        description: "Admin Key for register machine, see: https://api.pryv.com/reference-system/#admin. Please set a strong cryptographic key. Alphanumeric    of length 20 to 50."
       HOSTINGS_AND_CORES:
         description: "Defines the distribution of cores among the hostings providers"
         value:
@@ -30,7 +30,7 @@ vars:
             description: Europe - Switzerland
       REG_MASTER_PUBLIC_INTERFACE_IP_ADDRESS:
         value: REG_MASTER_IP_ADDRESS
-        description: "IP address of network interface bound to public network. Set if different to its public address at REG_MASTER_IP_ADDRESS. Use 'ifconfig' on VM to find it."
+        description: "IP address of network interface bound to public network. Set if different to its public address at REG_MASTER_IP_ADDRESS. Use 'ifconfig'  on VM to find it."
       REG_SLAVE_PUBLIC_INTERFACE_IP_ADDRESS:
         value: REG_SLAVE_IP_ADDRESS
         description: "IP address of network interface bound to public network. Set if different to its public address at REG_SLAVE_IP_ADDRESS. Use 'ifconfig' on VM to find it."
@@ -52,11 +52,11 @@ vars:
       TRUSTED_APPS: 
         value: '*@https://*.DOMAIN*, *@https://pryv.github.io*, *@https://*.rec.la*, *@https://api.pryv.com*'
         description: "Web pages authorized to run login API call. 
-        See https://api.pryv.com/reference-full/#trusted-apps-verification. 
-        You can remove the ones not related to your platform if you are not using Pryv's default apps
-        The format is comma-separated list of {trusted-app-id}@{origin} pairs.
-        Origins and appIds accept '*' wildcards, but never use wildcard appIds in production.
-        Example: *@https://*.DOMAIN*, *@https://pryv.github.io*, *@https://*.rec.la*"
+          See https://api.pryv.com/reference-full/#trusted-apps-verification. 
+          You can remove the ones not related to your platform if you are not using Pryv's default apps
+          The format is comma-separated list of {trusted-app-id}@{origin} pairs.
+          Origins and appIds accept '*' wildcards, but never use wildcard appIds in production.
+          Example: *@https://*.DOMAIN*, *@https://pryv.github.io*, *@https://*.rec.la*"
       DEFAULT_AUTH_URL: 
         value: https://sw.DOMAIN/access/access.html
         description: "Default auth url used for the authorization flow (https://api.pryv.com/reference/#auth-request)."
@@ -117,7 +117,7 @@ vars:
             ip: REG_SLAVE_IP_ADDRESS
       DNS_CUSTOM_ENTRIES:
         description: "Additional DNS entries. See the DNS configuration document: https://api.pryv.com/customer-resources/#documents.
-        Can be set to null if not used."
+          Can be set to null if not used."
         value: 
           ifttt:
             alias:
@@ -274,7 +274,7 @@ vars:
       UPDATES_IGNORE_PROTECTED_FIELDS: 
         value: false
         description: "When true, updates will ignore protected fields and print a warning log.
-        When false, trying to update read-only fields will fail with a forbidden error"
+          When false, trying to update read-only fields will fail with a forbidden error"
       WEBHOOKS_SETTINGS:
         description: "- minIntervalMs: minimum interval between successive webhook notifications, in milliseconds,
           - maxRetries: number of retried webhook notifications before it becomes inactive,
@@ -298,19 +298,19 @@ vars:
       INVITATION_TOKENS: 
         value: null
         description: "Allows to define a set of invitation tokens for user creation by providing
-        an array of strings as well as no check (null) & prevent all (empty array)"
+          an array of strings as well as no check (null) & prevent all (empty array)"
       CUSTOM_AUTH_FUNCTION:
         description: "Custom middleware function executed for each incoming request. 
-        May serve e.g. as additional authentication or validation step. 
-        Default value: 'module.exports=function(ctx, cb){cb();}'. 
-        More information: https://api.pryv.com/guides/custom-auth/"
+          May serve e.g. as additional authentication or validation step. 
+          Default value: 'module.exports=function(ctx, cb){cb();}'. 
+          More information: https://api.pryv.com/guides/custom-auth/"
         value: "module.exports=function(ctx, cb){cb();}"
       CUSTOM_SYSTEM_STREAMS:
         description: "Custom account fields that are saved and validated during registration.
-        These values should be set only once, because properties such as isUnique or isIndexed would not be updated
-        after settings update.
-        Default value: {'account': [{'isIndexed': true,'isUnique': true,'isShown': true,'isEditable': true,'type': 'email/string',
-                                     'name': 'Email','id': 'email','isRequiredInValidation': true}]}'.
-        More information could be found here: https://api.pryv.com/customer-resources/system-streams/"
+          These values should be set only once, because properties such as isUnique or isIndexed would not be updated
+          after settings update.
+          Default value: {'account': [{'isIndexed': true,'isUnique': true,'isShown': true,'isEditable': true,'type': 'email/string',
+                                      'name': 'Email','id': 'email','isRequiredInValidation': true}]}'.
+          More information could be found here: https://api.pryv.com/customer-resources/system-streams/"
         value: "{\"account\": [{\"isIndexed\": true,\"isUnique\": true,\"isShown\": true,\"isEditable\": true,\"type\": \"email/string\",\"name\": \"Email\",\"id\": \"email\",\"isRequiredInValidation\": true}]}"
 

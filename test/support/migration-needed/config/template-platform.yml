@@ -65,11 +65,11 @@ vars:
       TRUSTED_APPS: 
         value: '*@https://*.DOMAIN*, *@https://pryv.github.io*, *@https://*.rec.la*'
         description: "Web pages authorized to run login API call. 
-        See https://api.pryv.com/reference-full/#trusted-apps-verification. 
-        You can remove the ones not related to your platform if you are not using Pryv's default apps
-        The format is comma-separated list of {trusted-app-id}@{origin} pairs.
-        Origins and appIds accept '*' wildcards, but never use wildcard appIds in production.
-        Example: *@https://*.DOMAIN*, *@https://pryv.github.io*, *@https://*.rec.la*"
+          See https://api.pryv.com/reference-full/#trusted-apps-verification. 
+          You can remove the ones not related to your platform if you are not using Pryv's default apps
+          The format is comma-separated list of {trusted-app-id}@{origin} pairs.
+          Origins and appIds accept '*' wildcards, but never use wildcard appIds in production.
+          Example: *@https://*.DOMAIN*, *@https://pryv.github.io*, *@https://*.rec.la*"
       DEFAULT_AUTH_URL: 
         value: https://sw.DOMAIN/access/access.html
         description: "Default auth url used for the authorization flow (https://api.pryv.com/reference/#auth-request)."
@@ -131,7 +131,7 @@ vars:
             ip: REG_SLAVE_IP_ADDRESS
       DNS_CUSTOM_ENTRIES:
         description: "Additional DNS entries. See the DNS configuration document: https://api.pryv.com/customer-resources/#documents.
-        Can be set to null if not used."
+          Can be set to null if not used."
         value: 
           test:
             ip: REPLACE_ME
@@ -291,7 +291,7 @@ vars:
       UPDATES_IGNORE_PROTECTED_FIELDS: 
         value: false
         description: "When true, updates will ignore protected fields and print a warning log.
-        When false, trying to update read-only fields will fail with a forbidden error"
+          When false, trying to update read-only fields will fail with a forbidden error"
       WEBHOOKS_SETTINGS:
         description: "- minIntervalMs: minimum interval between successive webhook notifications, in milliseconds,
           - maxRetries: number of retried webhook notifications before it becomes inactive,
@@ -315,25 +315,25 @@ vars:
       INVITATION_TOKENS: 
         value: null
         description: "Allows to define a set of invitation tokens for user creation by providing
-        an array of strings as well as no check (null) & prevent all (empty array)"
+          an array of strings as well as no check (null) & prevent all (empty array)"
       CUSTOM_AUTH_FUNCTION:
         description: "Custom middleware function executed for each incoming request. 
-        May serve e.g. as additional authentication or validation step. 
-        Default value: 'module.exports=function(ctx, cb){cb();}'. 
-        More information: https://api.pryv.com/guides/custom-auth/"
+          May serve e.g. as additional authentication or validation step. 
+          Default value: 'module.exports=function(ctx, cb){cb();}'. 
+          More information: https://api.pryv.com/guides/custom-auth/"
         value: "module.exports=function(ctx, cb){cb();}"
       ACCOUNT_SYSTEM_STREAMS:
         description: "Custom account fields that are saved and validated during the registration.
-        Preferably these values should be modified with care, because fields like isUnique or isIndexed would not be updated
-        after settings update. If you remove streams that have events in some user accounts, these events will become unreachable.
-        Default value: [{'isIndexed': true,'isUnique': true,'isShown': true,'isEditable': true,'type': 'email/string',
-        'name': 'Email','id': 'email','isRequiredInValidation': true}]'.
-        More information available here: https://api.pryv.com/customer-resources/system-streams/"
+          Preferably these values should be modified with care, because fields like isUnique or isIndexed would not be updated
+          after settings update. If you remove streams that have events in some user accounts, these events will become unreachable.
+          Default value: [{'isIndexed': true,'isUnique': true,'isShown': true,'isEditable': true,'type': 'email/string',
+          'name': 'Email','id': 'email','isRequiredInValidation': true}]'.
+          More information available here: https://api.pryv.com/customer-resources/system-streams/"
         value: "[{\"isIndexed\": true,\"isUnique\": true,\"isShown\": true,\"isEditable\": true,\"type\": \"email/string\",\"name\": \"Email\",\"id\": \"email\",\"isRequiredInValidation\": true}]"
       OTHER_SYSTEM_STREAMS:
         description: "Custom stream structure that is available in all accounts. Preferably these values should be changed rarely. If you remove streams that have events in some user accounts, these events will become unreachable.
-        Default value: []
-        More information available here: https://api.pryv.com/customer-resources/system-streams/"
+          Default value: []
+          More information available here: https://api.pryv.com/customer-resources/system-streams/"
         value: "[]"
       BACKWARD_COMPATIBILITY_SYSTEM_STREAMS_PREFIX:
         description: "Makes the API accept and return system streams with the old '.' (dot) prefix (ex.: '.account'). When activated, you can migrate applications by making API calls with the 'disable-backward-compatibility-prefix: true' header.
