@@ -89,9 +89,13 @@ function deleteRemovedSettings(platform: {}, template: {}): {} {
   for (const [mainSettingKey, mainSettingValue] of Object.entries(platform.vars)) {
     if (template.vars[mainSettingKey] == null) {
       delete platform.vars[mainSettingKey];
+      logger.info(`removed root setting: ${mainSettingKey}`);
     } else {
       for (const [subSettingKey, subSettingValue] of Object.entries(mainSettingValue.settings)) {
-        if (template.vars[mainSettingKey].settings[subSettingKey] == null) delete platform.vars[mainSettingKey].settings[subSettingKey];
+        if (template.vars[mainSettingKey].settings[subSettingKey] == null) {
+          delete platform.vars[mainSettingKey].settings[subSettingKey];
+          logger.info(`removed sub setting: ${subSettingKey}`);
+        }
       }
     }
   }
