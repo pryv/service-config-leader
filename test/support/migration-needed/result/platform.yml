@@ -11,6 +11,12 @@ vars:
       REG_MASTER_IP_ADDRESS:
         value: 185.19.30.198
         description: "IP address of register master machine"
+      REG_MASTER_VPN_IP_ADDRESS:
+        value: REPLACE_ME
+        description: "IP address of master register on a secure line between it and slave register (such as a private network)"
+      REG_SLAVE_IP_ADDRESS:
+        value: REPLACE_ME
+        description: "IP address of register slave machine"
       REGISTER_ADMIN_KEY: 
         value: Jihh3Qwn4qGthD6v4wj2VCu8EkqfsnCMrNBVtNWj8PGAi
         description: "Admin Key for register machine, see: https://api.pryv.com/reference-system/#admin. Please set a strong cryptographic key. Alphanumeric of length 20 to 50."
@@ -33,7 +39,7 @@ vars:
         description: "IP address of network interface bound to public network. Change if different to its public address at REG_MASTER_IP_ADDRESS."
       REG_SLAVE_PUBLIC_INTERFACE_IP_ADDRESS:
         value: REG_SLAVE_IP_ADDRESS
-        description: "IP address of network interface bound to public network. Set if different to its public address at REG_SLAVE_IP_ADDRESS. Use 'ifconfig' on VM to find it."
+        description: "IP address of network interface bound to public network. Change if different to its public address at REG_SLAVE_IP_ADDRESS."
   MISCELLANEOUS_SETTINGS:
     name: "Miscellaneous settings"
     settings:
@@ -315,7 +321,7 @@ vars:
         Default value: [{'isIndexed': true,'isUnique': true,'isShown': true,'isEditable': true,'type': 'email/string',
         'name': 'Email','id': 'email','isRequiredInValidation': true}]'.
         More information available here: https://api.pryv.com/customer-resources/system-streams/"
-        value: "[{\"isIndexed\": true,\"isUnique\": true,\"isShown\": true,\"isEditable\": true,\"type\": \"email/string\",\"name\": \"Email\",\"id\": \"email\",\"isRequiredInValidation\": true}]"
+        value: "[{\"isIndexed\":true,\"isUnique\":true,\"isShown\":true,\"isEditable\":true,\"type\":\"email/string\",\"name\":\"Email\",\"id\":\"email\",\"isRequiredInValidation\":true}]"
       OTHER_SYSTEM_STREAMS:
         description: "Custom stream structure that is available in all accounts. Preferably these values should be changed rarely. If you remove streams that have events in some user accounts, these events will become unreachable.
         Default value: []
@@ -331,7 +337,7 @@ vars:
       AUDIT_STORAGE_FILTER:
         value: 
           methods:
-            include: ['all']
+            include: ['accesses.create']
             exclude: []
         description: 'Audited API calls filtering for storage. Default value: {"methods":{"include":["accesses.create"],"exclude":[]}}'
       AUDIT_SYSLOG_FILTER:

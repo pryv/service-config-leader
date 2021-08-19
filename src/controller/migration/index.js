@@ -29,7 +29,7 @@ const migrate = (platform: {}, template: {}): {} => {
   const deploymentType: DeploymentType = migrationExecution.deploymentType;
   let migratedPlaform = _.cloneDeep(platform);
   for (const migration of migrations) {
-    migratedPlaform = migration[deploymentType].run(migratedPlaform, template);
+    migratedPlaform = migration[deploymentType].run(migratedPlaform, migration[deploymentType].template);
   }
   return migratedPlaform;
 }
