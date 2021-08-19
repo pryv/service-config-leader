@@ -12,7 +12,7 @@ const { migrate, checkMigrations } = require('../../dist/controller/migration');
 
 describe('XXXmigration', () => {
 
-  describe.skip('migrate()', () => {
+  describe('migrate()', () => {
     describe('when there are migrations to apply', () => {
 
       let configFolder;
@@ -41,11 +41,14 @@ describe('XXXmigration', () => {
         const template = parseTemplateFile(configFolder);
         const expected = [ 
           { versionFrom: '1.6.21', versionTo: '1.6.22' }, 
-          { versionFrom: '1.6.22', versionTo: '1.6.23' }, 
           { versionFrom: '1.6.23', versionTo: '1.7.0' }
         ];
-        const actual = checkMigrations(platform, template);
-        assert.deepEqual(actual, expected, 'migrations were not defined properly');
+        const result = checkMigrations(platform, template);
+        const actual = result.migrations;
+        const deploymentType = result.deploymentType;
+        const withoutRuns = actual.map(m => { return { versionFrom: m.versionFrom, versionTo: m.versionTo };});
+        assert.deepEqual(withoutRuns, expected, 'migrations were not defined properly');
+        assert.equal(deploymentType, 'cluster');
       });
       
     });
