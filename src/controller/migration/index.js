@@ -47,7 +47,6 @@ const checkMigrations = (platform: {}, template: {}): MigrationExecution => {
 
   const platformVersion: string = platform.vars.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value;
   const templateVersion: string = template.vars.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value;
-  if (platformVersion === templateVersion) return [];
 
   const deploymentType: DeploymentType = findDeploymentType(platform);
 

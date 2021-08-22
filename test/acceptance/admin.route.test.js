@@ -258,20 +258,43 @@ describe('Test /admin endpoint', function () {
           assert.equal(res.status, 200);
           const migrations = res.body.migrations;
           assert.exists(migrations);
-          assert.isArray(migrations);
-          assert.equal(migrations.length, 2);
+          assert.deepEqual(migrations, [
+            { versionFrom: '1.6.21', versionTo: '1.6.22' },
+            { versionFrom: '1.6.23', versionTo: '1.7.0' },
+          ]);
         });
       });
       describe('when the user has insufficient permissions', () => {
-        it('must return a 401 error', () => {
-
+        it('must return a 401 error', async () => {
+          const res = await request
+            .get('/admin/migrations')
+            .set('Authorization', readOnlyToken);
+          assert.equal(res.status, 200);
         });
       });
     });
     describe('when there is no update', () => {
       describe('when the user has sufficient permissions', () => {
-        it('must return an empty list', () => {
 
+        let request;
+        before(() => {
+          const app = new Application({
+            nconfSettings: {
+              platformSettings: {
+                platform: path.resolve(__dirname, '../support/migration-not-needed/config/platform.yml'),
+                platformTemplate: path.resolve(__dirname, '../support/migration-not-needed/config/template-platform.yml'),
+              }
+            }
+          });
+          request = supertest(app.express);
+        });
+
+        it('must return an empty list', async () => {
+          const res = await request
+            .get('/admin/migrations')
+            .set('Authorization', readOnlyToken);
+          assert.equal(res.status, 200);
+          assert.deepEqual(res.body.migrations, []);
         });
       });
     });

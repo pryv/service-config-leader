@@ -148,8 +148,8 @@ module.exports = function (
     ) => {
       const platform = await loadPlatform(settings);
       const platformTemplate = await loadPlatformTemplate(settings);
-    
-      res.json({ migrations: checkMigrations(platform, platformTemplate).migrations.map(m => _.pick(m, ['versionFrom', 'versionTo'])) });
+      const migrations = checkMigrations(platform, platformTemplate).migrations.map(m => _.pick(m, ['versionFrom', 'versionTo']));
+      res.json({ migrations });
     }
   );
 };
