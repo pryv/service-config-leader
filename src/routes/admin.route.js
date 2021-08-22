@@ -5,7 +5,7 @@ const regeneratorRuntime = require('regenerator-runtime');
 
 const fs = require('fs');
 const request = require('superagent');
-const yaml = require('js-yaml')
+const _ = require('lodash');
 const logger = require('@utils/logging').getLogger('admin');
 const errorsFactory = require('@utils/errorsHandling').factory;
 const { SETTINGS_PERMISSIONS } = require('@models/permissions.model');
@@ -22,7 +22,7 @@ import {
   isValidJSON,
   isJSONFile
 } from '@utils/configuration.utils';
-const { loadPlatformTemplate } = require('../controller/migration');
+const { loadPlatformTemplate, loadPlatform, checkMigrations } = require('../controller/migration');
 
 module.exports = function (
   expressApp: express$Application,
@@ -34,7 +34,6 @@ module.exports = function (
   const authorizationService: AuthorizationService = getAuthorizationService(
     usersRepository
   );
-  const platformTemplate: {} = loadPlatformTemplate(settings);
 
   expressApp.all('/admin*', verifyToken(tokensRepository));
 
@@ -147,30 +146,10 @@ module.exports = function (
       res: express$Response,
       next: express$NextFunction
     ) => {
-      const currentVersion: string = platformSettings.vars.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value;
-      
-      settings.platformSettings.platformTemplate
-
-      let successes = [];
-      let failures = [];
-      for (const [auth, follower] of Object.entries(followers)) {
-        const followerUrl = follower.url;
-        try {
-          await request
-            .post(`${followerUrl}/notify`)
-            .set('Authorization', auth)
-            .send({ services: services });
-          successes.push(follower);
-        } catch (err) {
-          logger.warn('Error while notifying follower:', err);
-          failures.push(Object.assign({}, follower, { error: err }));
-        }
-      }
-
-      res.json({
-        successes: successes,
-        failures: failures
-      });
+      const platform = await loadPlatform(settings);
+      const platformTemplate = await loadPlatformTemplate(settings);
+    
+      res.json({ migrations: checkMigrations(platform, platformTemplate).migrations.map(m => _.pick(m, ['versionFrom', 'versionTo'])) });
     }
   );
 };

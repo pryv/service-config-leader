@@ -4,7 +4,7 @@
 const regeneratorRuntime = require('regenerator-runtime');
 
 const yaml = require('js-yaml');
-const fs = require('fs');
+const fs = require('fs/promises');
 const compareVersions = require('compare-versions');
 const _ = require('lodash');
 
@@ -101,13 +101,40 @@ function computeNeededMigrations(platformVersion: string, templateVersion: strin
  * 
  * @param {*} settings 
  */
-const loadPlatformTemplate = (settings: {}): {} => {
+const loadPlatformTemplate = async (settings: {}): {} => {
   const platformTemplate: string = settings.get('platformSettings:platformTemplate');
   if (platformTemplate == null) throw new Error('platformSettings:platformTemplate not set in config-leader.json. Config migrations will not work.');
   try {
-    return yaml.load(fs.readFileSync(platformTemplate, { encoding: 'utf-8' }));
+    return yaml.load(await fs.readFile(platformTemplate, { encoding: 'utf-8' }));
   } catch (e) {
     throw new Error(`Error while reading and parsing template platform file at ${platformTemplate}. ${e}`);
   }
 }
 module.exports.loadPlatformTemplate = loadPlatformTemplate;
+
+/**
+ * load platform from its settings value
+ * 
+ * @param {*} settings 
+ */
+const loadPlatform = async (settings: {}): {} => {
+  const platform: string = settings.get('platformSettings:platform');
+  if (platform == null) throw new Error('platformSettings:platform not set in config-leader.json. Config migrations will not work.');
+  try {
+    return yaml.load(await fs.readFile(platform, { encoding: 'utf-8' }));
+  } catch (e) {
+    throw new Error(`Error while reading and parsing platform file at ${platform}. ${e}`);
+  }
+}
+module.exports.loadPlatform = loadPlatform;
+
+/**
+ * Writes the content of platform into 'platformSettings:platform' from the setings
+ * 
+ * @param {*} settings 
+ * @param {*} platform 
+ */
+const writePlatform = async (settings: {}, platform: {}): void => {
+  await fs.writeFile(settings.get('platformSettings:platform'), yaml.dump(platform));
+}
+module.exports.writePlatform = writePlatform;

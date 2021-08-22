@@ -242,10 +242,10 @@ describe('Test /admin endpoint', function () {
         const app = new Application({
           nconfSettings: {
             platformSettings: {
-              platformConfig: path.resolve(__dirname, '../support/migration-needed/config/platform.yml'),
+              platform: path.resolve(__dirname, '../support/migration-needed/config/platform.yml'),
               platformTemplate: path.resolve(__dirname, '../support/migration-needed/config/template-platform.yml'),
+            }
           }
-        }
         });
         request = supertest(app.express);
       });
@@ -253,7 +253,7 @@ describe('Test /admin endpoint', function () {
       describe('when the user has sufficient permissions', () => {
         it('must return the list of migrations to perform', async () => {
           const res = await request
-            .get('/admin/migration')
+            .get('/admin/migrations')
             .set('Authorization', readOnlyToken);
           assert.equal(res.status, 200);
           const migrations = res.body.migrations;

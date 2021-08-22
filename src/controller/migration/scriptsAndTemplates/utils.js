@@ -5,7 +5,7 @@ const _ = require('lodash');
 const logger = require('../../../utils/logging').getLogger('migration-utils');
 
 /**
- * Performs base migration work
+ * Performs base migration work on copy of platform
  * 
  * @param {*} platform content of platform.yml
  * @param {*} template content of template platform.yml
