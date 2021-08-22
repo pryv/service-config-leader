@@ -137,7 +137,7 @@ module.exports = function (
       });
     });
 
-    // returns list of available config migrations
+  // returns list of available config migrations
   expressApp.get(
     '/admin/migrations',
     authorizationService.verifyIsAllowedTo(SETTINGS_PERMISSIONS.READ),

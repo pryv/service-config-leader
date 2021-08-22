@@ -268,8 +268,8 @@ describe('Test /admin endpoint', function () {
         it('must return a 401 error', async () => {
           const res = await request
             .get('/admin/migrations')
-            .set('Authorization', readOnlyToken);
-          assert.equal(res.status, 200);
+            .set('Authorization', updateOnlyToken);
+          assert.equal(res.status, 401);
         });
       });
     });
