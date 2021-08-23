@@ -138,6 +138,12 @@ module.exports.loadPlatform = loadPlatform;
  * @param {*} platform 
  */
 const writePlatform = async (settings: {}, platform: {}): void => {
-  await fs.writeFile(settings.get('platformSettings:platform'), yaml.dump(platform));
+
+  const yamlWriteOptions: {} = {
+    forceQuotes: true,
+    quotingType: '"',
+  };
+
+  await fs.writeFile(settings.get('platformSettings:platform'), yaml.dump(platform, yamlWriteOptions));
 }
 module.exports.writePlatform = writePlatform;
