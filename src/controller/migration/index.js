@@ -31,11 +31,11 @@ const migrate = (platform: {}, template: {}): ExecutedMigration => {
   const ScheduledMigration: ScheduledMigration = checkMigrations(platform, template);
   const migrations: Array<Migration> = ScheduledMigration.migrations;
   const deploymentType: DeploymentType = ScheduledMigration.deploymentType;
-  let migratedPlaform = _.cloneDeep(platform);
+  let migratedPlatform = _.cloneDeep(platform);
   for (const migration of migrations) {
-    migratedPlaform = migration[deploymentType].run(migratedPlaform, migration[deploymentType].template);
+    migratedPlatform = migration[deploymentType].run(migratedPlatform, migration[deploymentType].template);
   }
-  return { migratedPlaform, migrations };
+  return { migratedPlatform, migrations };
 }
 module.exports.migrate = migrate;
 

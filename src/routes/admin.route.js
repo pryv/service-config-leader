@@ -22,7 +22,7 @@ import {
   isValidJSON,
   isJSONFile
 } from '@utils/configuration.utils';
-const { loadPlatformTemplate, loadPlatform, checkMigrations } = require('../controller/migration');
+const { loadPlatformTemplate, loadPlatform, writePlatform, checkMigrations, migrate } = require('../controller/migration');
 
 module.exports = function (
   expressApp: express$Application,
@@ -163,8 +163,9 @@ module.exports = function (
     ) => {
       const platform = await loadPlatform(settings);
       const platformTemplate = await loadPlatformTemplate(settings);
-      const migrations = checkMigrations(platform, platformTemplate).migrations.map(m => _.pick(m, ['versionFrom', 'versionTo']));
-      res.json({ migrations });
+      const { migrations, migratedPlatform } = migrate(platform, platformTemplate);
+      await writePlatform(settings, migratedPlatform);
+      res.json({ migrations: migrations.map(m => _.pick(m, ['versionFrom', 'versionTo'])) });
     }
   );
 };
