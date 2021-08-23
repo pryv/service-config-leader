@@ -1,5 +1,8 @@
 // @flow
 
+// eslint-disable-next-line no-unused-vars
+const regeneratorRuntime = require('regenerator-runtime');
+
 const express = require('express');
 const middlewares = require('@middlewares');
 const fs = require('fs');
@@ -16,6 +19,7 @@ const {
   PLATFORM_USERS_PERMISSIONS
 } = require('@models/permissions.model');
 const morgan = require('morgan');
+const { setupGit, getGit } = require('@controller/migration');
 
 class Application {
   express: express$Application;
@@ -25,6 +29,7 @@ class Application {
   db: Database;
   usersRepository: UsersRepository;
   tokensRepository: TokensRepository;
+  git: {};
 
   constructor(settingsOverride = {}) {
     if (settingsOverride.nconfSettings) nconfSettings.merge(settingsOverride.nconfSettings);
@@ -40,6 +45,16 @@ class Application {
     this.generateSecrets(this.settings);
     this.generateInitialUser();
     this.startTokensBlacklistCleanupJob();
+    this.git = setupGit({
+      baseDir: this.settings.get('gitPath'),
+    });
+  }
+
+  /**
+   * mandatory in production and tests requiring git (POST /admin/migrations)
+   */
+  async init() {
+    await this.git.initRepo();
   }
 
   generateSecrets(settings: Object): void {

@@ -307,7 +307,7 @@ describe('Test /admin endpoint', function () {
     describe('when there is an update', () => {
 
       let request, backupPlatform, platformPath, expectedPlatform;
-      before(() => {
+      before(async () => {
         platformPath = path.resolve(__dirname, '../support/migration-needed/config/platform.yml');
         expectedPlatform = yaml.load(fs.readFileSync(path.resolve(__dirname, '../support/migration-needed/result/platform.yml'), 'utf-8'));
         const app = new Application({
@@ -318,6 +318,7 @@ describe('Test /admin endpoint', function () {
             }
           }
         });
+        await app.init();
         request = supertest(app.express);
         backupPlatform = fs.readFileSync(platformPath, 'utf-8');
       });

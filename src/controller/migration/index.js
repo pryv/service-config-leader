@@ -7,6 +7,7 @@ const yaml = require('js-yaml');
 const fs = require('fs/promises');
 const compareVersions = require('compare-versions');
 const _ = require('lodash');
+const { setupGit, getGit } = require('./git');
 
 import type { Migration, Run } from './migrations';
 const migrations: Array<Migration> = require('./migrations').migrations;
@@ -20,6 +21,9 @@ type ExecutedMigration = {
   migrations: Array<Migration>,
   migratedPlatform: {},
 };
+
+module.exports.setupGit = setupGit;
+module.exports.getGit = getGit;
 
 /**
  * migrate the platform up to the template's version
@@ -104,7 +108,7 @@ function computeNeededMigrations(platformVersion: string, templateVersion: strin
  * 
  * @param {*} settings 
  */
-const loadPlatformTemplate = async (settings: {}): {} => {
+const loadPlatformTemplate = async (settings: {}): Promise<{}> => {
   const platformTemplate: string = settings.get('platformSettings:platformTemplate');
   if (platformTemplate == null) throw new Error('platformSettings:platformTemplate not set in config-leader.json. Config migrations will not work.');
   try {
@@ -120,7 +124,7 @@ module.exports.loadPlatformTemplate = loadPlatformTemplate;
  * 
  * @param {*} settings 
  */
-const loadPlatform = async (settings: {}): {} => {
+const loadPlatform = async (settings: {}): Promise<{}> => {
   const platform: string = settings.get('platformSettings:platform');
   if (platform == null) throw new Error('platformSettings:platform not set in config-leader.json. Config migrations will not work.');
   try {
@@ -137,13 +141,15 @@ module.exports.loadPlatform = loadPlatform;
  * @param {*} settings 
  * @param {*} platform 
  */
-const writePlatform = async (settings: {}, platform: {}): void => {
+const writePlatform = async (settings: {}, platform: {}, author: string): Promise<void> => {
 
   const yamlWriteOptions: {} = {
     forceQuotes: true,
     quotingType: '"',
   };
-
   await fs.writeFile(settings.get('platformSettings:platform'), yaml.dump(platform, yamlWriteOptions));
+
+  const git: {} = getGit();
+  await git.commitChanges(`update through POST /admin/migrations by ${author}`);
 }
 module.exports.writePlatform = writePlatform;

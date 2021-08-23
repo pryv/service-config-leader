@@ -1,4 +1,4 @@
-/*global describe, it, before, after */
+/*global describe, it, before */
 
 // eslint-disable-next-line no-unused-vars
 const regeneratorRuntime = require('regenerator-runtime');
