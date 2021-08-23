@@ -82,11 +82,11 @@ describe('GET /conf', function () {
     assert.equal(coreConfig1.domain, 'rec.la');
 
     // Modify platform.yml
-    let path = settings.get('databasePath') + 'platform.yml';
-    let backup = fs.readFileSync(path);
-    let modifiedConfig = yaml.load(path);
+    const path = settings.get('platformSettings:platformConfig');
+    const backup = fs.readFileSync(path, 'utf-8');
+    const modifiedConfig = yaml.load(backup);
     modifiedConfig.vars.MAIN_PROPS.settings.DOMAIN.value = 'test.la';
-    fs.writeFileSync(path, yaml.stringify(modifiedConfig));
+    fs.writeFileSync(path, yaml.dump(modifiedConfig));
 
     // Check if /conf give the fresh settings
     const call2 = await request.get('/conf').set('Authorization', followerKey);
@@ -102,11 +102,11 @@ describe('GET /conf', function () {
 
   it('responds with 500 given incorrect config stored', async () => {
     // Set invalid config in platform.yml
-    let path = settings.get('databasePath') + 'platform.yml';
-    let backup = fs.readFileSync(path);
-    let modifiedConfig = yaml.load(path);
+    const path = settings.get('platformSettings:platformConfig');
+    const backup = fs.readFileSync(path, 'utf-8');
+    const modifiedConfig = yaml.load(backup);
     modifiedConfig.vars.DNS_SETTINGS.settings.DNS_CUSTOM_ENTRIES.value = '';
-    fs.writeFileSync(path, yaml.stringify(modifiedConfig));
+    fs.writeFileSync(path, yaml.dump(modifiedConfig));
 
     const res = await request.get('/conf').set('Authorization', followerKey);
     assert.equal(res.status, 500);
