@@ -152,4 +152,19 @@ module.exports = function (
       res.json({ migrations });
     }
   );
+
+  expressApp.post(
+    '/admin/migrations',
+    authorizationService.verifyIsAllowedTo(SETTINGS_PERMISSIONS.UPDATE),
+    async (
+      req: express$Request,
+      res: express$Response,
+      next: express$NextFunction
+    ) => {
+      const platform = await loadPlatform(settings);
+      const platformTemplate = await loadPlatformTemplate(settings);
+      const migrations = checkMigrations(platform, platformTemplate).migrations.map(m => _.pick(m, ['versionFrom', 'versionTo']));
+      res.json({ migrations });
+    }
+  );
 };

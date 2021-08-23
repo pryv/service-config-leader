@@ -23,8 +23,8 @@ describe('XXXmigration', () => {
         const platform = parsePlatformFile(configFolder);
         const template = parseTemplateFile(configFolder);
         const expected = parsePlatformFile(path.resolve(configFolder, '../result'));
-        const actual = await migrate(platform, template);
-        assert.deepEqual(actual, expected, 'config was not migrated as expected');
+        const { migratedPlaform, migrations } = await migrate(platform, template);
+        assert.deepEqual(migratedPlaform, expected, 'config was not migrated as expected');
       });
       
     });
@@ -61,7 +61,7 @@ describe('XXXmigration', () => {
         const platform = parsePlatformFile(configFolder);
         const template = parseTemplateFile(configFolder);
         const expected = [];
-        const actual = checkMigrations(platform, template);
+        const actual = checkMigrations(platform, template).migrations;
         assert.deepEqual(actual, expected, 'migrations were not defined properly');
       });
     });

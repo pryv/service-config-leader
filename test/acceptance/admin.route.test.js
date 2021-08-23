@@ -20,6 +20,7 @@ const helper = require('../fixtures/followersMockHelper');
 const { sign } = require('jsonwebtoken');
 const { SETTINGS_PERMISSIONS } = require('@models/permissions.model');
 import type { User } from '@models/user.model';
+const migration = require('@root/controller/migration');
 
 describe('Test /admin endpoint', function () {
   let readOnlyToken;
@@ -301,10 +302,80 @@ describe('Test /admin endpoint', function () {
 
   });
 
-  describe('POST /admin/update', function () {
+  describe('POST /admin/migrations', function () {
 
-    describe('', () => {
+    describe('when there is an update', () => {
 
+      let request, spy;
+      before(() => {
+        const app = new Application({
+          nconfSettings: {
+            platformSettings: {
+              platform: path.resolve(__dirname, '../support/migration-needed/config/platform.yml'),
+              platformTemplate: path.resolve(__dirname, '../support/migration-needed/config/template-platform.yml'),
+            }
+          }
+        });
+        request = supertest(app.express);
+        spy = sinon.spy(migration, 'migrate');
+      });
+      after(() => {
+        spy.restore();
+      });
+
+      describe('when the user has sufficient permissions', () => {
+        it('must call the migrate() function and return the executed migrations', async () => {
+          const res = await request
+            .post('/admin/migrations')
+            .set('Authorization', updateOnlyToken);
+          assert.equal(res.status, 200);
+          const migrations = res.body.migrations;
+          assert.deepEqual(migrations, [
+            { versionFrom: '1.6.21', versionTo: '1.6.22' },
+            { versionFrom: '1.6.23', versionTo: '1.7.0' },
+          ]);
+          //assert.equal(spy.called, true);
+        });
+      });
+      describe('when the user has insufficient permissions', () => {
+        it('must return a 401 error', async () => {
+          const res = await request
+            .post('/admin/migrations')
+            .set('Authorization', readOnlyToken);
+          assert.equal(res.status, 401);
+        });
+      });
     });
+    describe('when there is no update', () => {
+      describe('when the user has sufficient permissions', () => {
+
+        let request, spy;
+        before(() => {
+          const app = new Application({
+            nconfSettings: {
+              platformSettings: {
+                platform: path.resolve(__dirname, '../support/migration-not-needed/config/platform.yml'),
+                platformTemplate: path.resolve(__dirname, '../support/migration-not-needed/config/template-platform.yml'),
+              }
+            }
+          });
+          request = supertest(app.express);
+          spy = sinon.spy(migration, 'migrate');
+        });
+        after(() => {
+          spy.restore();
+        });
+
+        it('must return an empty list', async () => {
+          const res = await request
+            .post('/admin/migrations')
+            .set('Authorization', updateOnlyToken);
+          assert.equal(res.status, 200);
+          assert.deepEqual(res.body.migrations, []);
+          //assert.equal(spy.called, true);
+        });
+      });
+    });
+
   });
 });

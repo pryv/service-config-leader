@@ -12,9 +12,13 @@ import type { Migration, Run } from './migrations';
 const migrations: Array<Migration> = require('./migrations').migrations;
 
 type DeploymentType = 'singlenode' | 'cluster';
-type MigrationExecution = {
+type ScheduledMigration = {
   migrations: Array<Migration>,
   deploymentType: DeploymentType,
+};
+type ExecutedMigration = {
+  migrations: Array<Migration>,
+  migratedPlatform: {},
 };
 
 /**
@@ -23,15 +27,15 @@ type MigrationExecution = {
  * @param {*} platform the content of the platform.yml, used to figure out type of deployment (cluster/singlenode)
  * @param {*} template used to figure out the target version
  */
-const migrate = (platform: {}, template: {}): {} => {
-  const migrationExecution: MigrationExecution = checkMigrations(platform, template);
-  const migrations: Array<Migration> = migrationExecution.migrations;
-  const deploymentType: DeploymentType = migrationExecution.deploymentType;
+const migrate = (platform: {}, template: {}): ExecutedMigration => {
+  const ScheduledMigration: ScheduledMigration = checkMigrations(platform, template);
+  const migrations: Array<Migration> = ScheduledMigration.migrations;
+  const deploymentType: DeploymentType = ScheduledMigration.deploymentType;
   let migratedPlaform = _.cloneDeep(platform);
   for (const migration of migrations) {
     migratedPlaform = migration[deploymentType].run(migratedPlaform, migration[deploymentType].template);
   }
-  return migratedPlaform;
+  return { migratedPlaform, migrations };
 }
 module.exports.migrate = migrate;
 
@@ -41,7 +45,7 @@ module.exports.migrate = migrate;
  * @param {*} platform the platform.yml content
  * @param {*} template the template-platform.yml content
  */
-const checkMigrations = (platform: {}, template: {}): MigrationExecution => {
+const checkMigrations = (platform: {}, template: {}): ScheduledMigration => {
   validate(platform);
   validate(template);
 
