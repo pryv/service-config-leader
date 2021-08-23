@@ -108,7 +108,7 @@ describe('Test /admin endpoint', function () {
         .set('Authorization', readOnlyToken);
 
       const ymlFile = fs.readFileSync('platform.yml', 'utf8');
-      const platform = yaml.safeLoad(ymlFile);
+      const platform = yaml.load(ymlFile);
 
       assert.strictEqual(res.status, 200);
       assert.include(res.headers['content-type'], 'application/json');
@@ -140,7 +140,7 @@ describe('Test /admin endpoint', function () {
       assert.deepEqual(res.body.settings, updatedSettings);
       assert.deepEqual(platformSettings.get('vars'), updatedSettings);
       const ymlFile = fs.readFileSync('platform.yml', 'utf8');
-      const platform = yaml.safeLoad(ymlFile);
+      const platform = yaml.load(ymlFile);
       assert.deepEqual(updatedSettings, platform.vars);
     });
     it('must respond with 400 when given properties that create invalid config', async () => {
@@ -306,25 +306,27 @@ describe('Test /admin endpoint', function () {
 
     describe('when there is an update', () => {
 
-      let request, spy;
+      let request, backupPlatform, platformPath, expectedPlatform;
       before(() => {
+        platformPath = path.resolve(__dirname, '../support/migration-needed/config/platform.yml');
+        expectedPlatform = yaml.load(fs.readFileSync(path.resolve(__dirname, '../support/migration-needed/result/platform.yml'), 'utf-8'));
         const app = new Application({
           nconfSettings: {
             platformSettings: {
-              platform: path.resolve(__dirname, '../support/migration-needed/config/platform.yml'),
+              platform: platformPath,
               platformTemplate: path.resolve(__dirname, '../support/migration-needed/config/template-platform.yml'),
             }
           }
         });
         request = supertest(app.express);
-        spy = sinon.spy(migration, 'migrate');
+        backupPlatform = fs.readFileSync(platformPath, 'utf-8');
       });
       after(() => {
-        spy.restore();
+        fs.writeFileSync(platformPath, backupPlatform);
       });
 
       describe('when the user has sufficient permissions', () => {
-        it('must call the migrate() function and return the executed migrations', async () => {
+        it('must migrate the platform configuration and return the executed migrations', async () => {
           const res = await request
             .post('/admin/migrations')
             .set('Authorization', updateOnlyToken);
@@ -334,7 +336,8 @@ describe('Test /admin endpoint', function () {
             { versionFrom: '1.6.21', versionTo: '1.6.22' },
             { versionFrom: '1.6.23', versionTo: '1.7.0' },
           ]);
-          //assert.equal(spy.called, true);
+          const migratedPlatform = yaml.load(fs.readFileSync(platformPath));
+          assert.deepEqual(migratedPlatform, expectedPlatform);
         });
       });
       describe('when the user has insufficient permissions', () => {
@@ -349,30 +352,32 @@ describe('Test /admin endpoint', function () {
     describe('when there is no update', () => {
       describe('when the user has sufficient permissions', () => {
 
-        let request, spy;
+        let request, backupPlatform, platformPath;
         before(() => {
+          platformPath = path.resolve(__dirname, '../support/migration-not-needed/config/platform.yml');
           const app = new Application({
             nconfSettings: {
               platformSettings: {
-                platform: path.resolve(__dirname, '../support/migration-not-needed/config/platform.yml'),
+                platform: platformPath,
                 platformTemplate: path.resolve(__dirname, '../support/migration-not-needed/config/template-platform.yml'),
               }
             }
           });
           request = supertest(app.express);
-          spy = sinon.spy(migration, 'migrate');
+          backupPlatform = fs.readFileSync(platformPath, 'utf-8');
         });
         after(() => {
-          spy.restore();
-        });
+          fs.writeFileSync(platformPath, backupPlatform);
+        })
 
-        it('must return an empty list', async () => {
+        it('must not alter the platform configuration and return an empty list', async () => {
           const res = await request
             .post('/admin/migrations')
             .set('Authorization', updateOnlyToken);
           assert.equal(res.status, 200);
           assert.deepEqual(res.body.migrations, []);
-          //assert.equal(spy.called, true);
+          const platform = yaml.load(fs.readFileSync(platformPath));
+          assert.deepEqual(platform, yaml.load(backupPlatform));
         });
       });
     });

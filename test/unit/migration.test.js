@@ -10,7 +10,7 @@ const assert = require('chai').assert;
 
 const { migrate, checkMigrations } = require('../../dist/controller/migration');
 
-describe('XXXmigration', () => {
+describe('migration', () => {
 
   describe('migrate()', () => {
     describe('when there are migrations to apply', () => {
@@ -23,8 +23,8 @@ describe('XXXmigration', () => {
         const platform = parsePlatformFile(configFolder);
         const template = parseTemplateFile(configFolder);
         const expected = parsePlatformFile(path.resolve(configFolder, '../result'));
-        const { migratedPlaform, migrations } = await migrate(platform, template);
-        assert.deepEqual(migratedPlaform, expected, 'config was not migrated as expected');
+        const { migratedPlatform, migrations } = await migrate(platform, template);
+        assert.deepEqual(migratedPlatform, expected, 'config was not migrated as expected');
       });
       
     });
