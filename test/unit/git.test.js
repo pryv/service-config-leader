@@ -33,7 +33,8 @@ describe('git', () => {
 
   describe('commitChanges()', () => {
     let text, commitMsg;
-    before(() => {
+    before(async () => {
+      await git.initRepo();
       text = 'hello';
       commitMsg = 'howdy';
       writeFileSync(path.resolve(baseDir, 'someFile'), text);
