@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const assert = require('chai').assert;
 
-const { migrate, checkMigrations } = require('../../dist/controller/migration');
+const { migrate, checkMigrations } = require('@controller/migration');
 
 describe('migration', () => {
 

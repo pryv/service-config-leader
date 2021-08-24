@@ -22,7 +22,7 @@ import {
   isValidJSON,
   isJSONFile
 } from '@utils/configuration.utils';
-const { loadPlatformTemplate, loadPlatform, writePlatform, checkMigrations, migrate } = require('../controller/migration');
+const { loadPlatformTemplate, loadPlatform, writePlatform, checkMigrations, migrate } = require('@controller/migration');
 
 module.exports = function (
   expressApp: express$Application,

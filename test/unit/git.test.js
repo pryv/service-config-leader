@@ -8,7 +8,7 @@ const path = require('path');
 const { mkdirSync, statSync, writeFileSync } = require('fs');
 const cuid = require('cuid');
 const { tmpdir } = require('os');
-const { setupGit, getGit } = require('@root/controller/migration/git');
+const { setupGit, getGit } = require('@controller/migration/git');
 const simpleGit = require('simple-git');
 
 describe('git', () => {

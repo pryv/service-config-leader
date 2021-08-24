@@ -20,7 +20,6 @@ const helper = require('../fixtures/followersMockHelper');
 const { sign } = require('jsonwebtoken');
 const { SETTINGS_PERMISSIONS } = require('@models/permissions.model');
 import type { User } from '@models/user.model';
-const migration = require('@root/controller/migration');
 
 describe('Test /admin endpoint', function () {
   let readOnlyToken;
