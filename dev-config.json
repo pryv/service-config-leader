@@ -51,7 +51,7 @@
   "credentials": {
     "filePath": "./credentials.txt"
   },
-  "gitPath": "./test/fixtures/config-leader/conf",
+  "gitRepoPath": "./test/fixtures/config-leader/conf",
   "platformSettings": {
     "platformConfig": "./platform.yml",
     "platformTemplate": "./platform.yml"

@@ -46,7 +46,7 @@ class Application {
     this.generateInitialUser();
     this.startTokensBlacklistCleanupJob();
     this.git = setupGit({
-      baseDir: this.settings.get('gitPath'),
+      baseDir: this.settings.get('gitRepoPath'),
     });
   }
 
