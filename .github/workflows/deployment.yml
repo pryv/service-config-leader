@@ -39,8 +39,8 @@ jobs:
       - name: Npm packages installation
         run: yarn install
 
-      #- name: Tests
-      #  run: yarn test
+      - name: Tests
+        run: IS_CI=true yarn test
 
       - name: Build and publish image
         run: ./build/build 
