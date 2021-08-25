@@ -321,42 +321,53 @@ describe('Test /admin endpoint', function () {
         request = supertest(app.express);
         backupPlatform = fs.readFileSync(platformPath, 'utf-8');
       });
-      after(() => {
-        fs.writeFileSync(platformPath, backupPlatform);
-      });
 
       describe('when the user has sufficient permissions', () => {
-        it('must migrate the platform configuration and return the executed migrations', async function () {
-          if (process.env.IS_CI) {
-            // for some reason, in CI, the "git commit" action can't figure out the author
-            this.skip(); 
-          }
-          const res = await request
-            .post('/admin/migrations')
-            .set('Authorization', updateOnlyToken);
-          assert.equal(res.status, 200);
-          const migrations = res.body.migrations;
-          assert.deepEqual(migrations, [
-            { versionFrom: '1.6.21', versionTo: '1.6.22' },
-            { versionFrom: '1.6.23', versionTo: '1.7.0' },
-          ]);
-          const migratedPlatform = yaml.load(fs.readFileSync(platformPath));
-          assert.deepEqual(migratedPlatform, expectedPlatform);
-        });
 
-        describe.skip('when there is an error during migration', () => {
-          before(() => {
-
-          });
+        describe('when the configuration is correct', () => {
           after(() => {
+            fs.writeFileSync(platformPath, backupPlatform);
+          });
+          it('must migrate the platform configuration and return the executed migrations', async function () {
+            if (process.env.IS_CI) {
+              // for some reason, in CI, the "git commit" action can't figure out the author
+              this.skip(); 
+            }
+            const res = await request
+              .post('/admin/migrations')
+              .set('Authorization', updateOnlyToken);
+            assert.equal(res.status, 200);
+            const migrations = res.body.migrations;
+            assert.deepEqual(migrations, [
+              { versionFrom: '1.6.21', versionTo: '1.6.22' },
+              { versionFrom: '1.6.23', versionTo: '1.7.0' },
+            ]);
+            const migratedPlatform = yaml.load(fs.readFileSync(platformPath));
+            assert.deepEqual(migratedPlatform, expectedPlatform);
+          });
+        })
 
-          })
+        describe('when there is an error in the platform.yml', () => {
+          let request, platformPath, originalPlatform;
+          before(() => {
+            platformPath = path.resolve(__dirname, '../fixtures/migration-broken/config/platform.yml');
+            const app = new Application({
+              nconfSettings: {
+                platformSettings: {
+                  platform: platformPath,
+                  platformTemplate: path.resolve(__dirname, '../fixtures/migration-broken/config/template-platform.yml'),
+                }
+              }
+            });
+            request = supertest(app.express);
+            originalPlatform = fs.readFileSync(platformPath, 'utf-8' );
+          });
           it('must return a 400 error and not alter the platform.yml', async () => {
             const res = await request
               .post('/admin/migrations')
               .set('Authorization', updateOnlyToken);
-            assert.equal(res.status, 400);
-
+            assert.equal(res.status, 500);
+            assert.equal(fs.readFileSync(platformPath, 'utf-8' ), originalPlatform);
           });
         });
       });

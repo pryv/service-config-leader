@@ -99,7 +99,7 @@ class Application {
     const expressApp = express();
 
     expressApp.use(express.json());
-    expressApp.use(morgan('combined'));
+    expressApp.use(morgan('combined', { skip: () => process.env.NODE_ENV === 'test' }));
     expressApp.use(middlewares.cors);
 
     require('./routes/conf.route')(expressApp, settings, platformSettings);

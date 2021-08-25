@@ -1,0 +1,2 @@
+vars:
+  brokenField: "this should throw an error"

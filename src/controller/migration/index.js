@@ -25,6 +25,8 @@ type ExecutedMigration = {
 module.exports.setupGit = setupGit;
 module.exports.getGit = getGit;
 
+const logger = require('@utils/logging').getLogger('migration');
+
 /**
  * migrate the platform up to the template's version
  * 
@@ -50,8 +52,8 @@ module.exports.migrate = migrate;
  * @param {*} template the template-platform.yml content
  */
 const checkMigrations = (platform: {}, template: {}): ScheduledMigration => {
-  validate(platform);
-  validate(template);
+  validate(platform, 'platform.yml');
+  validate(template, 'template-platform.yml');
 
   const platformVersion: string = platform.vars.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value;
   const templateVersion: string = template.vars.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value;
@@ -63,14 +65,14 @@ const checkMigrations = (platform: {}, template: {}): ScheduledMigration => {
     deploymentType
   };
 
-  function validate(conf: {}): void {
+  function validate(conf: {}, filename: string): void {
     if (
       conf.vars ==  null || 
       conf.vars.MISCELLANEOUS_SETTINGS ==  null || 
       conf.vars.MISCELLANEOUS_SETTINGS.settings ==  null || 
       conf.vars.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION ==  null || 
       conf.vars.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value == null
-    ) throw new Error('template version missing. "vars.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value" undefined.');
+    ) throw new Error(`template version missing in ${filename}. "vars.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value" is undefined. Please fix the service's configuration files`);
   }
 
   function findDeploymentType(platform: {}): DeploymentType {
@@ -89,18 +91,19 @@ module.exports.checkMigrations = checkMigrations;
 function computeNeededMigrations(platformVersion: string, templateVersion: string, deploymentType: DeploymentType): Array<Migration> {
   const cv: number = compareVersions(platformVersion, templateVersion);
   
-  const versions: Array<Migration> = [];
-  if (cv === 1 || cv === 0) return versions;
+  const foundMigrations: Array<Migration> = [];
+  if (cv === 1 || cv === 0) return foundMigrations;
 
   for(const migration: Migration of migrations) {
     if (
       compareVersions(platformVersion, migration.versionTo) === -1 &&
       migration[deploymentType] != null
     ) {
-      versions.push(migration);
+      foundMigrations.push(migration);
     }
   }
-  return versions;
+  logger.info(`available migrations found: ${foundMigrations.map(m => { return { from: m.versionFrom, to: m.versionTo }; })}`)
+  return foundMigrations;
 }
 
 /**

@@ -161,11 +161,15 @@ module.exports = function (
       res: express$Response,
       next: express$NextFunction
     ) => {
-      const platform = await loadPlatform(settings);
-      const platformTemplate = await loadPlatformTemplate(settings);
-      const { migrations, migratedPlatform } = migrate(platform, platformTemplate);
-      if (migrations.length > 0) await writePlatform(settings, migratedPlatform, res.locals.username);
-      res.json({ migrations: migrations.map(m => _.pick(m, ['versionFrom', 'versionTo'])) });
+      try {
+        const platform = await loadPlatform(settings);
+        const platformTemplate = await loadPlatformTemplate(settings);
+        const { migrations, migratedPlatform } = migrate(platform, platformTemplate);
+        if (migrations.length > 0) await writePlatform(settings, migratedPlatform, res.locals.username);
+        res.json({ migrations: migrations.map(m => _.pick(m, ['versionFrom', 'versionTo'])) });
+      } catch (e) {
+        next(e);
+      }
     }
   );
 };
