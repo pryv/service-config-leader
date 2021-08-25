@@ -242,8 +242,8 @@ describe('Test /admin endpoint', function () {
         const app = new Application({
           nconfSettings: {
             platformSettings: {
-              platform: path.resolve(__dirname, '../support/migration-needed/config/platform.yml'),
-              platformTemplate: path.resolve(__dirname, '../support/migration-needed/config/template-platform.yml'),
+              platform: path.resolve(__dirname, '../fixtures/migration-needed/config/platform.yml'),
+              platformTemplate: path.resolve(__dirname, '../fixtures/migration-needed/config/template-platform.yml'),
             }
           }
         });
@@ -281,8 +281,8 @@ describe('Test /admin endpoint', function () {
           const app = new Application({
             nconfSettings: {
               platformSettings: {
-                platform: path.resolve(__dirname, '../support/migration-not-needed/config/platform.yml'),
-                platformTemplate: path.resolve(__dirname, '../support/migration-not-needed/config/template-platform.yml'),
+                platform: path.resolve(__dirname, '../fixtures/migration-not-needed/config/platform.yml'),
+                platformTemplate: path.resolve(__dirname, '../fixtures/migration-not-needed/config/template-platform.yml'),
               }
             }
           });
@@ -307,13 +307,13 @@ describe('Test /admin endpoint', function () {
 
       let request, backupPlatform, platformPath, expectedPlatform;
       before(async () => {
-        platformPath = path.resolve(__dirname, '../support/migration-needed/config/platform.yml');
-        expectedPlatform = yaml.load(fs.readFileSync(path.resolve(__dirname, '../support/migration-needed/result/platform.yml'), 'utf-8'));
+        platformPath = path.resolve(__dirname, '../fixtures/migration-needed/config/platform.yml');
+        expectedPlatform = yaml.load(fs.readFileSync(path.resolve(__dirname, '../fixtures/migration-needed/result/platform.yml'), 'utf-8'));
         const app = new Application({
           nconfSettings: {
             platformSettings: {
               platform: platformPath,
-              platformTemplate: path.resolve(__dirname, '../support/migration-needed/config/template-platform.yml'),
+              platformTemplate: path.resolve(__dirname, '../fixtures/migration-needed/config/template-platform.yml'),
             }
           }
         });
@@ -343,6 +343,22 @@ describe('Test /admin endpoint', function () {
           const migratedPlatform = yaml.load(fs.readFileSync(platformPath));
           assert.deepEqual(migratedPlatform, expectedPlatform);
         });
+
+        describe.skip('when there is an error during migration', () => {
+          before(() => {
+
+          });
+          after(() => {
+
+          })
+          it('must return a 400 error and not alter the platform.yml', async () => {
+            const res = await request
+              .post('/admin/migrations')
+              .set('Authorization', updateOnlyToken);
+            assert.equal(res.status, 400);
+
+          });
+        });
       });
       describe('when the user has insufficient permissions', () => {
         it('must return a 401 error', async () => {
@@ -358,12 +374,12 @@ describe('Test /admin endpoint', function () {
 
         let request, backupPlatform, platformPath;
         before(() => {
-          platformPath = path.resolve(__dirname, '../support/migration-not-needed/config/platform.yml');
+          platformPath = path.resolve(__dirname, '../fixtures/migration-not-needed/config/platform.yml');
           const app = new Application({
             nconfSettings: {
               platformSettings: {
                 platform: platformPath,
-                platformTemplate: path.resolve(__dirname, '../support/migration-not-needed/config/template-platform.yml'),
+                platformTemplate: path.resolve(__dirname, '../fixtures/migration-not-needed/config/template-platform.yml'),
               }
             }
           });

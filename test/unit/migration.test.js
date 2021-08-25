@@ -17,7 +17,7 @@ describe('migration', () => {
 
       let configFolder;
       before(() => {
-        configFolder = path.resolve(__dirname, '../support/migration-needed/config');
+        configFolder = path.resolve(__dirname, '../fixtures/migration-needed/config');
       });
       it('must return the migrated config', async () => {
         const platform = parsePlatformFile(configFolder);
@@ -34,7 +34,7 @@ describe('migration', () => {
 
       let configFolder;
       before(() => {
-        configFolder = path.resolve(__dirname, '../support/migration-needed/config');
+        configFolder = path.resolve(__dirname, '../fixtures/migration-needed/config');
       });
       it('must return the available migrations', () => {
         const platform = parsePlatformFile(configFolder);
@@ -55,7 +55,7 @@ describe('migration', () => {
     describe('when there are no migrations to apply', () => {
       let configFolder;
       before(() => {
-        configFolder = path.resolve(__dirname, '../support/migration-not-needed/config');
+        configFolder = path.resolve(__dirname, '../fixtures/migration-not-needed/config');
       });
       it('must return an empty array', () => {
         const platform = parsePlatformFile(configFolder);
