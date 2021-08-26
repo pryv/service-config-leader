@@ -102,7 +102,7 @@ function computeNeededMigrations(platformVersion: string, templateVersion: strin
       foundMigrations.push(migration);
     }
   }
-  logger.info(`available migrations found: ${foundMigrations.map(m => { return { from: m.versionFrom, to: m.versionTo }; })}`)
+  logger.info(`available migrations found: ${foundMigrations.map(m => { return { from: m.versionsFrom, to: m.versionTo }; })}`)
   return foundMigrations;
 }
 

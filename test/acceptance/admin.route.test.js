@@ -259,8 +259,9 @@ describe('Test /admin endpoint', function () {
           const migrations = res.body.migrations;
           assert.exists(migrations);
           assert.deepEqual(migrations, [
-            { versionFrom: '1.6.21', versionTo: '1.6.22' },
-            { versionFrom: '1.6.23', versionTo: '1.7.0' },
+            { versionsFrom: ['1.6.21'], versionTo: '1.6.22' }, 
+            { versionsFrom: ['1.6.22'], versionTo: '1.6.23' }, 
+            { versionsFrom: ['1.6.23'], versionTo: '1.7.0' }
           ]);
         });
       });
@@ -339,8 +340,9 @@ describe('Test /admin endpoint', function () {
             assert.equal(res.status, 200);
             const migrations = res.body.migrations;
             assert.deepEqual(migrations, [
-              { versionFrom: '1.6.21', versionTo: '1.6.22' },
-              { versionFrom: '1.6.23', versionTo: '1.7.0' },
+              { versionsFrom: ['1.6.21'], versionTo: '1.6.22' }, 
+              { versionsFrom: ['1.6.22'], versionTo: '1.6.23' }, 
+              { versionsFrom: ['1.6.23'], versionTo: '1.7.0' }
             ]);
             const migratedPlatform = yaml.load(fs.readFileSync(platformPath));
             assert.deepEqual(migratedPlatform, expectedPlatform);

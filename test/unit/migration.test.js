@@ -40,13 +40,14 @@ describe('migration', () => {
         const platform = parsePlatformFile(configFolder);
         const template = parseTemplateFile(configFolder);
         const expected = [ 
-          { versionFrom: '1.6.21', versionTo: '1.6.22' }, 
-          { versionFrom: '1.6.23', versionTo: '1.7.0' }
+          { versionsFrom: ['1.6.21'], versionTo: '1.6.22' }, 
+          { versionsFrom: ['1.6.22'], versionTo: '1.6.23' }, 
+          { versionsFrom: ['1.6.23'], versionTo: '1.7.0' }
         ];
         const result = checkMigrations(platform, template);
         const actual = result.migrations;
         const deploymentType = result.deploymentType;
-        const withoutRuns = actual.map(m => { return { versionFrom: m.versionFrom, versionTo: m.versionTo };});
+        const withoutRuns = actual.map(m => { return { versionsFrom: m.versionsFrom, versionTo: m.versionTo };});
         assert.deepEqual(withoutRuns, expected, 'migrations were not defined properly');
         assert.equal(deploymentType, 'cluster');
       });
