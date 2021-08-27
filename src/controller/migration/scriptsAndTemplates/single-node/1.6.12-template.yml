@@ -5,48 +5,12 @@ vars:
       DOMAIN:
         value: REPLACE_ME
         description: "Domain and name of the platform"
-      STATIC_WEB_IP_ADDRESS:
+      SINGLE_MACHINE_IP_ADDRESS:
         value: REPLACE_ME
         description: "IP address of the machine"
-      REG_MASTER_IP_ADDRESS:
-        value: REPLACE_ME
-        description: "IP address of register master machine"
-      REG_MASTER_VPN_IP_ADDRESS:
-        value: REPLACE_ME
-        description: "IP address of master register on a secure line between it and slave register (such as a private network)"
-      REG_SLAVE_IP_ADDRESS:
-        value: REPLACE_ME
-        description: "IP address of register slave machine"
       REGISTER_ADMIN_KEY: 
         value: REPLACE_ME
-        description: "Admin Key for register machine, see: https://api.pryv.com/reference-system/#admin. Please set a strong cryptographic key. Alphanumeric of length 20 to 50."
-      HOSTINGS_AND_CORES:
-        description: "Defines the distribution of cores among the hostings providers"
-        value:
-          hosting1:
-            co1: 
-              ip: REPLACE_ME
-          hosting2:
-            co2:
-              ip: REPLACE_ME
-      HOSTINGS_PROVIDERS:
-        optional: true
-        description: "Additional information about the hostings providers. Can be set to null if not used (HOSTINGS_PROVIDERS: null)"
-        value:
-          hosting1:
-            url: https://www.hosting1.ch
-            name: Hosting 1
-            description: Europe - Switzerland
-          hosting2:
-            url: https://www.hosting2.ch
-            name: Hosting 2
-            description: Europe - France
-      REG_MASTER_PUBLIC_INTERFACE_IP_ADDRESS:
-        value: REG_MASTER_IP_ADDRESS
-        description: "IP address of network interface bound to public network. Change if different to its public address at REG_MASTER_IP_ADDRESS."
-      REG_SLAVE_PUBLIC_INTERFACE_IP_ADDRESS:
-        value: REG_SLAVE_IP_ADDRESS
-        description: "IP address of network interface bound to public network. Change if different to its public address at REG_SLAVE_IP_ADDRESS."
+        description: "Admin Key for register machine, see: https://api.pryv.com/reference-system/#admin. Please set a strong cryptographic key"
   MISCELLANEOUS_SETTINGS:
     name: "Miscellaneous settings"
     settings:
@@ -54,22 +18,22 @@ vars:
         value: REPLACE_ME
         description: "License name provided with installation files"
       TEMPLATE_VERSION: 
-        value: 1.7.0
+        value: 1.6.12
         description: "Version of configuration template"
   API_SETTINGS:
     name: "API settings"
     settings:
       EVENT_TYPES_URL: 
         value: https://api.pryv.com/event-types/flat.json
-        description: "URL of the file listing the validated Event types. See: https://api.pryv.com/faq-api/#event-types. Default value: https://api.pryv.com/event-types/flat.json"
+        description: "URL of the file listing the validated Event types. See: https://api.pryv.com/faq-api/#event-types"
       TRUSTED_APPS: 
         value: '*@https://*.DOMAIN*, *@https://pryv.github.io*, *@https://*.rec.la*'
         description: "Web pages authorized to run login API call. 
-          See https://api.pryv.com/reference-full/#trusted-apps-verification. 
-          You can remove the ones not related to your platform if you are not using Pryv's default apps
-          The format is comma-separated list of {trusted-app-id}@{origin} pairs.
-          Origins and appIds accept '*' wildcards, but never use wildcard appIds in production.
-          Example: *@https://*.DOMAIN*, *@https://pryv.github.io*, *@https://*.rec.la*"
+        See https://api.pryv.com/reference-full/#trusted-apps-verification. 
+        You can remove the ones not related to your platform if you are not using Pryv's default apps
+        The format is comma-separated list of {trusted-app-id}@{origin} pairs.
+        Origins and appIds accept '*' wildcards, but never use wildcard appIds in production.
+        Example: *@https://*.DOMAIN*, *@https://pryv.github.io*, *@https://*.rec.la*"
       DEFAULT_AUTH_URL: 
         value: https://sw.DOMAIN/access/access.html
         description: "Default auth url used for the authorization flow (https://api.pryv.com/reference/#auth-request)."
@@ -83,19 +47,9 @@ vars:
       APP_WEB_AUTH_URL:
         value: http://app_web_auth3_server
         description: "URL of customized app-web-auth, exposed on https://sw.DOMAIN (https://github.com/pryv/app-web-auth3). Default value: http://app_web_auth3_server. To use most recent version select: https://pryv.github.io/app-web-auth3/"
-      MAX_UPLOAD_SIZE_MB:
-        value: 20
-        description: "The value of the maximum upload size in Mega Bytes."
       DISABLE_GET_USERNAME_BY_EMAIL:
         description: "Whether to disable endpoint GET /:email/username"
         value: false
-      ACCOUNT_DELETION:
-        description: "Whether platform user account is available and by which command.
-          Available tokens:
-          - adminToken: User account deletion will become available through the admin API using the delete platform user method (https://api.pryv.com/reference-admin/#delete-user)
-          - personalToken: User account deletion will be available by the user with a personal token. Contact Pryv for the API route details."
-        value:
-          - adminToken
   SERVICE_INFORMATION_SETTINGS:
     name: "Service information settings"
     optional: true
@@ -117,21 +71,9 @@ vars:
   DNS_SETTINGS:
     name: "DNS settings"
     settings:
-      NAME_SERVER_ENTRIES:
-        description: |-
-          Name server entries for your Pryv.io platform domain.  
-          You should set the `name` values to the hostnames provided as name servers in the domain setup phase(https://api.pryv.com/customer-resources/pryv.io-setup/#obtain-a-domain-name).  
-          The IP addresses should point to the machine(s) running your Pryv.io DNS, they should be the same when running a single DNS.
-        value:
-          - 
-            name: dns1.DOMAIN
-            ip: REG_MASTER_IP_ADDRESS
-          - 
-            name: dns2.DOMAIN
-            ip: REG_SLAVE_IP_ADDRESS
       DNS_CUSTOM_ENTRIES:
         description: "Additional DNS entries. See the DNS configuration document: https://api.pryv.com/customer-resources/#documents.
-          Can be set to null if not used."
+        Can be set to null if not used."
         value: 
           test:
             ip: REPLACE_ME
@@ -160,7 +102,7 @@ vars:
         value: en
         description: "Default language for email templates eg: en"
       EMAIL_SMTP_SETTINGS:
-        description: "If used, Host, port and credentials of the SMTP server. See the following for available parameters: https://nodemailer.com/smtp/"
+        description: "If used, Host, port and credentials of the SMTP server"
         value:
           host: REPLACE_ME
           port: REPLACE_ME
@@ -251,33 +193,13 @@ vars:
       MFA_SESSIONS_TTL_SECONDS: 
         value: 1800
         description: "Duration in seconds after which MFA sessions are destroyed"
-      MFA_MODE:
-        description: 'Defines the MFA mode, Available values: "single", "challenge-verify". See https://api.pryv.com/customer-resources/mfa/.'
-        value: 'single'
-      MFA_ENDPOINTS:
-        description: "Allow to define an external API endpoint handling the MFA challenge/verify or sending. See https://api.pryv.com/customer-resources/mfa/."
+      MFA_SMS_API_SETTINGS:
+        description: "Allow to define an external SMS API handling the MFA challenge. API endpoints that allow to trigger and verify the MFA challenge as well as the API key that will be passed as 'Authorization' header"
         value:
-          challenge:
-            url: ''
-            method: 'POST'
-            body: '{"phone_number":"{{ phone_number }}"}'
-            headers:
-              authorization: ''
-              'content-type': 'application/json'
-          verify:
-            url: ''
-            method: 'POST'
-            body: '{"phone_number":"{{ phone_number }}","code":"{{ code }}"}'
-            headers:
-              authorization: ''
-              'content-type': 'application/json'
-          single: 
-            url: ''
-            method: 'POST'
-            body: '{"phone_number":"{{ phone_number }}"}'
-            headers:
-              authorization: ''
-              'content-type': 'application/json'
+          endpoints:
+            challenge: REPLACE_ME
+            verify: REPLACE_ME
+          auth: REPLACE_ME
   ADVANCED_API_SETTINGS:
     optional: true
     name: "Advanced API settings"
@@ -291,7 +213,7 @@ vars:
       UPDATES_IGNORE_PROTECTED_FIELDS: 
         value: false
         description: "When true, updates will ignore protected fields and print a warning log.
-          When false, trying to update read-only fields will fail with a forbidden error"
+        When false, trying to update read-only fields will fail with a forbidden error"
       WEBHOOKS_SETTINGS:
         description: "- minIntervalMs: minimum interval between successive webhook notifications, in milliseconds,
           - maxRetries: number of retried webhook notifications before it becomes inactive,
@@ -299,10 +221,10 @@ vars:
         value:
           minIntervalMs: 5000
           maxRetries: 5
-          runsSize: 50 
+          runsSize: 50
       VERSIONING_SETTINGS:
-        description: "- forceKeepHistory: when true, modification history of events is stored,
-          - deletionMode: defines the behaviour of events deletion
+        description: "forceKeepHistory: when true, modification history of events is stored,
+          deletionMode: defines the behaviour of events deletion:
           - 'keep-nothing': Delete history, keep head as itemDeletion as it is now by default.
           - 'keep-authors': Keep fields 'headId', 'id', 'modified', 'modifiedBy' in head and history.
           - 'keep-everything': Add 'deleted' field to head item, leave history as is."
@@ -315,56 +237,19 @@ vars:
       INVITATION_TOKENS: 
         value: null
         description: "Allows to define a set of invitation tokens for user creation by providing
-          an array of strings as well as no check (null) & prevent all (empty array)"
+        an array of strings as well as no check (null) & prevent all (empty array)"
       CUSTOM_AUTH_FUNCTION:
         description: "Custom middleware function executed for each incoming request. 
-          May serve e.g. as additional authentication or validation step. 
-          Default value: 'module.exports=function(ctx, cb){cb();}'. 
-          More information: https://api.pryv.com/guides/custom-auth/"
+        May serve e.g. as additional authentication or validation step. 
+        Default value: 'module.exports=function(ctx, cb){cb();}'. 
+        More information: https://api.pryv.com/guides/custom-auth/"
         value: "module.exports=function(ctx, cb){cb();}"
-      ACCOUNT_SYSTEM_STREAMS:
+      CUSTOM_SYSTEM_STREAMS:
         description: "Custom account fields that are saved and validated during the registration.
-          Preferably these values should be modified with care, because fields like isUnique or isIndexed would not be updated
-          after settings update. If you remove streams that have events in some user accounts, these events will become unreachable.
-          Default value: [{'isIndexed': true,'isUnique': true,'isShown': true,'isEditable': true,'type': 'email/string',
-          'name': 'Email','id': 'email','isRequiredInValidation': true}]'.
-          More information available here: https://api.pryv.com/customer-resources/system-streams/"
-        value: "[{\"isIndexed\": true,\"isUnique\": true,\"isShown\": true,\"isEditable\": true,\"type\": \"email/string\",\"name\": \"Email\",\"id\": \"email\",\"isRequiredInValidation\": true}]"
-      OTHER_SYSTEM_STREAMS:
-        description: "Custom stream structure that is available in all accounts. Preferably these values should be changed rarely. If you remove streams that have events in some user accounts, these events will become unreachable.
-          Default value: []
-          More information available here: https://api.pryv.com/customer-resources/system-streams/"
-        value: "[]"
-      BACKWARD_COMPATIBILITY_SYSTEM_STREAMS_PREFIX:
-        description: "Makes the API accept and return system streams with the old '.' (dot) prefix (ex.: '.account'). When activated, you can migrate applications by making API calls with the 'disable-backward-compatibility-prefix: true' header.
-        Default value: false"
-        value: false
-  AUDIT_SETTINGS:
-    name: "Audit settings"
-    settings:
-      AUDIT_STORAGE_FILTER:
-        value: 
-          methods:
-            include: ['accesses.create']
-            exclude: []
-        description: 'Audited API calls filtering for storage. Default value: {"methods":{"include":["accesses.create"],"exclude":[]}}'
-      AUDIT_SYSLOG_FILTER:
-        value: 
-          methods:
-            include: ['all']
-            exclude: []
-        description: 'Audited API calls filtering. Default value: {"methods":{"include":["all"],"exclude":[]}}'
-      AUDIT_SYSLOG_FORMAT: 
-        value: 
-          template: "{userid} {type} createdBy:{createdBy} {streamIds} {content}"
-          level: notice # One of notice, warning, error, critical, alert, emerg
-        description: "Version of configuration template"
-  OSERVABILITY_SETTINGS:
-    name: "Observability settings"
-    settings:
-      LOG_ROTATION_ACTIVE:
-        value: true
-        description: "Whether log rotation is active or not. Currently available for: core, hfs, preview, webhooks."
-      LOG_ROTATION_DAYS:
-        value: 60
-        description: "How many days of logs to keep."
+        Preferably these values should be set only once, because fields like isUnique or isIndexed would not be updated
+        after settings update.
+        Default value: {'account': [{'isIndexed': true,'isUnique': true,'isShown': true,'isEditable': true,'type': 'email/string',
+                                     'name': 'Email','id': 'email','isRequiredInValidation': true}]}'.
+        More information could be found here: https://api.pryv.com/customer-resources/system-streams/"
+        value: "{\"account\": [{\"isIndexed\": true,\"isUnique\": true,\"isShown\": true,\"isEditable\": true,\"type\": \"email/string\",\"name\": \"Email\",\"id\": \"email\",\"isRequiredInValidation\": true}]}"
+

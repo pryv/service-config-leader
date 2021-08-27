@@ -12,18 +12,29 @@ const { migrate, checkMigrations } = require('@controller/migration');
 
 describe('migration', () => {
 
+  let defaultTemplatePath;
+  before(() => {
+    defaultTemplatePath = path.resolve(__dirname, '../../src/controller/migration/scriptsAndTemplates/cluster/1.7.0-template.yml');
+  })
+
   describe('migrate()', () => {
     describe('when there are migrations to apply', () => {
 
-      let configFolder;
-      before(() => {
-        configFolder = path.resolve(__dirname, '../fixtures/migration-needed/config');
+      it('must return the migrated config: 1.6.21', async () => {
+        const configFolder = path.resolve(__dirname, '../fixtures/migration-needed/1.6.21');
+        const platform = parseYamlFile(path.resolve(configFolder, 'platform.yml'));
+        const expected = parseYamlFile(path.resolve(configFolder, 'expected.yml'));
+        const templatePath = path.resolve(__dirname, '../../src/controller/migration/scriptsAndTemplates/cluster/1.6.21-template.yml');
+        const template = parseYamlFile(templatePath); // template is 1.7.0
+        const { migratedPlatform } = await migrate(platform, template);
+        assert.deepEqual(migratedPlatform, expected, 'config was not migrated as expected');
       });
-      it('must return the migrated config', async () => {
-        const platform = parsePlatformFile(configFolder);
-        const template = parseTemplateFile(configFolder);
-        const expected = parsePlatformFile(path.resolve(configFolder, '../result'));
-        const { migratedPlatform, migrations } = await migrate(platform, template);
+      it('must return the migrated config: 1.7.0', async () => {
+        const configFolder = path.resolve(__dirname, '../fixtures/migration-needed/1.7.0');
+        const platform = parseYamlFile(path.resolve(configFolder, 'platform.yml'));
+        const expected = parseYamlFile(path.resolve(configFolder, 'expected.yml'));
+        const template = parseYamlFile(defaultTemplatePath);
+        const { migratedPlatform } = await migrate(platform, template);
         assert.deepEqual(migratedPlatform, expected, 'config was not migrated as expected');
       });
       
@@ -34,11 +45,11 @@ describe('migration', () => {
 
       let configFolder;
       before(() => {
-        configFolder = path.resolve(__dirname, '../fixtures/migration-needed/config');
+        configFolder = path.resolve(__dirname, '../fixtures/migration-needed/1.7.0');
       });
       it('must return the available migrations', () => {
-        const platform = parsePlatformFile(configFolder);
-        const template = parseTemplateFile(configFolder);
+        const platform = parseYamlFile(path.resolve(configFolder, 'platform.yml'));
+        const template = parseYamlFile(defaultTemplatePath);
         const expected = [ 
           { versionsFrom: ['1.6.21'], versionTo: '1.6.22' }, 
           { versionsFrom: ['1.6.22'], versionTo: '1.6.23' }, 
@@ -59,19 +70,19 @@ describe('migration', () => {
         configFolder = path.resolve(__dirname, '../fixtures/migration-not-needed/config');
       });
       it('must return an empty array', () => {
-        const platform = parsePlatformFile(configFolder);
-        const template = parseTemplateFile(configFolder);
+        const platform = parseYamlFile(path.resolve(configFolder, 'platform.yml'));
+        const template = parseYamlFile(defaultTemplatePath);
         const expected = [];
         const actual = checkMigrations(platform, template).migrations;
         assert.deepEqual(actual, expected, 'migrations were not defined properly');
       });
     });
+    describe('when there is no migration for the target template version', () => {
+
+    });
   });
 
-  function parsePlatformFile(configFolder) {
-    return yaml.load(fs.readFileSync(path.resolve(configFolder, 'platform.yml'), { encoding: 'utf-8' }));
-  }
-  function parseTemplateFile(configFolder) {
-    return yaml.load(fs.readFileSync(path.resolve(configFolder, 'template-platform.yml'), { encoding: 'utf-8' }));
+  function parseYamlFile(path) {
+    return yaml.load(fs.readFileSync(path, { encoding: 'utf-8' }));
   }
 });

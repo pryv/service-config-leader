@@ -56,12 +56,11 @@ const checkMigrations = (platform: {}, template: {}): ScheduledMigration => {
   validate(template, 'template-platform.yml');
 
   const platformVersion: string = platform.vars.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value;
-  const templateVersion: string = template.vars.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value;
+  const targetVersion: string = template.vars.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value;
 
   const deploymentType: DeploymentType = findDeploymentType(platform);
-
   return { 
-    migrations: computeNeededMigrations(platformVersion, templateVersion, deploymentType),
+    migrations: computeNeededMigrations(platformVersion, targetVersion, deploymentType),
     deploymentType
   };
 
@@ -86,15 +85,14 @@ module.exports.checkMigrations = checkMigrations;
  * Returns an array of version migrations
  * 
  * @param {*} platformVersion 
- * @param {*} templateVersion 
+ * @param {*} targetVersion 
  */
-function computeNeededMigrations(platformVersion: string, templateVersion: string, deploymentType: DeploymentType): Array<Migration> {
-  const cv: number = compareVersions(platformVersion, templateVersion);
-  
+function computeNeededMigrations(platformVersion: string, targetVersion: string, deploymentType: DeploymentType): Array<Migration> {
   const foundMigrations: Array<Migration> = [];
-  if (cv === 1 || cv === 0) return foundMigrations;
 
-  for(const migration: Migration of migrations) {
+  for(let i=0; i<migrations.length && isSmallerOrEqual(migrations[i].versionTo, targetVersion); i++) {
+    
+    const migration: Migration = migrations[i];
     if (
       compareVersions(platformVersion, migration.versionTo) === -1 &&
       migration[deploymentType] != null
@@ -104,6 +102,17 @@ function computeNeededMigrations(platformVersion: string, templateVersion: strin
   }
   logger.info(`available migrations found: ${foundMigrations.map(m => { return { from: m.versionsFrom, to: m.versionTo }; })}`)
   return foundMigrations;
+
+  /**
+   * checks if versionA is smaller or equal to versionB
+   * 
+   * @param {*} versionA 
+   * @param {*} versionB 
+   */
+  function isSmallerOrEqual(versionA: string, versionB: string): boolean {
+    const cv: number = compareVersions(versionA, versionB);
+    return cv === -1 || cv === 0;
+  }
 }
 
 /**
