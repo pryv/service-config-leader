@@ -15,8 +15,6 @@ export type Run = {
   template: {},
 }
 
-//console.log('yo', fs.readFileSync(path.resolve(__dirname, 'scriptsAndTemplates/cluster/1.6.22.js'), 'utf-8'))
-
 const migrations: Array<Migration> = addTemplateUpgradeToEmptyRuns([
   {
     versionsFrom: ['1.0.34'], versionTo: '1.6.0',

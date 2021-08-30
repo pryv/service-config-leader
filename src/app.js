@@ -37,7 +37,6 @@ class Application {
     this.platformSettings = _.cloneDeep(platformSettings);
     if (settingsOverride.nconfSettings) this.settings.merge(settingsOverride.nconfSettings);
     if (settingsOverride.platformSettings) this.platformSettings.merge(settingsOverride.platformSettings);
-    console.log('instanciating App wid', this.settings.get('platformSettings:platformConfig'))
 
     this.logger = require('./utils/logging').getLogger('app');
     this.db = this.connectToDb();

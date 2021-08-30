@@ -14,7 +14,6 @@ module.exports = function getPlatformSettings(mainSettings: {}): {} {
   // 3. Values in `platform.json`
   //
   const configFile = mainSettings.get('platformSettings:platformConfig') || 'platform.yml';
-  console.log('platform conf file', configFile)
   store.file({
     file: configFile,
     format: require('nconf-yaml'),
