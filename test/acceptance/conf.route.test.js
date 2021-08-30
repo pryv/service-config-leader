@@ -1,6 +1,6 @@
 // @flow
 
-/*global describe, it */
+/*global describe, before, beforeEach, it */
 
 // eslint-disable-next-line no-unused-vars
 const regeneratorRuntime = require('regenerator-runtime');
@@ -10,13 +10,23 @@ const path = require('path');
 const fs = require('fs');
 const assert = require('chai').assert;
 const Application = require('@root/app');
-const app = new Application();
-const request = require('supertest')(app.express);
-const settings = app.settings;
 
 describe('GET /conf', function () {
-  const followerKey = 'singlenode-machine-key';
-  const follower = settings.get(`followers:${followerKey}`);
+
+  let app, request, settings, follower, followerKey, platformPath, platform;
+  before(() => {
+    app = new Application();
+    request = require('supertest')(app.express);
+    settings = app.settings;
+    followerKey = 'singlenode-machine-key';
+    follower = settings.get(`followers:${followerKey}`);
+    platformPath = settings.get('platformSettings:platformConfig');
+    platform = fs.readFileSync(platformPath, 'utf-8');
+  });
+
+  beforeEach(() => {
+    fs.writeFileSync(platformPath, platform);
+  });
 
   it('fails if configuration folder for given role does not exist', async () => {
     const res = await request.get('/conf').set('Authorization', 'valid');
@@ -58,9 +68,9 @@ describe('GET /conf', function () {
     coreConfig1 = JSON.parse(coreConfig1);
     assert.equal(coreConfig1.http.port, 9000);
 
-    let path = settings.get('templatesPath') + '/pryv/core/conf/core.json';
-    let backup = fs.readFileSync(path);
-    let modifiedConfig = JSON.parse(backup);
+    const path = settings.get('templatesPath') + '/pryv/core/conf/core.json';
+    const backup = fs.readFileSync(path);
+    const modifiedConfig = JSON.parse(backup);
     modifiedConfig.http.port = 8000;
     fs.writeFileSync(path, JSON.stringify(modifiedConfig, null, 2));
     const call2 = await request.get('/conf').set('Authorization', followerKey);
@@ -82,11 +92,9 @@ describe('GET /conf', function () {
     assert.equal(coreConfig1.domain, 'rec.la');
 
     // Modify platform.yml
-    const path = settings.get('platformSettings:platformConfig');
-    const backup = fs.readFileSync(path, 'utf-8');
-    const modifiedConfig = yaml.load(backup);
+    const modifiedConfig = yaml.load(platform);
     modifiedConfig.vars.MAIN_PROPS.settings.DOMAIN.value = 'test.la';
-    fs.writeFileSync(path, yaml.dump(modifiedConfig));
+    fs.writeFileSync(platformPath, yaml.dump(modifiedConfig));
 
     // Check if /conf give the fresh settings
     const call2 = await request.get('/conf').set('Authorization', followerKey);
@@ -94,10 +102,6 @@ describe('GET /conf', function () {
     let coreConfig2 = files2.filter((f) => f.path.indexOf('substitute.json') > 0)[0].content;
     coreConfig2 = JSON.parse(coreConfig2);
     assert.equal(coreConfig2.domain, 'test.la');
-
-    // Set platform.yml to the backup
-    fs.writeFileSync(path, backup);
-
   })
 
   it('responds with 500 given incorrect config stored', async () => {

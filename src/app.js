@@ -3,11 +3,12 @@
 // eslint-disable-next-line no-unused-vars
 const regeneratorRuntime = require('regenerator-runtime');
 
+const _ = require('lodash');
 const express = require('express');
 const middlewares = require('@middlewares');
 const fs = require('fs');
 const nconfSettings = (new (require('./settings'))).store;
-const platformSettings = require('./platform');
+const platformSettings = require('./platform')(nconfSettings);
 const Database = require('better-sqlite3');
 const CronJob = require('cron').CronJob;
 const { UsersRepository } = require('@repositories/users.repository');
@@ -19,7 +20,7 @@ const {
   PLATFORM_USERS_PERMISSIONS
 } = require('@models/permissions.model');
 const morgan = require('morgan');
-const { setupGit, getGit } = require('@controller/migration');
+const { setupGit } = require('@controller/migration');
 
 class Application {
   express: express$Application;
@@ -32,10 +33,11 @@ class Application {
   git: {};
 
   constructor(settingsOverride = {}) {
-    if (settingsOverride.nconfSettings) nconfSettings.merge(settingsOverride.nconfSettings);
-    if (settingsOverride.platformSettings) platformSettings.merge(settingsOverride.platformSettings);
-    this.settings = nconfSettings;
-    this.platformSettings = platformSettings;
+    this.settings = _.cloneDeep(nconfSettings);
+    this.platformSettings = _.cloneDeep(platformSettings);
+    if (settingsOverride.nconfSettings) this.settings.merge(settingsOverride.nconfSettings);
+    if (settingsOverride.platformSettings) this.platformSettings.merge(settingsOverride.platformSettings);
+    console.log('instanciating App wid', this.settings.get('platformSettings:platformConfig'))
 
     this.logger = require('./utils/logging').getLogger('app');
     this.db = this.connectToDb();

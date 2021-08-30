@@ -24,12 +24,13 @@ describe('Test /admin endpoint', function () {
 
   let deleteAllStmt;
 
-  let app, settings, platformSettings, request, platformBackup;
+  let app, settings, platformPath, platformSettings, request, platformBackup;
   before(async () => {
     app = new Application();
     await app.init();
     settings = app.settings;
-    platformBackup = fs.readFileSync(settings.get('platformSettings:platformConfig'), 'utf-8');
+    platformPath = settings.get('platformSettings:platformConfig');
+    platformBackup = fs.readFileSync(platformPath, 'utf-8');
     platformSettings = app.platformSettings;
     request = supertest(app.express);
 
@@ -50,7 +51,7 @@ describe('Test /admin endpoint', function () {
       },
     };
     after(() => {
-      fs.writeFileSync(settings.get('platformSettings:platformConfig'), platformBackup);
+      fs.writeFileSync(platformPath, platformBackup);
     });
 
     deleteAllStmt = app.db.prepare('DELETE FROM users;');
@@ -155,9 +156,9 @@ describe('Test /admin endpoint', function () {
       assert.strictEqual(res.status, 200);
       assert.deepEqual(res.body.settings, updatedSettings);
       assert.deepEqual(platformSettings.get('vars'), updatedSettings);
-      const ymlFile = fs.readFileSync('platform.yml', 'utf8');
+      const ymlFile = fs.readFileSync(platformPath, 'utf8');
       const platform = yaml.load(ymlFile);
-      assert.deepEqual(updatedSettings, platform.vars);
+      assert.deepEqual(platform.vars, updatedSettings);
 
       const logs = await gitClient.log();
       assert.equal(logs.all[0].message, 'update through PUT /admin/settings by userOnlyUpdatePerm');
@@ -267,7 +268,7 @@ describe('Test /admin endpoint', function () {
         const app = new Application({
           nconfSettings: {
             platformSettings: {
-              platform: path.resolve(__dirname, '../fixtures/migration-needed/1.7.0/platform.yml'),
+              platformConfig: path.resolve(__dirname, '../fixtures/migration-needed/1.7.0/platform.yml'),
               platformTemplate: templatePath,
             }
           }
@@ -307,7 +308,7 @@ describe('Test /admin endpoint', function () {
           const app = new Application({
             nconfSettings: {
               platformSettings: {
-                platform: path.resolve(__dirname, '../fixtures/migration-not-needed/config/platform.yml'),
+                platformConfig: path.resolve(__dirname, '../fixtures/migration-not-needed/config/platform.yml'),
                 platformTemplate: templatePath,
               }
             }
@@ -343,7 +344,7 @@ describe('Test /admin endpoint', function () {
         const app = new Application({
           nconfSettings: {
             platformSettings: {
-              platform: platformPath,
+              platformConfig: platformPath,
               platformTemplate: templatePath,
             }
           }
@@ -386,7 +387,7 @@ describe('Test /admin endpoint', function () {
             const app = new Application({
               nconfSettings: {
                 platformSettings: {
-                  platform: platformPath,
+                  platformConfig: platformPath,
                   platformTemplate: templatePath,
                 }
               }
@@ -421,7 +422,7 @@ describe('Test /admin endpoint', function () {
           const app = new Application({
             nconfSettings: {
               platformSettings: {
-                platform: platformPath,
+                platformConfig: platformPath,
                 platformTemplate: templatePath,
               }
             }

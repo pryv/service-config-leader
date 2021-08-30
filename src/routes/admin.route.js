@@ -55,19 +55,24 @@ module.exports = function (
       let list = [];
       listConfFiles(templatesPath, list);
 
-      list.forEach((file) => {
-        const templateConf = fs.readFileSync(file, 'utf8');
-        const newConf = applySubstitutions(
-          templateConf,
-          settings,
-          newSettings
-        );
-        if (isJSONFile(file) && !isValidJSON(newConf)) {
-          throw errorsFactory.invalidInput(
-            'Configuration format invalid'
+      try {
+        list.forEach((file) => {
+          const templateConf = fs.readFileSync(file, 'utf8');
+          const newConf = applySubstitutions(
+            templateConf,
+            settings,
+            newSettings
           );
-        }
-      });
+          if (isJSONFile(file) && !isValidJSON(newConf)) {
+            throw errorsFactory.invalidInput(
+              'Configuration format invalid'
+            );
+          }
+        });
+      } catch (err) {
+        return next(err);
+      }
+      
 
       platformSettings.set('vars', newSettings);
 

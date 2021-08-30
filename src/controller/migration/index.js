@@ -137,8 +137,8 @@ module.exports.loadPlatformTemplate = loadPlatformTemplate;
  * @param {*} settings 
  */
 const loadPlatform = async (settings: {}): Promise<{}> => {
-  const platform: string = settings.get('platformSettings:platform');
-  if (platform == null) throw new Error('platformSettings:platform not set in config-leader.json. Config migrations will not work.');
+  const platform: string = settings.get('platformSettings:platformConfig');
+  if (platform == null) throw new Error('platformSettings:platformConfig not set in config-leader.json. Config migrations will not work.');
   try {
     return yaml.load(await fs.readFile(platform, { encoding: 'utf-8' }));
   } catch (e) {
@@ -148,7 +148,7 @@ const loadPlatform = async (settings: {}): Promise<{}> => {
 module.exports.loadPlatform = loadPlatform;
 
 /**
- * Writes the content of platform into 'platformSettings:platform' from the setings
+ * Writes the content of platform into 'platformSettings:platformConfig' from the setings
  * 
  * @param {*} settings 
  * @param {*} platform 
@@ -159,7 +159,7 @@ const writePlatform = async (settings: {}, platform: {}, author: string): Promis
     forceQuotes: true,
     quotingType: '"',
   };
-  await fs.writeFile(settings.get('platformSettings:platform'), yaml.dump(platform, yamlWriteOptions));
+  await fs.writeFile(settings.get('platformSettings:platformConfig'), yaml.dump(platform, yamlWriteOptions));
 
   const git: {} = getGit();
   await git.commitChanges(`update through POST /admin/migrations by ${author}`);

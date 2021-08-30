@@ -7,7 +7,7 @@ vars:
         description: ''
       STATIC_WEB_IP_ADDRESS:
         value: REPLACE_ME
-      REG_MASTER_IP_ADDRESS: 
+      REG_MASTER_IP_ADDRESS:
         value: REPLACE_ME
       REG_MASTER_VPN_IP_ADDRESS:
         value: REPLACE_ME
@@ -23,20 +23,23 @@ vars:
         value: REPLACE_ME
       SERVICE_INFO_ASSETS:
         value:
-          definitions: 'https://api.pryv.com/assets-pryv.me/index.json'
+          definitions: https://api.pryv.com/assets-pryv.me/index.json
       CORE_1:
         value:
           ip: REPLACE_ME
-      TRUSTED_APPS: 
+      TRUSTED_APPS:
         value: '*@https://*.DOMAIN*'
   API_SETTINGS:
-    name: "API settings"
+    name: API settings
     settings:
       ACCOUNT_DELETION:
-        description: "Whether platform user account is available and by which command.
-          Available tokens:
-          - adminToken: User account deletion will become available through the admin API using the delete platform user method (https://api.pryv.com/reference-admin/#delete-user)
-          - personalToken: User account deletion will be available by the user with a personal token. Contact Pryv for the API route details."
+        description: >-
+          Whether platform user account is available and by which command.
+          Available tokens: - adminToken: User account deletion will become
+          available through the admin API using the delete platform user method
+          (https://api.pryv.com/reference-admin/#delete-user) - personalToken:
+          User account deletion will be available by the user with a personal
+          token. Contact Pryv for the API route details.
         value:
           - adminToken
   DNS_SETTINGS:
@@ -47,7 +50,7 @@ vars:
           Additional DNS entries. See the DNS configuration document:
           https://api.pryv.com/customer-resources/#documents. Can be set to null
           if not used.
-        value:
+        value: 
           test:
             ip: 1.2.3.4
       DNS_ROOT_DOMAIN_A_RECORD:
@@ -61,10 +64,11 @@ vars:
       VERSIONING_SETTINGS:
         description: >
           forceKeepHistory: when true, modification history of items is stored,
-          keep-authors: defines the behaviour of items deletion:
-          - 'keep-nothing': Delete history, keep head as itemDeletion as it is now by default.
-          - 'keep-authors': Keep fields 'headId', 'id', 'modified', 'modifiedBy' in head and history.
-          - 'keep-everything': Add 'deleted' field to head item, leave history as is.
+          keep-authors: defines the behaviour of items deletion: -
+          'keep-nothing': Delete history, keep head as itemDeletion as it is now
+          by default. - 'keep-authors': Keep fields 'headId', 'id', 'modified',
+          'modifiedBy' in head and history. - 'keep-everything': Add 'deleted'
+          field to head item, leave history as is.
         value:
           forceKeepHistory: false
           deletionMode: keep-authors
@@ -76,24 +80,29 @@ vars:
           all (empty array)
   EMAIL_CONFIGURATION_SETTINGS:
     optional: true
-    description: "See the Emails configuration document: https://api.pryv.com/customer-resources/#documents"
-    name: "Email configuration"
+    description: >-
+      See the Emails configuration document:
+      https://api.pryv.com/customer-resources/#documents
+    name: Email configuration
     settings:
       EMAIL_SMTP_SETTINGS:
-        description: "If used, Host, port and credentials of the SMTP server"
+        description: If used, Host, port and credentials of the SMTP server
         value:
           host: bob
           port: 123
           auth: null
   MFA_SETTINGS:
     optional: true
-    name: "MFA settings"
+    name: MFA settings
     settings:
-      MFA_SESSIONS_TTL_SECONDS: 
+      MFA_SESSIONS_TTL_SECONDS:
         value: 1800
-        description: "Duration in seconds after which MFA sessions are destroyed"
+        description: Duration in seconds after which MFA sessions are destroyed
       MFA_SMS_API_SETTINGS:
-        description: "Allow to define an external SMS API handling the MFA challenge. API endpoints that allow to trigger and verify the MFA challenge as well  as the API key that will be passed as 'Authorization' header"
+        description: >-
+          Allow to define an external SMS API handling the MFA challenge. API
+          endpoints that allow to trigger and verify the MFA challenge as well 
+          as the API key that will be passed as 'Authorization' header
         value:
           endpoints:
             challenge: https://challenge.api.com
