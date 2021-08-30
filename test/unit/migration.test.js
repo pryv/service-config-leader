@@ -20,23 +20,34 @@ describe('migration', () => {
   describe('migrate()', () => {
     describe('when there are migrations to apply', () => {
 
+      it.skip('must return the migrated config: 1.6.0', async () => {
+        await testMigration('1.6.0');
+      });
+      it('must return the migrated config: 1.6.4', async () => {
+        await testMigration('1.6.4');
+      });
+      it('must return the migrated config: 1.6.12', async () => {
+        await testMigration('1.6.12');
+      });
+      it('must return the migrated config: 1.6.15', async () => {
+        await testMigration('1.6.15');
+      });
       it('must return the migrated config: 1.6.21', async () => {
-        const configFolder = path.resolve(__dirname, '../fixtures/migration-needed/1.6.21');
-        const platform = parseYamlFile(path.resolve(configFolder, 'platform.yml'));
-        const expected = parseYamlFile(path.resolve(configFolder, 'expected.yml'));
-        const templatePath = path.resolve(__dirname, '../../src/controller/migration/scriptsAndTemplates/cluster/1.6.21-template.yml');
-        const template = parseYamlFile(templatePath); // template is 1.7.0
-        const { migratedPlatform } = await migrate(platform, template);
-        assert.deepEqual(migratedPlatform, expected, 'config was not migrated as expected');
+        await testMigration('1.6.21');
       });
       it('must return the migrated config: 1.7.0', async () => {
-        const configFolder = path.resolve(__dirname, '../fixtures/migration-needed/1.7.0');
+        await testMigration('1.7.0');
+      });
+
+      async function testMigration(version) {
+        const configFolder = path.resolve(__dirname, `../fixtures/migration-needed/${version}`);
         const platform = parseYamlFile(path.resolve(configFolder, 'platform.yml'));
         const expected = parseYamlFile(path.resolve(configFolder, 'expected.yml'));
-        const template = parseYamlFile(defaultTemplatePath);
+        const templatePath = path.resolve(__dirname, `../../src/controller/migration/scriptsAndTemplates/cluster/${version}-template.yml`);
+        const template = parseYamlFile(templatePath);
         const { migratedPlatform } = await migrate(platform, template);
-        assert.deepEqual(migratedPlatform, expected, 'config was not migrated as expected');
-      });
+        assert.deepEqual(migratedPlatform, expected, `config was not migrated as expected to v${version}`);
+      }
       
     });
   });

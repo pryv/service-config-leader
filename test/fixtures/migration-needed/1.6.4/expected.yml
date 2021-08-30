@@ -11,6 +11,12 @@ vars:
       REG_MASTER_IP_ADDRESS:
         value: 185.19.30.198
         description: "IP address of register master machine"
+      REG_MASTER_VPN_IP_ADDRESS:
+        value: REPLACE_ME
+        description: "IP address of master register on a secure line between it and slave register (such as a private network)"
+      REG_SLAVE_IP_ADDRESS:
+        value: REPLACE_ME
+        description: "IP address of register slave machine"
       REGISTER_ADMIN_KEY: 
         value: Jihh3Qwn4qGthD6v4wj2VCu8EkqfsnCMrNBVtNWj8PGAi
         description: "Admin Key for register machine, see: https://api.pryv.com/reference-system/#admin. Please set a strong cryptographic key"
