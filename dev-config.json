@@ -53,7 +53,7 @@
   },
   "gitRepoPath": "./test/fixtures/config-leader/conf",
   "platformSettings": {
-    "platformConfig": "./platform.yml",
+    "platformConfig": "./test/fixtures/config-leader/conf/platform.yml",
     "platformTemplate": "./platform.yml"
   }
 }

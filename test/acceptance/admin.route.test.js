@@ -8,11 +8,7 @@ const sinon = require('sinon');
 const assert = require('chai').assert;
 const path = require('path');
 const Application = require('@root/app');
-const app = new Application();
-const settings = app.settings;
-const platformSettings = app.platformSettings;
 const supertest = require('supertest');
-const request = supertest(app.express);
 const fs = require('fs');
 const yaml = require('js-yaml');
 const mockFollowers = require('../fixtures/followersMock');
@@ -20,6 +16,7 @@ const helper = require('../fixtures/followersMockHelper');
 const { sign } = require('jsonwebtoken');
 const { SETTINGS_PERMISSIONS } = require('@models/permissions.model');
 import type { User } from '@models/user.model';
+const simpleGit = require('simple-git');
 
 describe('Test /admin endpoint', function () {
   let readOnlyToken;
@@ -27,7 +24,15 @@ describe('Test /admin endpoint', function () {
 
   let deleteAllStmt;
 
-  before(function () {
+  let app, settings, platformSettings, request, platformBackup;
+  before(async () => {
+    app = new Application();
+    await app.init();
+    settings = app.settings;
+    platformBackup = fs.readFileSync(settings.get('platformSettings:platformConfig'), 'utf-8');
+    platformSettings = app.platformSettings;
+    request = supertest(app.express);
+
     const userOnlyReadPerm: User = {
       username: 'userOnlyReadPerm',
       password: 'pass',
@@ -44,6 +49,9 @@ describe('Test /admin endpoint', function () {
         users: [],
       },
     };
+    after(() => {
+      fs.writeFileSync(settings.get('platformSettings:platformConfig'), platformBackup);
+    });
 
     deleteAllStmt = app.db.prepare('DELETE FROM users;');
 
@@ -123,7 +131,17 @@ describe('Test /admin endpoint', function () {
   });
 
   describe('PUT /admin/settings', function () {
-    it('updates settings in memory and on disk', async () => {
+
+    let gitClient;
+    before(() => {
+      gitClient = simpleGit({ baseDir: path.resolve(settings.get('platformSettings:platformConfig'), '..') });
+    })
+
+    it('updates settings in memory and on disk, with a git commit', async function () {
+      if (process.env.IS_CI) {
+        // for some reason, in CI, the "git commit" action can't figure out the author
+        this.skip(); 
+      }
       const previousSettings = platformSettings.get('vars');
       const update = {
         updatedProp: { settings: { SOME_SETTING: { value: 'updatedVal' } } },
@@ -134,13 +152,15 @@ describe('Test /admin endpoint', function () {
         .put('/admin/settings')
         .send(update)
         .set('Authorization', updateOnlyToken);
-
       assert.strictEqual(res.status, 200);
       assert.deepEqual(res.body.settings, updatedSettings);
       assert.deepEqual(platformSettings.get('vars'), updatedSettings);
       const ymlFile = fs.readFileSync('platform.yml', 'utf8');
       const platform = yaml.load(ymlFile);
       assert.deepEqual(updatedSettings, platform.vars);
+
+      const logs = await gitClient.log();
+      assert.equal(logs.all[0].message, 'update through PUT /admin/settings by userOnlyUpdatePerm');
     });
     it('must respond with 400 when given properties that create invalid config', async () => {
       const invalidProps = {

@@ -3,6 +3,7 @@
 // eslint-disable-next-line no-unused-vars
 const regeneratorRuntime = require('regenerator-runtime');
 
+const bluebird = require('bluebird');
 const fs = require('fs');
 const request = require('superagent');
 const _ = require('lodash');
@@ -16,6 +17,7 @@ const {
 } = require('@middlewares/security/authorization.service');
 const { UsersRepository } = require('@repositories/users.repository');
 const { TokensRepository } = require('@repositories/tokens.repository');
+const { getGit } = require('@controller/migration/git');
 import {
   listConfFiles,
   applySubstitutions,
@@ -41,7 +43,7 @@ module.exports = function (
   expressApp.put(
     '/admin/settings',
     authorizationService.verifyIsAllowedTo(SETTINGS_PERMISSIONS.UPDATE),
-    (
+    async (
       req: express$Request,
       res: express$Response,
       next: express$NextFunction
@@ -69,14 +71,23 @@ module.exports = function (
 
       platformSettings.set('vars', newSettings);
 
-      platformSettings.save((err) => {
-        if (err) {
-          platformSettings.set('vars', previousSettings);
-          return next(err);
-        }
-        res.send({ 
-          settings: newSettings
-        });
+      try {
+        await bluebird.fromCallback(cb => platformSettings.save(cb));
+      } catch (err) {
+        platformSettings.set('vars', previousSettings);
+        return next(err);
+      }
+
+      try {
+        // perform git commit
+        const git: {} = getGit();
+        await git.commitChanges(`update through PUT /admin/settings by ${res.locals.username}`);
+      } catch (err) {
+        return next(err);
+      }
+      
+      res.send({ 
+        settings: newSettings
       });
     }
   );

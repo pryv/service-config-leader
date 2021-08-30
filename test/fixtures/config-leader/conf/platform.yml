@@ -99,4 +99,3 @@ vars:
             challenge: https://challenge.api.com
             verify: https://verify.api.com
           auth: key_abcd
-
