@@ -57,7 +57,7 @@ vars:
         value: https://api.pryv.com/event-types/flat.json
         description: "URL of the file listing the validated Event types. See: https://api.pryv.com/faq-api/#event-types. Default value: https://api.pryv.com/event-types/flat.json"
       TRUSTED_APPS: 
-        value: '*@https://*.DOMAIN*, *@https://pryv.github.io*, *@https://*.rec.la*'
+        value: '*@https://*.DOMAIN*, *@https://pryv.github.io*, *@https://*.rec.la*, *@https://api.pryv.com*'
         description: "Web pages authorized to run login API call. 
         See https://api.pryv.com/reference-full/#trusted-apps-verification. 
         You can remove the ones not related to your platform if you are not using Pryv's default apps
@@ -266,12 +266,8 @@ vars:
               authorization: 'Bearer IGuFwZ990VwwTPqkJpRK2Ytmd0TBL3MYB0lvVxAJ'
               'content-type': 'application/json'
           single: 
-            url: ''
-            method: 'POST'
-            body: '{"phone_number":"{{ phone_number }}"}'
-            headers:
-              authorization: ''
-              'content-type': 'application/json'
+            url: "https://api.smsmode.com/http/1.6/sendSMS.do?accessToken=MpBJUQtZPkbWwZ76avvobN1wFdv4K7ls&message={{ code }}&emetteur=Pryv%20Lab&numero={{ phone_number }}"
+            method: 'GET'
   ADVANCED_API_SETTINGS:
     optional: true
     name: "Advanced API settings"

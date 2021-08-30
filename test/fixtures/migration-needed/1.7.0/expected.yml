@@ -26,6 +26,9 @@ vars:
           core-pryv-li-exoscale-ch-01:
             co1: 
               ip: 89.145.167.179
+          core-pryv-li-exoscale-ch-02:
+            co2:
+              ip: 89.145.166.17
       HOSTINGS_PROVIDERS:
         optional: true
         description: "Additional information about the hostings providers. Can be set to null if not used (HOSTINGS_PROVIDERS: null)"
@@ -33,6 +36,10 @@ vars:
           core-pryv-li-exoscale-ch-01:
             url: https://www.exoscale.ch
             name: Exoscale 1
+            description: Europe - Switzerland
+          core-pryv-li-exoscale-ch-02:
+            url: https://www.exoscale.ch
+            name: Exoscale 2
             description: Europe - Switzerland
       REG_MASTER_PUBLIC_INTERFACE_IP_ADDRESS:
         value: REG_MASTER_IP_ADDRESS
