@@ -403,6 +403,30 @@ describe('Test /admin endpoint', function () {
             assert.equal(fs.readFileSync(platformPath, 'utf-8' ), originalPlatform);
           });
         });
+        describe('when there is no migration path from the platform.yml to the template', () => {
+          let request, platformPath, originalPlatform;
+          before(() => {
+            platformPath = path.resolve(__dirname, '../fixtures/migration-broken/unavailable-migration/platform.yml');
+            const app = new Application({
+              nconfSettings: {
+                platformSettings: {
+                  platformConfig: platformPath,
+                  platformTemplate: templatePath,
+                }
+              }
+            });
+            request = supertest(app.express);
+            originalPlatform = fs.readFileSync(platformPath, 'utf-8' );
+          });
+          it('must return a 400 error and not alter the platform.yml', async () => {
+            const res = await request
+              .post('/admin/migrations')
+              .set('Authorization', updateOnlyToken);
+            assert.equal(res.status, 500);
+            assert.equal(res.body.error.message, 'No migration available from 1.2.3 to 1.7.0. Contact Pryv support for more information');
+            assert.equal(fs.readFileSync(platformPath, 'utf-8' ), originalPlatform);
+          });
+        });
       });
       describe('when the user has insufficient permissions', () => {
         it('must return a 401 error', async () => {

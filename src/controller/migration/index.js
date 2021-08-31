@@ -90,18 +90,28 @@ module.exports.checkMigrations = checkMigrations;
 function computeNeededMigrations(platformVersion: string, targetVersion: string, deploymentType: DeploymentType): Array<Migration> {
   const foundMigrations: Array<Migration> = [];
 
+  if (platformVersion === targetVersion) return foundMigrations;
+
+  let versionCounter: string = platformVersion;
   for(let i=0; i<migrations.length && isSmallerOrEqual(migrations[i].versionTo, targetVersion); i++) {
     
     const migration: Migration = migrations[i];
-    if (
-      compareVersions(platformVersion, migration.versionTo) === -1 &&
-      migration[deploymentType] != null
-    ) {
+    if (isPartOfVersionsFrom(migration.versionsFrom, versionCounter)) {
       foundMigrations.push(migration);
+      versionCounter = migration.versionTo;
     }
   }
+  
+  if (isSmallerOrEqual(platformVersion, targetVersion) && foundMigrations.length === 0) {
+    throw new Error(`No migration available from ${platformVersion} to ${targetVersion}. Contact Pryv support for more information`);
+  }
+
   logger.info(`available migrations found: ${foundMigrations.map(m => { return { from: m.versionsFrom, to: m.versionTo }; })}`)
   return foundMigrations;
+
+  function isPartOfVersionsFrom(versionsFrom: Array<string>, targetVersion: string): boolean {
+    return versionsFrom.includes(targetVersion);
+  }
 
   /**
    * checks if versionA is smaller or equal to versionB

@@ -89,7 +89,15 @@ describe('migration', () => {
       });
     });
     describe('when there is no migration for the target template version', () => {
-
+      it('must throw an error', () => {
+        const platform = { vars: { 
+          MISCELLANEOUS_SETTINGS: { settings: { TEMPLATE_VERSION: { value: '1.2.3' }}},
+          MACHINES_AND_PLATFORM_SETTINGS: { settings: { }}
+        }};
+        const template = parseYamlFile(defaultTemplatePath);
+        assert.throws(checkMigrations.bind(null, platform, template));
+        
+      });
     });
   });
 

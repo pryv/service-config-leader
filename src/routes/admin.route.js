@@ -162,10 +162,14 @@ module.exports = function (
       res: express$Response,
       next: express$NextFunction
     ) => {
-      const platform = await loadPlatform(settings);
-      const platformTemplate = await loadPlatformTemplate(settings);
-      const migrations = checkMigrations(platform, platformTemplate).migrations.map(m => _.pick(m, ['versionsFrom', 'versionTo']));
-      res.json({ migrations });
+      try {
+        const platform = await loadPlatform(settings);
+        const platformTemplate = await loadPlatformTemplate(settings);
+        const migrations = checkMigrations(platform, platformTemplate).migrations.map(m => _.pick(m, ['versionsFrom', 'versionTo']));
+        res.json({ migrations });
+      } catch (err) {
+        next (err);
+      }
     }
   );
 
