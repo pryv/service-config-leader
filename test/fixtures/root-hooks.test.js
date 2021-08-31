@@ -1,6 +1,6 @@
 // @flow
 
-/*global before, after */
+/* global before, after */
 
 const fs = require('fs');
 

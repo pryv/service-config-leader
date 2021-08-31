@@ -1,12 +1,14 @@
 // @flow
 
-const assert = require('chai').assert;
+import UsersRepository from '@repositories/users.repository';
+
+const { assert } = require('chai');
 const Database = require('better-sqlite3');
-const { describe, before, it, after } = require('mocha');
+const {
+  describe, before, it, after,
+} = require('mocha');
 
-import { UsersRepository } from '@repositories/users.repository';
-
-describe('Test Users Repository', function () {
+describe('Test Users Repository', () => {
   let db: Database;
   let usersRepository;
   let selectUserStmt;
@@ -21,96 +23,96 @@ describe('Test Users Repository', function () {
     password: 'new_pass',
   };
 
-  before(function () {
-    db = new Database(':memory:', { verbose: console.log });
+  before(() => {
+    db = new Database(':memory:', { /* verbose: console.log */ });
     usersRepository = new UsersRepository(db);
     selectUserStmt = db.prepare('SELECT * FROM users WHERE username = ?;');
   });
 
-  after(function () {
+  after(() => {
     db.close();
   });
 
-  describe('Create user', function () {
+  describe('Create user', () => {
     let createdUser;
     let savedUser;
 
-    before(function () {
+    before(() => {
       createdUser = usersRepository.createUser(user);
       savedUser = selectUserStmt.get(user.username);
     });
 
-    it('must save user with hashed password and created id', function () {
+    it('must save user with hashed password and created id', () => {
       assert.exists(savedUser);
       assert.exists(savedUser.id);
       assert.exists(savedUser.password);
       assert.notEqual(savedUser.password, user.password);
       assert.equal(savedUser.permissions, JSON.stringify(user.permissions));
     });
-    it('must return created user without password property', function () {
+    it('must return created user without password property', () => {
       assert.exists(createdUser);
       assert.notExists(createdUser.password);
       assert.deepEqual(createdUser.permissions, user.permissions);
     });
   });
-  describe('Find user', function () {
+  describe('Find user', () => {
     let foundUser;
 
-    before(function () {
+    before(() => {
       foundUser = usersRepository.findUser(user.username);
     });
 
-    it('must return username and permissions of the user', function () {
+    it('must return username and permissions of the user', () => {
       assert.exists(foundUser);
       assert.exists(foundUser.username);
       assert.exists(foundUser.permissions);
     });
-    it('must not return password of the user', function () {
+    it('must not return password of the user', () => {
       assert.notExists(foundUser.password);
     });
   });
-  describe('Find all users', function () {
+  describe('Find all users', () => {
     let foundUsers;
 
-    before(function () {
+    before(() => {
       foundUsers = usersRepository.findAllUsers();
     });
 
-    it('must return an array with users', function () {
+    it('must return an array with users', () => {
       assert.exists(foundUsers);
       assert.equal(foundUsers.length, 1);
       assert.exists(foundUsers[0].username, user.username);
       assert.exists(foundUsers[0].permissions, user.permissions);
     });
   });
-  describe('Check password', function () {
+  describe('Check password', () => {
     let checkOfValidPassword;
     let checkOfInvalidPassword;
 
-    before(function () {
+    before(() => {
       checkOfValidPassword = usersRepository.isPasswordValid(user);
       checkOfInvalidPassword = usersRepository.isPasswordValid(
-        Object.assign({}, user, { password: 'wrong_pass' })
+        { ...user, password: 'wrong_pass' },
       );
     });
 
-    it('must return true given valid password', function () {
+    it('must return true given valid password', () => {
       assert.exists(checkOfValidPassword);
     });
-    it('must return false given invalid password', function () {
+    it('must return false given invalid password', () => {
       assert.isFalse(checkOfInvalidPassword);
     });
   });
-  describe('Update user', function () {
+  describe('Update user', () => {
     let updatedUser;
     let savedUser;
 
-    before(function () {
+    before(() => {
       updatedUser = usersRepository.updateUser(user.username, newUser);
       savedUser = selectUserStmt.get(newUser.username);
     });
 
-    it('must update the user with provided changes', function () {
+    it('must update the user with provided changes', () => {
       assert.exists(savedUser);
       assert.exists(savedUser.id);
       assert.equal(savedUser.username, newUser.username);
@@ -118,22 +120,22 @@ describe('Test Users Repository', function () {
       assert.exists(savedUser.password);
       assert.equal(savedUser.permissions, JSON.stringify(user.permissions));
     });
-    it('must return updated user', function () {
+    it('must return updated user', () => {
       assert.exists(updatedUser);
       assert.notExists(updatedUser.password);
       assert.equal(updatedUser.username, newUser.username);
       assert.equal(updatedUser.permissions, newUser.permissions);
     });
   });
-  describe('Reset password', function () {
+  describe('Reset password', () => {
     let savedUser;
 
-    before(function () {
+    before(() => {
       usersRepository.resetPassword(newUser.username);
       savedUser = selectUserStmt.get(newUser.username);
     });
 
-    it('must set random string as new user password', function () {
+    it('must set random string as new user password', () => {
       assert.exists(savedUser);
       assert.exists(savedUser.id);
       assert.equal(savedUser.username, newUser.username);
@@ -142,19 +144,19 @@ describe('Test Users Repository', function () {
       assert.equal(savedUser.permissions, JSON.stringify(user.permissions));
     });
   });
-  describe('Delete user', function () {
+  describe('Delete user', () => {
     let deletedUsername;
     let deletedUser;
 
-    before(function () {
+    before(() => {
       deletedUsername = usersRepository.deleteUser(newUser.username);
       deletedUser = selectUserStmt.get(newUser.username);
     });
 
-    it('must return deleted user username', function () {
+    it('must return deleted user username', () => {
       assert.equal(deletedUsername, newUser.username);
     });
-    it('must entirely delete user from db', function () {
+    it('must entirely delete user from db', () => {
       assert.notExists(deletedUser);
     });
   });

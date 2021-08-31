@@ -4,9 +4,9 @@ const url = require('url');
 const request = require('superagent');
 const bluebird = require('bluebird');
 const logger = require('@utils/logging').getLogger('platform-users');
-const { UsersRepository } = require('@repositories/users.repository');
-const { TokensRepository } = require('@repositories/tokens.repository');
-const { verifyToken } = require('@middlewares/security/token.verification');
+const UsersRepository = require('@repositories/users.repository');
+const TokensRepository = require('@repositories/tokens.repository');
+const verifyToken = require('@middlewares/security/token.verification');
 const {
   getAuthorizationService,
   AuthorizationService,
@@ -20,10 +20,10 @@ module.exports = function (
   settings: Object,
   platformSettings: Object,
   usersRepository: UsersRepository,
-  tokensRepository: TokensRepository
+  tokensRepository: TokensRepository,
 ) {
   const authorizationService: AuthorizationService = getAuthorizationService(
-    usersRepository
+    usersRepository,
   );
   const auditLogger = getAuditLogger(settings.get('logs:audit:filePath'));
 
@@ -32,34 +32,34 @@ module.exports = function (
   expressApp.get(
     '/platform-users/:username',
     authorizationService.verifyIsAllowedTo(PLATFORM_USERS_PERMISSIONS.READ),
-    async function (req: express$Request, res: express$Response, next: express$NextFunction) {
+    async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       const authKey = settings.get('internals:REGISTER_SYSTEM_KEY_1');
       const registerUrl = settings.get('registerUrl');
-      const username = req.params.username;
+      const { username } = req.params;
       try {
         const getResponse = await request
-          .get(url.resolve(registerUrl ,`/admin/users/${username}`))
+          .get(url.resolve(registerUrl, `/admin/users/${username}`))
           .set('Authorization', authKey);
-        res.status(200).json({ user: getResponse.body });
+        return res.status(200).json({ user: getResponse.body });
       } catch (err) {
         if (err.status && err.status === 404) return next(errors.notFound(`user with username: "${username}" not found on register at: ${registerUrl}. Register error: ${err.message}`));
         return next(errors.unexpectedError(new Error(`Error while fetching user on register at: ${registerUrl}. Register error: ${err.message}`)));
       }
-    }
+    },
   );
 
   expressApp.delete(
     '/platform-users/:username',
     authorizationService.verifyIsAllowedTo(PLATFORM_USERS_PERMISSIONS.DELETE),
-    async function (
+    async (
       req: express$Request,
       res: express$Response,
-      next: express$NextFunction
-    ) {
+      next: express$NextFunction,
+    ) => {
       const accountDeletions: Array<string> = platformSettings.get('vars:API_SETTINGS:settings:ACCOUNT_DELETION:value');
       const isDeleteAllowed: boolean = accountDeletions.includes('adminToken');
-      if (! isDeleteAllowed) {
-        const error: any = new Error('Platform user deletion is disabled. Refer to your platform configuration.')
+      if (!isDeleteAllowed) {
+        const error: any = new Error('Platform user deletion is disabled. Refer to your platform configuration.');
         error.httpStatus = 403;
         return next(error);
       }
@@ -78,7 +78,7 @@ module.exports = function (
 
       if (cores == null || cores.length === 0) {
         return next(
-          new Error('No core machines defined in followers settings')
+          new Error('No core machines defined in followers settings'),
         );
       }
 
@@ -89,13 +89,13 @@ module.exports = function (
             deleteFromCoresPromises.push(
               request
                 .delete(`http://core:3000/users/${usernameToDelete}`)
-                .set('Authorization', authKeyCore)
+                .set('Authorization', authKeyCore),
             );
           } else {
             deleteFromCoresPromises.push(
               request
                 .delete(url.resolve(core.url, `/users/${usernameToDelete}`))
-                .set('Authorization', authKeyCore)
+                .set('Authorization', authKeyCore),
             );
           }
         }
@@ -103,17 +103,16 @@ module.exports = function (
         await bluebird.any(deleteFromCoresPromises);
       } catch (err) {
         let unexpectedError: ?{};
-        err.forEach(error => {
-          if (error.status != 404) {
+        err.forEach((error) => {
+          if (error.status !== 404) {
             unexpectedError = error;
           }
         });
         if (unexpectedError != null) {
           logger.warn('Error while deleting user:', unexpectedError);
           return res.status(unexpectedError.status).json(unexpectedError.response || unexpectedError.message);
-        } else {
-          // continue with call to reg
         }
+        // continue with call to reg
       }
 
       try {
@@ -126,29 +125,28 @@ module.exports = function (
       }
 
       auditLogger.appendToLogFile(res.locals.username, DELETE_USER_ACTION, usernameToDelete);
-      
-      res.status(200).json({username: usernameToDelete});
-    }
+
+      return res.status(200).json({ username: usernameToDelete });
+    },
   );
 
   expressApp.delete(
     '/platform-users/:username/mfa',
     authorizationService.verifyIsAllowedTo(PLATFORM_USERS_PERMISSIONS.MODIFY),
-    async function (
+    async (
       req: express$Request,
       res: express$Response,
-      next: express$NextFunction
-    ) {
+      next: express$NextFunction,
+    ) => {
       const authKeyCore = settings.get('internals:CORE_SYSTEM_KEY');
-      const username = req.params.username;
+      const { username } = req.params;
       const registerUrl = settings.get('registerUrl');
       let coreUrl: string;
       // find core
       try {
-        
         const res = await request
           .get(url.resolve(registerUrl, '/cores'))
-          .query({username});
+          .query({ username });
         coreUrl = res.body.core.url;
       } catch (err) {
         return next(errors.unexpectedError(new Error(`Error while fetching user's core from register at: ${registerUrl}. Register error: ${err.message}`)));
@@ -165,6 +163,7 @@ module.exports = function (
 
       auditLogger.appendToLogFile(res.locals.username, MODIFY_USER_ACTION, username);
 
-      res.status(204).end();
-    });
+      return res.status(204).end();
+    },
+  );
 };

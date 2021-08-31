@@ -1,20 +1,20 @@
 // @flow
 
-const errorsFactory = require('@utils/errorsHandling').factory;
-import type { Permission } from '@models/permissions.model';
-const { UsersRepository } = require('@repositories/users.repository');
+import type { Permission, PermissionsGroup, Permissions } from '@models/permissions.model';
 import type {
   User,
   UserNoPass,
   UserNoPerms,
   UserPasswordChange,
 } from '@models/user.model';
-import type { PermissionsGroup, Permissions } from '@models/permissions.model';
+
+const errorsFactory = require('@utils/errorsHandling').factory;
+const UsersRepository = require('@repositories/users.repository');
 
 let AUTHORIZATION_SERVICE: AuthorizationService;
 
 export const getAuthorizationService = function (
-  usersRepository: UsersRepository
+  usersRepository: UsersRepository,
 ) {
   if (!AUTHORIZATION_SERVICE) {
     AUTHORIZATION_SERVICE = new AuthorizationService(usersRepository);
@@ -33,7 +33,7 @@ export class AuthorizationService {
     return function (
       req: express$Request,
       res: express$Response,
-      next: express$NextFunction
+      next: express$NextFunction,
     ) {
       try {
         let permissionsGroup: PermissionsGroup;
@@ -52,8 +52,8 @@ export class AuthorizationService {
           throw new Error();
         }
 
-        this.checkHasPermissionsOnGroup(user, permissionsGroup);
-        this.checkHasPermission(permission, user.permissions[permissionsGroup]);
+        AuthorizationService.checkHasPermissionsOnGroup(user, permissionsGroup);
+        AuthorizationService.checkHasPermission(permission, user.permissions[permissionsGroup]);
         next();
       } catch (err) {
         next(errorsFactory.unauthorized('Insufficient permissions'));
@@ -61,11 +61,11 @@ export class AuthorizationService {
     }.bind(this);
   }
 
-  verifyChangesItself() {
+  static verifyChangesItself() {
     return function (
       req: express$Request,
       res: express$Response,
-      next: express$NextFunction
+      next: express$NextFunction,
     ) {
       const usernameFromToken = res.locals.username;
       const usernameFromPath = req.params.username;
@@ -81,16 +81,17 @@ export class AuthorizationService {
     return function (
       req: express$Request,
       res: express$Response,
-      next: express$NextFunction
+      next: express$NextFunction,
     ) {
-      const username = (res.locals: any).username;
-      const oldPassword = ((req.body: any): UserPasswordChange).oldPassword;
-      const newPassword = ((req.body: any): UserPasswordChange).newPassword;
-      const newPasswordCheck = ((req.body: any): UserPasswordChange)
-        .newPasswordCheck;
+      const { username } = res.locals;
+      const {
+        oldPassword,
+        newPassword,
+        newPasswordCheck,
+      } = ((req.body: any): UserPasswordChange);
 
       const user: UserNoPerms = ({
-        username: username,
+        username,
         password: oldPassword,
       }: UserNoPerms);
       const passwordValid = this.usersRepository.isPasswordValid(user);
@@ -108,7 +109,7 @@ export class AuthorizationService {
     return function (
       req: express$Request,
       res: express$Response,
-      next: express$NextFunction
+      next: express$NextFunction,
     ) {
       try {
         const username = ((res.locals.username: any): string);
@@ -118,15 +119,15 @@ export class AuthorizationService {
           throw new Error();
         }
 
-        this.checkHasPermissionsOnGroup(user, 'users');
+        AuthorizationService.checkHasPermissionsOnGroup(user, 'users');
 
         const userToCreatePermissions: Permissions = ((req.body: any): User)
           .permissions;
         for (const permissionsGroup of ['users', 'settings', 'platformUsers']) {
           for (const permission of userToCreatePermissions[permissionsGroup]) {
-            this.checkHasPermission(
+            AuthorizationService.checkHasPermission(
               permission,
-              user.permissions[permissionsGroup]
+              user.permissions[permissionsGroup],
             );
           }
         }
@@ -138,16 +139,16 @@ export class AuthorizationService {
     }.bind(this);
   }
 
-  checkHasPermission(
+  static checkHasPermission(
     expectedPermission: Permission,
-    permissions: Permission[]
+    permissions: Permission[],
   ) {
     if (!permissions.includes(expectedPermission)) {
       throw new Error();
     }
   }
 
-  checkHasPermissionsOnGroup(user: UserNoPass, group: PermissionsGroup): void {
+  static checkHasPermissionsOnGroup(user: UserNoPass, group: PermissionsGroup): void {
     if (!user || !user.permissions || !user.permissions[group]) {
       throw new Error();
     }

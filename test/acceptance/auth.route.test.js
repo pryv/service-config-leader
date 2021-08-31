@@ -1,13 +1,16 @@
 // @flow
 
-const assert = require('chai').assert;
-const { describe, before, it, after } = require('mocha');
+const { assert } = require('chai');
+const {
+  describe, before, it, after,
+} = require('mocha');
 const Application = require('@root/app');
+
 const app = new Application();
 const request = require('supertest')(app.express);
 const { sign } = require('jsonwebtoken');
 
-describe('Test /auth endpoint', function () {
+describe('Test /auth endpoint', () => {
   const user = {
     username: 'some_name',
     password: 'pass',
@@ -16,16 +19,14 @@ describe('Test /auth endpoint', function () {
   let deleteAllUsersStmt;
   let getAllTokensStmt;
 
-  before(function () {
+  before(() => {
     deleteAllUsersStmt = app.db.prepare('DELETE FROM users;');
     getAllTokensStmt = app.db.prepare('SELECT * FROM blacklisted_tokens;');
 
     deleteAllUsersStmt.run();
     app.tokensRepository.clean();
     app.usersRepository.createUser(
-      Object.assign({}, user, {
-        permissions: { users: ['read'], settings: [] },
-      })
+      { ...user, permissions: { users: ['read'], settings: [] } },
     );
   });
 
@@ -33,7 +34,7 @@ describe('Test /auth endpoint', function () {
     deleteAllUsersStmt.run();
   });
 
-  describe('POST /auth/login', function () {
+  describe('POST /auth/login', () => {
     it('must respond with 200 and token in body given valid user data', async () => {
       const res = await request.post('/auth/login').send(user);
 
@@ -57,13 +58,13 @@ describe('Test /auth endpoint', function () {
       assert.notExists(res.body.token);
     });
   });
-  describe('POST /auth/logout', function () {
+  describe('POST /auth/logout', () => {
     let token;
 
     before(() => {
       token = sign(
         { username: user.username },
-        app.settings.get('internals:configLeaderTokenSecret')
+        app.settings.get('internals:configLeaderTokenSecret'),
       );
     });
 

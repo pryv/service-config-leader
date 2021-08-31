@@ -1,5 +1,12 @@
 // @flow
 
+import {
+  listConfFiles,
+  applySubstitutions,
+  isValidJSON,
+  isJSONFile,
+} from '@utils/configuration.utils';
+
 const bluebird = require('bluebird');
 const fs = require('fs');
 const request = require('superagent');
@@ -7,31 +14,27 @@ const _ = require('lodash');
 const logger = require('@utils/logging').getLogger('admin');
 const errorsFactory = require('@utils/errorsHandling').factory;
 const { SETTINGS_PERMISSIONS } = require('@models/permissions.model');
-const { verifyToken } = require('@middlewares/security/token.verification');
+const verifyToken = require('@middlewares/security/token.verification');
 const {
   getAuthorizationService,
   AuthorizationService,
 } = require('@middlewares/security/authorization.service');
-const { UsersRepository } = require('@repositories/users.repository');
-const { TokensRepository } = require('@repositories/tokens.repository');
+const UsersRepository = require('@repositories/users.repository');
+const TokensRepository = require('@repositories/tokens.repository');
 const { getGit } = require('@controller/migration/git');
-import {
-  listConfFiles,
-  applySubstitutions,
-  isValidJSON,
-  isJSONFile
-} from '@utils/configuration.utils';
-const { loadPlatformTemplate, loadPlatform, writePlatform, checkMigrations, migrate } = require('@controller/migration');
+const {
+  loadPlatformTemplate, loadPlatform, writePlatform, checkMigrations, migrate,
+} = require('@controller/migration');
 
 module.exports = function (
   expressApp: express$Application,
   settings: Object,
   platformSettings: Object,
   usersRepository: UsersRepository,
-  tokensRepository: TokensRepository
+  tokensRepository: TokensRepository,
 ) {
   const authorizationService: AuthorizationService = getAuthorizationService(
-    usersRepository
+    usersRepository,
   );
 
   expressApp.all('/admin*', verifyToken(tokensRepository));
@@ -43,13 +46,13 @@ module.exports = function (
     async (
       req: express$Request,
       res: express$Response,
-      next: express$NextFunction
+      next: express$NextFunction,
     ) => {
       const previousSettings = platformSettings.get('vars');
       const templatesPath = settings.get('templatesPath');
-      const newSettings = Object.assign({}, previousSettings, req.body);
+      const newSettings = { ...previousSettings, ...req.body };
 
-      let list = [];
+      const list = [];
       listConfFiles(templatesPath, list);
 
       try {
@@ -58,23 +61,22 @@ module.exports = function (
           const newConf = applySubstitutions(
             templateConf,
             settings,
-            newSettings
+            newSettings,
           );
           if (isJSONFile(file) && !isValidJSON(newConf)) {
             throw errorsFactory.invalidInput(
-              'Configuration format invalid'
+              'Configuration format invalid',
             );
           }
         });
       } catch (err) {
         return next(err);
       }
-      
 
       platformSettings.set('vars', newSettings);
 
       try {
-        await bluebird.fromCallback(cb => platformSettings.save(cb));
+        await bluebird.fromCallback((cb) => platformSettings.save(cb));
       } catch (err) {
         platformSettings.set('vars', previousSettings);
         return next(err);
@@ -87,11 +89,11 @@ module.exports = function (
       } catch (err) {
         return next(err);
       }
-      
-      res.send({ 
-        settings: newSettings
+
+      return res.send({
+        settings: newSettings,
       });
-    }
+    },
   );
 
   // returns current settings as json
@@ -101,16 +103,16 @@ module.exports = function (
     (
       req: express$Request,
       res: express$Response,
-      next: express$NextFunction
+      next: express$NextFunction,
     ) => {
       const currentSettings = platformSettings.get('vars');
       if (currentSettings == null) {
         next(new Error('Missing platform settings.'));
       }
       res.json({
-        settings: currentSettings
+        settings: currentSettings,
       });
-    }
+    },
   );
 
   // notifies followers about configuration changes
@@ -120,35 +122,36 @@ module.exports = function (
     async (
       req: express$Request,
       res: express$Response,
-      next: express$NextFunction
+      next: express$NextFunction,
     ) => {
       const followers = settings.get('followers');
-      const services = req.body.services;
+      const { services } = req.body;
       if (followers == null) {
         next(new Error('Missing followers settings.'));
       }
 
-      let successes = [];
-      let failures = [];
+      const successes = [];
+      const failures = [];
       for (const [auth, follower] of Object.entries(followers)) {
         const followerUrl = follower.url;
         try {
           await request
             .post(`${followerUrl}/notify`)
             .set('Authorization', auth)
-            .send({ services: services });
+            .send({ services });
           successes.push(follower);
         } catch (err) {
           logger.warn('Error while notifying follower:', err);
-          failures.push(Object.assign({}, follower, { error: err }));
+          failures.push({ ...follower, error: err });
         }
       }
 
       res.json({
-        successes: successes,
-        failures: failures
+        successes,
+        failures,
       });
-    });
+    },
+  );
 
   // returns list of available config migrations
   expressApp.get(
@@ -157,17 +160,17 @@ module.exports = function (
     async (
       req: express$Request,
       res: express$Response,
-      next: express$NextFunction
+      next: express$NextFunction,
     ) => {
       try {
         const platform = await loadPlatform(settings);
         const platformTemplate = await loadPlatformTemplate(settings);
-        const migrations = checkMigrations(platform, platformTemplate).migrations.map(m => _.pick(m, ['versionsFrom', 'versionTo']));
+        const migrations = checkMigrations(platform, platformTemplate).migrations.map((m) => _.pick(m, ['versionsFrom', 'versionTo']));
         res.json({ migrations });
       } catch (err) {
-        next (err);
+        next(err);
       }
-    }
+    },
   );
 
   expressApp.post(
@@ -176,17 +179,17 @@ module.exports = function (
     async (
       req: express$Request,
       res: express$Response,
-      next: express$NextFunction
+      next: express$NextFunction,
     ) => {
       try {
         const platform = await loadPlatform(settings);
         const platformTemplate = await loadPlatformTemplate(settings);
         const { migrations, migratedPlatform } = migrate(platform, platformTemplate);
         if (migrations.length > 0) await writePlatform(settings, migratedPlatform, res.locals.username);
-        res.json({ migrations: migrations.map(m => _.pick(m, ['versionsFrom', 'versionTo'])) });
+        res.json({ migrations: migrations.map((m) => _.pick(m, ['versionsFrom', 'versionTo'])) });
       } catch (e) {
         next(e);
       }
-    }
+    },
   );
 };

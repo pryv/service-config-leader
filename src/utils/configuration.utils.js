@@ -6,14 +6,14 @@ const fs = require('fs');
 export function applySubstitutions(
   template: string,
   settings: Object,
-  platformSettingsVars: Object
+  platformSettingsVars: Object,
 ): string {
   const platformVars = retrieveFlatSettings(platformSettingsVars);
   const internalVars = settings.get('internals');
 
   if (platformVars == null && internalVars == null) return template;
 
-  let substitutions = Object.assign({}, internalVars, platformVars);
+  const substitutions = { ...internalVars, ...platformVars };
 
   const re = new RegExp(Object.keys(substitutions).join('|'), 'g');
   return replaceInString(template);
@@ -36,10 +36,10 @@ export function applySubstitutions(
   }
 
   function retrieveFlatSettings(rootSettings: Object): Object {
-    let settings = {};
+    const settings = {};
     for (const group of Object.keys(rootSettings)) {
-      for (const setting of Object.keys(rootSettings[group]['settings'])) {
-        settings[setting] = rootSettings[group]['settings'][setting].value;
+      for (const setting of Object.keys(rootSettings[group].settings)) {
+        settings[setting] = rootSettings[group].settings[setting].value;
       }
     }
     return settings;
@@ -48,7 +48,7 @@ export function applySubstitutions(
 
 export function listConfFiles(dir: string, files: Array<string>): void {
   fs.readdirSync(dir).forEach((file) => {
-    let fullPath = path.join(dir, file);
+    const fullPath = path.join(dir, file);
     if (fs.lstatSync(fullPath).isDirectory()) {
       listConfFiles(fullPath, files);
     } else {

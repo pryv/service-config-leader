@@ -1,4 +1,1 @@
-module.exports.spy = () => {
-  return true;
-}
-  
+module.exports.spy = () => true;

@@ -21,7 +21,6 @@ module.exports = (platform: {}, template: {}): {} => {
   platformCopy.vars.ADVANCED_API_SETTINGS.settings.VERSIONING_SETTINGS.value.deletionMode = oldVersioning.deletionMode.value;
   platformCopy.vars.ADVANCED_API_SETTINGS.settings.VERSIONING_SETTINGS.value.forceKeepHistory = oldVersioning.forceKeepHistory.value;
 
-
   platformCopy = deleteRemovedSettings(platformCopy, template);
   return platformCopy;
 };

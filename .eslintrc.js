@@ -5,7 +5,12 @@ module.exports = {
     es6: true,
     node: true,
   },
-  extends: ["eslint:recommended", "plugin:flowtype/recommended", "prettier"],
+  extends: [
+    "eslint:recommended",
+    "plugin:flowtype/recommended",
+    "prettier",
+    "airbnb"
+  ],
   parserOptions: {
     sourceType: "module",
   },
@@ -21,4 +26,22 @@ module.exports = {
     "linebreak-style": ["error", "unix"],
     quotes: ["error", "single"],
   },
+  "overrides": [
+    {
+      "files": ["*.js"],
+      "rules": {
+        "no-use-before-define": "off",
+        "global-require": "off",
+        "import/no-unresolved": "off",
+        "max-len": "off",
+        "no-shadow": "off",
+        "func-names": "off",
+        "no-restricted-syntax": "off",
+        "import/no-dynamic-require": "off",
+        "no-param-reassign": "off",
+        "max-classes-per-file": "off",
+        "no-plusplus": "off"
+      }
+    }
+  ]
 };

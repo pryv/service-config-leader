@@ -1,16 +1,16 @@
 // @flow
 
-/*global describe, before, beforeEach, it */
+/* global describe, before, beforeEach, it */
 
-const yaml = require('js-yaml')
+const yaml = require('js-yaml');
 const path = require('path');
 const fs = require('fs');
-const assert = require('chai').assert;
+const { assert } = require('chai');
 const Application = require('@root/app');
 
-describe('GET /conf', function () {
-
-  let app, request, settings, follower, followerKey, platformPath, platform;
+describe('GET /conf', () => {
+  let app; let request; let settings; let follower; let followerKey; let platformPath; let
+      platform;
   before(() => {
     app = new Application();
     request = require('supertest')(app.express);
@@ -29,11 +29,11 @@ describe('GET /conf', function () {
     const res = await request.get('/conf').set('Authorization', 'valid');
 
     assert.strictEqual(res.status, 404);
-    const error = res.body.error;
+    const { error } = res.body;
     assert.isDefined(error);
     assert.strictEqual(
       error.message,
-      'Configuration folder not found for \'unexisting\'.'
+      'Configuration folder not found for \'unexisting\'.',
     );
   });
 
@@ -42,17 +42,17 @@ describe('GET /conf', function () {
 
     assert.strictEqual(res.status, 200);
 
-    const files = res.body.files;
+    const { files } = res.body;
     assert.isDefined(files);
 
     ['core', 'register', 'mfa'].forEach((component) => {
       const conf = files.find(
-        (f) => f.path === `/${component}/conf/${component}.json`
+        (f) => f.path === `/${component}/conf/${component}.json`,
       );
       assert.isNotNull(conf);
       assert.deepEqual(
         conf.content.replace(/\s/g, ''),
-        expectedConf(follower.role, component)
+        expectedConf(follower.role, component),
       );
     });
   });
@@ -65,7 +65,7 @@ describe('GET /conf', function () {
     coreConfig1 = JSON.parse(coreConfig1);
     assert.equal(coreConfig1.http.port, 9000);
 
-    const path = settings.get('templatesPath') + '/pryv/core/conf/core.json';
+    const path = `${settings.get('templatesPath')}/pryv/core/conf/core.json`;
     const backup = fs.readFileSync(path);
     const modifiedConfig = JSON.parse(backup);
     modifiedConfig.http.port = 8000;
@@ -99,7 +99,7 @@ describe('GET /conf', function () {
     let coreConfig2 = files2.filter((f) => f.path.indexOf('substitute.json') > 0)[0].content;
     coreConfig2 = JSON.parse(coreConfig2);
     assert.equal(coreConfig2.domain, 'test.la');
-  })
+  });
 
   it('responds with 500 given incorrect config stored', async () => {
     // Set invalid config in platform.yml

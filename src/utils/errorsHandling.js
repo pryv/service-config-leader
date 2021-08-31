@@ -14,31 +14,31 @@ class ApiError extends Error {
 // Factory class that allows to generate Api Error.
 //
 class ErrorsFactory {
-  unexpectedError(error: Error) {
+  static unexpectedError(error: Error) {
     const msg = error.message || 'Unexpected error.';
     return new ApiError(500, msg);
   }
 
-  unauthorized(message: ?string) {
+  static unauthorized(message: ?string) {
     const msg = message || 'Operation is not authorized.';
     return new ApiError(401, msg);
   }
 
-  invalidInput(message: ?string) {
+  static invalidInput(message: ?string) {
     const msg = message || 'Invalid input';
     return new ApiError(400, msg);
   }
 
-  missingHeader(headerName: string): ApiError {
+  static missingHeader(headerName: string): ApiError {
     const msg = `Missing expected header "${headerName}".`;
     return new ApiError(400, msg);
   }
 
-  notFound(message: ?string): ApiError {
+  static notFound(message: ?string): ApiError {
     const msg = message || 'Resource not found.';
     return new ApiError(404, msg);
   }
 }
 
-module.exports.factory = new ErrorsFactory();
+module.exports.factory = ErrorsFactory;
 module.exports.ApiError = ApiError;

@@ -1,7 +1,5 @@
 // @flow
 
-const _ = require('lodash');
-const bcrypt = require('bcryptjs');
 import type {
   User,
   UserNoPass,
@@ -9,26 +7,35 @@ import type {
   UserOptional,
   UserDB,
 } from '@models/user.model';
+
+const _ = require('lodash');
+const bcrypt = require('bcryptjs');
 const { Database, Statement } = require('better-sqlite3');
 const cryptoRandomString = require('crypto-random-string');
 
-export class UsersRepository {
+class UsersRepository {
   db: Database;
+
   createUserStmt: Statement;
+
   deleteUserStmtcreateUserStmt: Statement;
+
   getUserWithPasswordStmt: Statement;
+
   getUserWithPermissionsStmt: Statement;
+
   getAllUsersStmt: Statement;
+
   deleteUserStmt: Statement;
 
   constructor(db: Database) {
     this.db = db;
     const tableCreationStatement = this.db.prepare(
-      'CREATE TABLE IF NOT EXISTS users ' +
-        '(id INTEGER PRIMARY KEY, ' +
-        'username TEXT NOT NULL UNIQUE, ' +
-        'password TEXT NOT NULL, ' +
-        'permissions TEXT);'
+      'CREATE TABLE IF NOT EXISTS users '
+        + '(id INTEGER PRIMARY KEY, '
+        + 'username TEXT NOT NULL UNIQUE, '
+        + 'password TEXT NOT NULL, '
+        + 'permissions TEXT);',
     );
     tableCreationStatement.run();
 
@@ -37,44 +44,45 @@ export class UsersRepository {
 
   prepareStatements() {
     this.createUserStmt = this.db.prepare(
-      'INSERT INTO users(username, password, permissions) VALUES(@username, @password, @permissions);'
+      'INSERT INTO users(username, password, permissions) VALUES(@username, @password, @permissions);',
     );
     this.getUserWithPasswordStmt = this.db.prepare(
-      'SELECT username, password FROM users WHERE username = ?;'
+      'SELECT username, password FROM users WHERE username = ?;',
     );
     this.getUserWithPermissionsStmt = this.db.prepare(
-      'SELECT username, permissions FROM users WHERE username = ?;'
+      'SELECT username, permissions FROM users WHERE username = ?;',
     );
     this.getAllUsersStmt = this.db.prepare(
-      'SELECT username, permissions FROM users;'
+      'SELECT username, permissions FROM users;',
     );
     this.deleteUserStmt = this.db.prepare(
-      'DELETE FROM users WHERE username = ?;'
+      'DELETE FROM users WHERE username = ?;',
     );
   }
 
   createUser(user: User): UserNoPass {
     const passwordHash: string = bcrypt.hashSync(user.password, 10);
-    const userToCreate: UserDB = Object.assign({}, user, {
+    const userToCreate: UserDB = {
+      ...user,
       password: passwordHash,
       permissions: JSON.stringify(user.permissions),
-    });
+    };
 
     this.createUserStmt.run(userToCreate);
 
-    return this.sanitizeOutput(userToCreate);
+    return UsersRepository.sanitizeOutput(userToCreate);
   }
 
   findAllUsers(): Array<UserNoPass> {
     const users = this.getAllUsersStmt
       .all()
-      .map((user) => this.sanitizeOutput(user));
+      .map((user) => UsersRepository.sanitizeOutput(user));
     return users;
   }
 
   findUser(username: string): UserNoPass | null {
     const row = this.getUserWithPermissionsStmt.get(username);
-    return row ? this.sanitizeOutput(row) : null;
+    return row ? UsersRepository.sanitizeOutput(row) : null;
   }
 
   isPasswordValid(user: UserNoPerms): boolean {
@@ -85,8 +93,8 @@ export class UsersRepository {
   resetPassword(username: string): UserNoPerms {
     const password = cryptoRandomString({ length: 15 });
 
-    this.updateUser(username, { password: password });
-    return { username: username, password: password };
+    this.updateUser(username, { password });
+    return { username, password };
   }
 
   updateUser(username: string, newUser: UserOptional): UserNoPass {
@@ -111,17 +119,17 @@ export class UsersRepository {
 
     updateStmt.run([...Object.values(userToUpdate), username]);
 
-    return this.sanitizeOutput(userToUpdate);
+    return UsersRepository.sanitizeOutput(userToUpdate);
   }
 
   deleteUser(username: string): string | null {
     const info = this.deleteUserStmt.run(username);
     if (info.changes) {
       return username;
-    } else return null;
+    } return null;
   }
 
-  sanitizeOutput(user: any): UserNoPass {
+  static sanitizeOutput(user: any): UserNoPass {
     const sanitizedUser = _.pick(user, ['username', 'permissions']);
     if (sanitizedUser.permissions) {
       Object.assign(sanitizedUser, {
@@ -131,3 +139,4 @@ export class UsersRepository {
     return sanitizedUser;
   }
 }
+module.exports = UsersRepository;

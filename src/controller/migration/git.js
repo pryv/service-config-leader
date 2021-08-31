@@ -1,8 +1,8 @@
 // @flow
 
-import simpleGit from 'simple-git';
+import SimpleGit from 'simple-git';
 
-let git = null
+let git = null;
 function setupGit(settings): {} {
   git = new Git(settings);
   return getGit();
@@ -16,20 +16,20 @@ function getGit() {
 module.exports.getGit = getGit;
 
 class Git {
-
   git: {};
+
   author: string;
 
   constructor(params: {}) {
-    this.git = new simpleGit(params);
+    this.git = new SimpleGit(params);
     this.author = 'Pryv config <support@pryv.com>';
   }
 
-  async initRepo() {
-    return await this.git.init();
+  async initRepo(): Promise<void> {
+    return this.git.init();
   }
 
-  async commitChanges(message: string = 'update') {
+  async commitChanges(message: string = 'update'): Promise<void> {
     await this.git.add('.');
     await this.git.commit(message, { '--author': this.author });
   }

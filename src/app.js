@@ -1,32 +1,40 @@
 // @flow
 
+import type { UserNoPerms } from '@models/user.model';
+
 const _ = require('lodash');
 const express = require('express');
 const middlewares = require('@middlewares');
 const fs = require('fs');
-const nconfSettings = (new (require('./settings'))).store;
-const platformSettings = require('./platform')(nconfSettings);
+const nconfSettings = (new (require('./settings'))()).store;
 const Database = require('better-sqlite3');
-const CronJob = require('cron').CronJob;
-const { UsersRepository } = require('@repositories/users.repository');
-import type { UserNoPerms } from '@models/user.model';
-const { TokensRepository } = require('@repositories/tokens.repository');
+const { CronJob } = require('cron');
+const UsersRepository = require('@repositories/users.repository');
+const TokensRepository = require('@repositories/tokens.repository');
 const {
   USERS_PERMISSIONS,
   SETTINGS_PERMISSIONS,
-  PLATFORM_USERS_PERMISSIONS
+  PLATFORM_USERS_PERMISSIONS,
 } = require('@models/permissions.model');
 const morgan = require('morgan');
 const { setupGit } = require('@controller/migration');
+const platformSettings = require('./platform')(nconfSettings);
 
 class Application {
   express: express$Application;
+
   settings: Object;
+
   platformSettings: Object;
+
   logger: Object;
+
   db: Database;
+
   usersRepository: UsersRepository;
+
   tokensRepository: TokensRepository;
+
   git: {};
 
   constructor(settingsOverride = {}) {
@@ -82,7 +90,7 @@ class Application {
 
   connectToDb(): Database {
     return new Database(
-      `${this.settings.get('databasePath')}/config-user-management.db`
+      `${this.settings.get('databasePath')}/config-user-management.db`,
     );
   }
 
@@ -92,7 +100,7 @@ class Application {
 
   setupExpressApp(
     settings: Object,
-    platformSettings: Object
+    platformSettings: Object,
   ): express$Application {
     const expressApp = express();
 
@@ -106,24 +114,24 @@ class Application {
       settings,
       platformSettings,
       this.usersRepository,
-      this.tokensRepository
+      this.tokensRepository,
     );
     require('./routes/users.route')(
       expressApp,
       this.usersRepository,
-      this.tokensRepository
+      this.tokensRepository,
     );
     require('./routes/auth.route')(
       expressApp,
       this.usersRepository,
-      this.tokensRepository
+      this.tokensRepository,
     );
     require('./routes/platformUsers.route')(
       expressApp,
       settings,
       platformSettings,
       this.usersRepository,
-      this.tokensRepository
+      this.tokensRepository,
     );
 
     expressApp.use(middlewares.errors);
@@ -134,11 +142,11 @@ class Application {
   startTokensBlacklistCleanupJob() {
     const job = new CronJob(
       '0 0 * * 0,3,5',
-      function () {
+      (() => {
         this.tokensRepository.clean();
-      }.bind(this),
+      }),
       null,
-      false
+      false,
     );
     job.start();
   }
@@ -167,10 +175,10 @@ class Application {
     this.usersRepository.deleteUser(initialUser.username);
     this.usersRepository.createUser(initialUser);
     const createdUser: UserNoPerms = this.usersRepository.resetPassword(
-      initialUser.username
+      initialUser.username,
     );
     this.logger.info(
-      `Initial user generated. Username: ${initialUser.username}, password: ${createdUser.password}`
+      `Initial user generated. Username: ${initialUser.username}, password: ${createdUser.password}`,
     );
     // also set password in the credentials volume - this directory should be set in docker-compose
     const credentialsFilePath = this.settings.get('credentials:filePath');
