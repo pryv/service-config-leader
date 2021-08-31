@@ -1,6 +1,6 @@
 {
-  "presets": ["babel-preset-env", "flow"],
   "plugins": [
+    "@babel/plugin-proposal-class-properties",
     [
       "module-resolver",
       {
@@ -16,5 +16,18 @@
         }
       }
     ]
+  ],
+  "presets": [
+    
+    ["@babel/preset-env", { 
+      "targets": {
+        "node": "current"
+      }, 
+      "modules": "auto"
+    }],
+    "@babel/preset-flow"
+  ],
+  "ignore": [
+    "**/node_modules"
   ]
 }
