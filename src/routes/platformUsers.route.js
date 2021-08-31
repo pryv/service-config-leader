@@ -100,7 +100,7 @@ module.exports = function (
           }
         }
 
-        const res = await bluebird.any(deleteFromCoresPromises);
+        await bluebird.any(deleteFromCoresPromises);
       } catch (err) {
         let unexpectedError: ?{};
         err.forEach(error => {
@@ -117,7 +117,7 @@ module.exports = function (
       }
 
       try {
-        const res = await request
+        await request
           .delete(url.resolve(registerUrl, `/users/${usernameToDelete}?onlyReg=true`))
           .set('Authorization', authKeyReg);
       } catch (err) {
@@ -151,7 +151,7 @@ module.exports = function (
           .query({username});
         coreUrl = res.body.core.url;
       } catch (err) {
-        return next(errors.unexpectedError(new Error(`Error while fetching user\'s core from register at: ${registerUrl}. Register error: ${err.message}`)));
+        return next(errors.unexpectedError(new Error(`Error while fetching user's core from register at: ${registerUrl}. Register error: ${err.message}`)));
       }
 
       // send request
@@ -166,5 +166,5 @@ module.exports = function (
       auditLogger.appendToLogFile(res.locals.username, MODIFY_USER_ACTION, username);
 
       res.status(204).end();
-  });
+    });
 };

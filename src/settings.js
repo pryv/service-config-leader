@@ -1,7 +1,6 @@
 // @flow
 
 const nconf = require('nconf');
-const path = require('path');
 
 function nconfSettings() {
   this.store = new nconf.Provider();

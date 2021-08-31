@@ -17,7 +17,6 @@ const { USERS_PERMISSIONS } = require('@models/permissions.model');
 import type {
   User,
   UserOptional,
-  UserPasswordChange,
 } from '@models/user.model';
 
 const validator = createValidator();
@@ -40,7 +39,7 @@ module.exports = function (
     authorizationService.verifyGivenPermissionsNotExceedOwned(),
     function (req: express$Request, res: express$Response) {
       const createdUser = usersRepository.createUser(((req.body: any): User));
-      res.status(201).json({ user:createdUser });
+      res.status(201).json({ user:createdUser });
     }
   );
 
@@ -84,7 +83,7 @@ module.exports = function (
       const newPassword: UserOptional = {
         password: req.body.newPassword,
       };
-      const updatedUser = usersRepository.updateUser(
+      usersRepository.updateUser(
         req.params.username,
         newPassword
       );

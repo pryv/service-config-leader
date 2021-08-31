@@ -1,6 +1,5 @@
 // @flow
 
-const _ = require('lodash');
 const { baseWork, deleteRemovedSettings } = require('../utils');
 const { cloneAndApply } = require('@utils/treeUtils');
 

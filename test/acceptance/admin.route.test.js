@@ -1,6 +1,6 @@
 // @flow
 
-/*global describe, it, before, after */
+/*global describe, it, before, beforeEach, after */
 
 const sinon = require('sinon');
 const assert = require('chai').assert;

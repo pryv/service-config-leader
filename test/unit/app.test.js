@@ -1,12 +1,11 @@
 // @flow
 
-/*global describe, it, before, after*/
+/*global describe, it, before*/
 
 const fs = require('fs');
 
 const assert = require('chai').assert;
 const Application = require('@root/app');
-const simpleGit = require('simple-git');
 const path = require('path');
 const cuid = require('cuid');
 const { tmpdir } = require('os');
@@ -38,14 +37,13 @@ describe('Application', function () {
   });
 
   describe('init()', () => {
-    let app, gitFolder, gitClient;
+    let app, gitFolder;
     before(() => {
       gitFolder = path.resolve(tmpdir(), cuid());
       fs.mkdirSync(gitFolder);
       app = new Application({
         nconfSettings: { gitRepoPath: gitFolder }
       });
-      gitClient = simpleGit({ baseDir: gitFolder });
     });
     it('must initialise a git repository', async () => {
       await app.init();

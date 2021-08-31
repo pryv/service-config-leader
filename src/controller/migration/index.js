@@ -6,7 +6,7 @@ const compareVersions = require('compare-versions');
 const _ = require('lodash');
 const { setupGit, getGit } = require('./git');
 
-import type { Migration, Run } from './migrations';
+import type { Migration } from './migrations';
 const migrations: Array<Migration> = require('./migrations').migrations;
 
 type DeploymentType = 'singlenode' | 'cluster';
@@ -84,7 +84,7 @@ module.exports.checkMigrations = checkMigrations;
  * @param {*} platformVersion 
  * @param {*} targetVersion 
  */
-function computeNeededMigrations(platformVersion: string, targetVersion: string, deploymentType: DeploymentType): Array<Migration> {
+function computeNeededMigrations(platformVersion: string, targetVersion: string): Array<Migration> {
   const foundMigrations: Array<Migration> = [];
 
   if (platformVersion === targetVersion) return foundMigrations;

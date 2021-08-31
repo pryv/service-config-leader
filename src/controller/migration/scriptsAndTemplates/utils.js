@@ -91,7 +91,7 @@ function deleteRemovedSettings(platform: {}, template: {}): {} {
       delete platform.vars[mainSettingKey];
       logger.info(`removed root setting: ${mainSettingKey}`);
     } else {
-      for (const [subSettingKey, subSettingValue] of Object.entries(mainSettingValue.settings)) {
+      for (const [subSettingKey] of Object.keys(mainSettingValue.settings)) {
         if (template.vars[mainSettingKey].settings[subSettingKey] == null) {
           delete platform.vars[mainSettingKey].settings[subSettingKey];
           logger.info(`removed sub setting: ${subSettingKey}`);

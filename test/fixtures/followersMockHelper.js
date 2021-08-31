@@ -1,4 +1,4 @@
-module.exports.spy = (services) => {
- return true;
+module.exports.spy = () => {
+  return true;
 }
   

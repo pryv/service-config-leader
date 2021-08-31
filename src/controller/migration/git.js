@@ -1,6 +1,6 @@
 // @flow
 
-import simpleGit from "simple-git";
+import simpleGit from 'simple-git';
 
 let git = null
 function setupGit(settings): {} {
