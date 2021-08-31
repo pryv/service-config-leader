@@ -1,8 +1,6 @@
 // @flow
+
 const fs = require('fs');
-
-const regeneratorRuntime = require('regenerator-runtime');
-
 const assert = require('chai').assert;
 const { describe, before, it, afterEach, after } = require('mocha');
 const charlatan = require('charlatan');

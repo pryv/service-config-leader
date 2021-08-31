@@ -2,10 +2,7 @@
 
 /*global describe, before, beforeEach, it */
 
-// eslint-disable-next-line no-unused-vars
-const regeneratorRuntime = require('regenerator-runtime');
 const yaml = require('js-yaml')
-
 const path = require('path');
 const fs = require('fs');
 const assert = require('chai').assert;

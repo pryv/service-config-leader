@@ -1,7 +1,4 @@
-/*global describe, it, before, after */
-
-// eslint-disable-next-line no-unused-vars
-const regeneratorRuntime = require('regenerator-runtime');
+/*global describe, it, before*/
 
 const { assert } = require('chai');
 const path = require('path');

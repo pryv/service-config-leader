@@ -1,8 +1,5 @@
 // @flow
 
-// eslint-disable-next-line no-unused-vars
-const regeneratorRuntime = require('regenerator-runtime');
-
 const yaml = require('js-yaml');
 const fs = require('fs/promises');
 const compareVersions = require('compare-versions');

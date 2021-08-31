@@ -1,8 +1,5 @@
 // @flow
 
-// eslint-disable-next-line no-unused-vars
-const regeneratorRuntime = require('regenerator-runtime');
-
 const bluebird = require('bluebird');
 const fs = require('fs');
 const request = require('superagent');

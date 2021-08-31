@@ -1,8 +1,5 @@
 // @flow
 
-// eslint-disable-next-line no-unused-vars
-const regeneratorRuntime = require('regenerator-runtime');
-
 const _ = require('lodash');
 const express = require('express');
 const middlewares = require('@middlewares');

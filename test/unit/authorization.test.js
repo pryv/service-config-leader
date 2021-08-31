@@ -2,9 +2,6 @@
 
 /*global describe, it, beforeEach */
 
-// eslint-disable-next-line no-unused-vars
-const regeneratorRuntime = require('regenerator-runtime');
-
 const settings = (new (require('@root/settings'))()).store;
 const middlewares = require('@middlewares');
 const authMiddleware = middlewares.authorization(settings);
