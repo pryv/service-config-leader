@@ -4,7 +4,7 @@
   "description": "A service for centralization of Pryv.io configuration and distribution among all Pryv.io components.",
   "main": "index.js",
   "author": "Thiébaud Modoux",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "scripts": {
     "start": "node_modules/.bin/babel-node src/server.js --config dev-config.json",
     "start-prod": "node dist/server.js --config dev-config.json",
