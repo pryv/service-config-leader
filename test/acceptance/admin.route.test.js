@@ -217,7 +217,7 @@ describe('Test /admin endpoint', () => {
           assert.equal(failure.role, follower.role);
         } else {
           const success = successes.find((success) => success.url === follower.url);
-          assert.exists(success);
+          assert.exists(success, `expected success with ${follower.role} not found`);
           assert.equal(success.role, follower.role);
         }
       }

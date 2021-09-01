@@ -132,19 +132,24 @@ module.exports = function (
 
       const successes = [];
       const failures = [];
+
+      const requests: Array<Promise<any>> = [];
       for (const [auth, follower] of Object.entries(followers)) {
-        const followerUrl = follower.url;
-        try {
-          await request
-            .post(`${followerUrl}/notify`)
-            .set('Authorization', auth)
-            .send({ services });
-          successes.push(follower);
-        } catch (err) {
-          logger.warn('Error while notifying follower:', err);
-          failures.push({ ...follower, error: err });
-        }
+        requests.push((async () => {
+          const followerUrl = follower.url;
+          try {
+            await request
+              .post(`${followerUrl}/notify`)
+              .set('Authorization', auth)
+              .send({ services });
+            successes.push(follower);
+          } catch (e) {
+            logger.error('Error while notifying follower:', e);
+            failures.push({ ...follower, error: e });
+          }
+        })());
       }
+      await Promise.allSettled(requests);
 
       res.json({
         successes,
