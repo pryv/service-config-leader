@@ -61,13 +61,7 @@ const checkMigrations = (platform: {}, template: {}): ScheduledMigration => {
   };
 
   function validate(conf: {}, filename: string): void {
-    if (
-      conf.vars == null
-      || conf.vars.MISCELLANEOUS_SETTINGS == null
-      || conf.vars.MISCELLANEOUS_SETTINGS.settings == null
-      || conf.vars.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION == null
-      || conf.vars.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value == null
-    ) throw new Error(`template version missing in ${filename}. "vars.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value" is undefined. Please fix the service's configuration files`);
+    if (conf?.vars?.MISCELLANEOUS_SETTINGS?.settings?.TEMPLATE_VERSION?.value == null) throw new Error(`template version missing in ${filename}. "vars.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value" is undefined. Please fix the service's configuration files`);
   }
 
   function findDeploymentType(platform: {}): DeploymentType {
