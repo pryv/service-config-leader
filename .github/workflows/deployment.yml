@@ -39,6 +39,9 @@ jobs:
       - name: Npm packages installation
         run: yarn install
 
+      - name: lint
+        run: yarn lint        
+
       - name: Tests
         run: IS_CI=true yarn test
 
