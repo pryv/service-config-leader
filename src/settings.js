@@ -42,6 +42,8 @@ function nconfSettings() {
     },
   });
 
+  if (process.env.NODE_ENV === 'test') this.store.set('logs:console:active', false);
+
   return this;
 }
 

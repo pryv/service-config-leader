@@ -1,0 +1,16 @@
+vars:
+  MACHINES_AND_PLATFORM_SETTINGS:
+    name: "Machines and platform settings"
+    settings:
+      DOMAIN:
+        value: REPLACE_ME
+        description: "Domain and name of the platform"
+  MISCELLANEOUS_SETTINGS:
+    name: "Miscellaneous settings"
+    settings:
+      LICENSE_NAME:
+        value: REPLACE_ME
+        description: "License name provided with installation files"
+      TEMPLATE_VERSION: 
+        value: 1.2.3
+        description: "Version of configuration template"

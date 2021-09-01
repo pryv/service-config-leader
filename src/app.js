@@ -1,10 +1,14 @@
 // @flow
 
+// eslint-disable-next-line no-unused-vars
+const regeneratorRuntime = require('regenerator-runtime');
+
+const _ = require('lodash');
 const express = require('express');
 const middlewares = require('@middlewares');
 const fs = require('fs');
 const nconfSettings = (new (require('./settings'))).store;
-const platformSettings = require('./platform');
+const platformSettings = require('./platform')(nconfSettings);
 const Database = require('better-sqlite3');
 const CronJob = require('cron').CronJob;
 const { UsersRepository } = require('@repositories/users.repository');
@@ -16,6 +20,7 @@ const {
   PLATFORM_USERS_PERMISSIONS
 } = require('@models/permissions.model');
 const morgan = require('morgan');
+const { setupGit } = require('@controller/migration');
 
 class Application {
   express: express$Application;
@@ -25,12 +30,13 @@ class Application {
   db: Database;
   usersRepository: UsersRepository;
   tokensRepository: TokensRepository;
+  git: {};
 
   constructor(settingsOverride = {}) {
-    if (settingsOverride.nconfSettings) nconfSettings.merge(settingsOverride.nconfSettings);
-    if (settingsOverride.platformSettings) platformSettings.merge(settingsOverride.platformSettings);
-    this.settings = nconfSettings;
-    this.platformSettings = platformSettings;
+    this.settings = _.cloneDeep(nconfSettings);
+    this.platformSettings = _.cloneDeep(platformSettings);
+    if (settingsOverride.nconfSettings) this.settings.merge(settingsOverride.nconfSettings);
+    if (settingsOverride.platformSettings) this.platformSettings.merge(settingsOverride.platformSettings);
 
     this.logger = require('./utils/logging').getLogger('app');
     this.db = this.connectToDb();
@@ -40,6 +46,16 @@ class Application {
     this.generateSecrets(this.settings);
     this.generateInitialUser();
     this.startTokensBlacklistCleanupJob();
+    this.git = setupGit({
+      baseDir: this.settings.get('gitRepoPath'),
+    });
+  }
+
+  /**
+   * mandatory in production and tests requiring git (POST /admin/migrations)
+   */
+  async init() {
+    await this.git.initRepo();
   }
 
   generateSecrets(settings: Object): void {
@@ -84,7 +100,7 @@ class Application {
     const expressApp = express();
 
     expressApp.use(express.json());
-    expressApp.use(morgan('combined'));
+    expressApp.use(morgan('combined', { skip: () => process.env.NODE_ENV === 'test' }));
     expressApp.use(middlewares.cors);
 
     require('./routes/conf.route')(expressApp, settings, platformSettings);

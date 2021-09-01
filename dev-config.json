@@ -50,5 +50,10 @@
   "registerUrl": "http://localhost:8082",
   "credentials": {
     "filePath": "./credentials.txt"
+  },
+  "gitRepoPath": "./test/fixtures/config-leader/conf",
+  "platformSettings": {
+    "platformConfig": "./test/fixtures/config-leader/conf/platform.yml",
+    "platformTemplate": "./platform.yml"
   }
 }

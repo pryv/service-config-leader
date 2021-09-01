@@ -1,6 +1,11 @@
 ## 1.0
 
-### 1.1.4-5
+### 1.1.7
+
+- add /admin/migrations routes to check and apply platform config migrations
+  - including git-based versioning
+
+### 1.1.4-5-6
 
 - add Deactivate MFA route
 

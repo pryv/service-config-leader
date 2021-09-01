@@ -47,7 +47,7 @@ module.exports = function (
         let fullConf = [];
         let latestModifiedTime = 0;
         let latestModifiedFile = '';
-        platformSettings.load()
+        platformSettings.load();
         list.forEach((file) => {
           const templateConf = fs.readFileSync(file, 'utf8');
           const fileName = file.replace(confFolder, '');

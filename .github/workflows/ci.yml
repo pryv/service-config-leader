@@ -14,7 +14,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [12.13]
+        node-version: [16.4.1]
 
     steps:
       - name: Download master branch
@@ -26,7 +26,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Npm packages installation
-        run: yarn install
+        run: yarn install --frozen-lockfile # equivalent to "npm ci"
 
       - name: Tests
-        run: yarn test
+        run: IS_CI=true yarn test

@@ -59,12 +59,12 @@ vars:
     name: Advanced API settings
     settings:
       VERSIONING_SETTINGS:
-        description:
-          "forceKeepHistory: when true, modification history of items is stored,
+        description: >
+          forceKeepHistory: when true, modification history of items is stored,
           keep-authors: defines the behaviour of items deletion:
           - 'keep-nothing': Delete history, keep head as itemDeletion as it is now by default.
           - 'keep-authors': Keep fields 'headId', 'id', 'modified', 'modifiedBy' in head and history.
-          - 'keep-everything': Add 'deleted' field to head item, leave history as is."
+          - 'keep-everything': Add 'deleted' field to head item, leave history as is.
         value:
           forceKeepHistory: false
           deletionMode: keep-authors
@@ -93,13 +93,10 @@ vars:
         value: 1800
         description: "Duration in seconds after which MFA sessions are destroyed"
       MFA_SMS_API_SETTINGS:
-        description: "Allow to define an external SMS API handling the MFA challenge. API endpoints that allow to trigger and verify the MFA challenge as well as the API key that will be passed as 'Authorization' header"
+        description: "Allow to define an external SMS API handling the MFA challenge. API endpoints that allow to trigger and verify the MFA challenge as well  as the API key that will be passed as 'Authorization' header"
         value:
           endpoints:
             challenge: https://challenge.api.com
             verify: https://verify.api.com
           auth: key_abcd
-  updatedProp:
-    settings:
-      SOME_SETTING:
-        value: updatedVal
+
