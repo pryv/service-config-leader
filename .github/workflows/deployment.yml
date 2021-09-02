@@ -37,7 +37,7 @@ jobs:
           docker tag "${{ secrets.REGISTRY_PRYV_SERVER }}/pryvio/base:1.5.1" "pryvio/base:1.5.1"
 
       - name: Npm packages installation
-        run: yarn install
+        run: yarn install --frozen-lockfile # equivalent to "npm ci"
 
       - name: lint
         run: yarn lint        
