@@ -323,7 +323,7 @@ describe('Test /admin endpoint', () => {
     });
   });
 
-  describe('POST /admin/migrations', () => {
+  describe('POST /admin/migrations/apply', () => {
     let templatePath;
     before(() => {
       templatePath = path.resolve(__dirname, '../../src/controller/migration/scriptsAndTemplates/cluster/1.7.0-template.yml');
@@ -359,7 +359,7 @@ describe('Test /admin endpoint', () => {
               this.skip();
             }
             const res = await request
-              .post('/admin/migrations')
+              .post('/admin/migrations/apply')
               .set('Authorization', updateOnlyToken);
             assert.equal(res.status, 200);
             const { migrations } = res.body;
@@ -391,7 +391,7 @@ describe('Test /admin endpoint', () => {
           });
           it('must return a 400 error and not alter the platform.yml', async () => {
             const res = await request
-              .post('/admin/migrations')
+              .post('/admin/migrations/apply')
               .set('Authorization', updateOnlyToken);
             assert.equal(res.status, 500);
             assert.equal(fs.readFileSync(platformPath, 'utf-8'), originalPlatform);
@@ -415,7 +415,7 @@ describe('Test /admin endpoint', () => {
           });
           it('must return a 400 error and not alter the platform.yml', async () => {
             const res = await request
-              .post('/admin/migrations')
+              .post('/admin/migrations/apply')
               .set('Authorization', updateOnlyToken);
             assert.equal(res.status, 500);
             assert.equal(res.body.error.message, 'No migration available from 1.2.3 to 1.7.0. Contact Pryv support for more information');
@@ -426,7 +426,7 @@ describe('Test /admin endpoint', () => {
       describe('when the user has insufficient permissions', () => {
         it('must return a 401 error', async () => {
           const res = await request
-            .post('/admin/migrations')
+            .post('/admin/migrations/apply')
             .set('Authorization', readOnlyToken);
           assert.equal(res.status, 401);
         });
@@ -455,7 +455,7 @@ describe('Test /admin endpoint', () => {
 
         it('must not alter the platform configuration and return an empty list', async () => {
           const res = await request
-            .post('/admin/migrations')
+            .post('/admin/migrations/apply')
             .set('Authorization', updateOnlyToken);
           assert.equal(res.status, 200);
           assert.deepEqual(res.body.migrations, []);

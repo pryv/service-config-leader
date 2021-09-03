@@ -57,7 +57,7 @@ class Application {
   }
 
   /**
-   * mandatory in production and tests requiring git (POST /admin/migrations)
+   * mandatory in production and tests requiring git (POST /admin/migrations/apply)
    */
   async init() {
     await this.git.initRepo();

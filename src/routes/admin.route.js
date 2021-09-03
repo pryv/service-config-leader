@@ -179,7 +179,7 @@ module.exports = function (
   );
 
   expressApp.post(
-    '/admin/migrations',
+    '/admin/migrations/apply',
     authorizationService.verifyIsAllowedTo(SETTINGS_PERMISSIONS.UPDATE),
     async (
       req: express$Request,

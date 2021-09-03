@@ -160,6 +160,6 @@ const writePlatform = async (settings: {}, platform: {}, author: string): Promis
   await fs.writeFile(settings.get('platformSettings:platformConfig'), yaml.dump(platform, yamlWriteOptions));
 
   const git: {} = getGit();
-  await git.commitChanges(`update through POST /admin/migrations by ${author}`);
+  await git.commitChanges(`update through POST /admin/migrations/apply by ${author}`);
 };
 module.exports.writePlatform = writePlatform;
