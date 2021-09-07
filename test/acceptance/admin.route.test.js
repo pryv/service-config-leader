@@ -55,7 +55,6 @@ describe('Test /admin endpoint', () => {
     });
 
     deleteAllStmt = app.db.prepare('DELETE FROM users;');
-
     deleteAllStmt.run();
 
     app.usersRepository.createUser(userOnlyReadPerm);

@@ -131,16 +131,3 @@ const loadPlatformTemplate = async (settings: {}): Promise<{}> => {
   }
 };
 module.exports.loadPlatformTemplate = loadPlatformTemplate;
-
-/**
- * Writes the content of platform and version it using git
- *
- * @param {*} platformSettings
- * @param {*} author
- */
-const writePlatform = async (platformSettings: {}, author: string): Promise<void> => {
-  await bluebird.fromCallback(cb => platformSettings.save(cb));
-  const git: {} = getGit();
-  await git.commitChanges(`update through POST /admin/upgrades by ${author}`);
-};
-module.exports.writePlatform = writePlatform;

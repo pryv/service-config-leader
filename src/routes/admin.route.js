@@ -23,7 +23,7 @@ const UsersRepository = require('@repositories/users.repository');
 const TokensRepository = require('@repositories/tokens.repository');
 const { getGit } = require('@controller/migration/git');
 const {
-  loadPlatformTemplate, writePlatform, checkMigrations, migrate,
+  loadPlatformTemplate, checkMigrations, migrate,
 } = require('@controller/migration');
 
 module.exports = function (
