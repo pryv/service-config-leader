@@ -1,9 +1,14 @@
 // @flow
 
+const path = require('path');
 const nconf = require('nconf');
 
+let store;
 function nconfSettings() {
-  const store = new nconf.Provider();
+
+  if (store != null) return store;
+
+  store = new nconf.Provider();
 
   // 1. `process.env`
   // 2. `process.argv`
