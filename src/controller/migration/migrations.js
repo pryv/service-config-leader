@@ -21,11 +21,11 @@ const migrations: Array<Migration> = addTemplateUpgradeToEmptyRuns([
     versionTo: '1.6.0',
     singlenode: {
       run: require('./scriptsAndTemplates/single-node/1.6.0'),
-      template: yaml.load(fs.readFileSync(path.resolve(__dirname, 'scriptsAndTemplates/single-node/1.6.0-template.yml'), 'utf-8')),
+      template: loadTemplate('scriptsAndTemplates/single-node/1.6.0-template.yml'),
     },
     cluster: {
       run: require('./scriptsAndTemplates/cluster/1.6.0'),
-      template: yaml.load(fs.readFileSync(path.resolve(__dirname, 'scriptsAndTemplates/cluster/1.6.0-template.yml'), 'utf-8')),
+      template: loadTemplate('scriptsAndTemplates/cluster/1.6.0-template.yml'),
     },
   },
   {
@@ -33,11 +33,11 @@ const migrations: Array<Migration> = addTemplateUpgradeToEmptyRuns([
     versionTo: '1.6.4',
     singlenode: {
       run: require('./scriptsAndTemplates/single-node/1.6.4'),
-      template: yaml.load(fs.readFileSync(path.resolve(__dirname, 'scriptsAndTemplates/single-node/1.6.4-template.yml'), 'utf-8')),
+      template: loadTemplate('scriptsAndTemplates/single-node/1.6.4-template.yml'),
     },
     cluster: {
       run: require('./scriptsAndTemplates/cluster/1.6.4'),
-      template: yaml.load(fs.readFileSync(path.resolve(__dirname, 'scriptsAndTemplates/cluster/1.6.4-template.yml'), 'utf-8')),
+      template: loadTemplate('scriptsAndTemplates/cluster/1.6.4-template.yml'),
     },
   },
   {
@@ -45,11 +45,11 @@ const migrations: Array<Migration> = addTemplateUpgradeToEmptyRuns([
     versionTo: '1.6.12',
     singlenode: {
       run: require('./scriptsAndTemplates/single-node/1.6.12'),
-      template: yaml.load(fs.readFileSync(path.resolve(__dirname, 'scriptsAndTemplates/single-node/1.6.12-template.yml'), 'utf-8')),
+      template: loadTemplate('scriptsAndTemplates/single-node/1.6.12-template.yml'),
     },
     cluster: {
       run: require('./scriptsAndTemplates/cluster/1.6.12'),
-      template: yaml.load(fs.readFileSync(path.resolve(__dirname, 'scriptsAndTemplates/cluster/1.6.12-template.yml'), 'utf-8')),
+      template: loadTemplate('scriptsAndTemplates/cluster/1.6.12-template.yml'),
     },
   },
   {
@@ -57,11 +57,11 @@ const migrations: Array<Migration> = addTemplateUpgradeToEmptyRuns([
     versionTo: '1.6.15',
     singlenode: {
       run: require('./scriptsAndTemplates/single-node/1.6.15'),
-      template: yaml.load(fs.readFileSync(path.resolve(__dirname, 'scriptsAndTemplates/single-node/1.6.15-template.yml'), 'utf-8')),
+      template: loadTemplate('scriptsAndTemplates/single-node/1.6.15-template.yml'),
     },
     cluster: {
       run: require('./scriptsAndTemplates/cluster/1.6.15'),
-      template: yaml.load(fs.readFileSync(path.resolve(__dirname, 'scriptsAndTemplates/cluster/1.6.15-template.yml'), 'utf-8')),
+      template: loadTemplate('scriptsAndTemplates/cluster/1.6.15-template.yml'),
     },
   },
   {
@@ -69,11 +69,11 @@ const migrations: Array<Migration> = addTemplateUpgradeToEmptyRuns([
     versionTo: '1.6.21',
     singlenode: {
       run: require('./scriptsAndTemplates/single-node/1.6.21'),
-      template: yaml.load(fs.readFileSync(path.resolve(__dirname, 'scriptsAndTemplates/single-node/1.6.21-template.yml'), 'utf-8')),
+      template: loadTemplate('scriptsAndTemplates/single-node/1.6.21-template.yml'),
     },
     cluster: {
       run: require('./scriptsAndTemplates/cluster/1.6.21'),
-      template: yaml.load(fs.readFileSync(path.resolve(__dirname, 'scriptsAndTemplates/cluster/1.6.21-template.yml'), 'utf-8')),
+      template: loadTemplate('scriptsAndTemplates/cluster/1.6.21-template.yml'),
     },
   },
   {
@@ -81,7 +81,7 @@ const migrations: Array<Migration> = addTemplateUpgradeToEmptyRuns([
     versionTo: '1.6.22',
     cluster: {
       run: require('./scriptsAndTemplates/cluster/1.6.22'),
-      template: yaml.load(fs.readFileSync(path.resolve(__dirname, 'scriptsAndTemplates/cluster/1.6.22-template.yml'), 'utf-8')),
+      template: loadTemplate('scriptsAndTemplates/cluster/1.6.22-template.yml'),
     },
   },
   {
@@ -89,7 +89,7 @@ const migrations: Array<Migration> = addTemplateUpgradeToEmptyRuns([
     versionTo: '1.6.23',
     singlenode: {
       run: require('./scriptsAndTemplates/single-node/1.6.23'),
-      template: yaml.load(fs.readFileSync(path.resolve(__dirname, 'scriptsAndTemplates/single-node/1.6.23-template.yml'), 'utf-8')),
+      template: loadTemplate('scriptsAndTemplates/single-node/1.6.23-template.yml'),
     },
   },
   {
@@ -97,15 +97,19 @@ const migrations: Array<Migration> = addTemplateUpgradeToEmptyRuns([
     versionTo: '1.7.0',
     singlenode: {
       run: require('./scriptsAndTemplates/single-node/1.7.0'),
-      template: yaml.load(fs.readFileSync(path.resolve(__dirname, 'scriptsAndTemplates/single-node/1.7.0-template.yml'), 'utf-8')),
+      template: loadTemplate('scriptsAndTemplates/single-node/1.7.0-template.yml'),
     },
     cluster: {
       run: require('./scriptsAndTemplates/cluster/1.7.0'),
-      template: yaml.load(fs.readFileSync(path.resolve(__dirname, 'scriptsAndTemplates/cluster/1.7.0-template.yml'), 'utf-8')),
+      template: loadTemplate('scriptsAndTemplates/cluster/1.7.0-template.yml'),
     },
   },
 ]);
 
+/**
+ * 
+ * @param {*} migrations 
+ */
 function addTemplateUpgradeToEmptyRuns(migrations: Array<Migration>): Array<Migration> {
   for (const migration of migrations) {
     if (migration.cluster == null) migration.cluster = addRun(migration.versionTo);
@@ -116,12 +120,22 @@ function addTemplateUpgradeToEmptyRuns(migrations: Array<Migration>): Array<Migr
   function addRun(version: string): Run {
     return {
       run: (platform: {}) => {
-        platform.vars.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value = version;
+        platform.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value = version;
         return platform;
       },
       template: {},
     };
   }
+}
+
+/**
+ * Loads the template, returns .vars
+ * 
+ * @param {*} filePath the file path, relative to this directory
+ */
+function loadTemplate(filePath: string): {} {
+  const template = yaml.load(fs.readFileSync(path.resolve(__dirname, filePath), 'utf-8'));
+  return template.vars;
 }
 
 module.exports.migrations = migrations;

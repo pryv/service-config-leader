@@ -1,7 +1,7 @@
 // @flow
 
 const winston = require('winston');
-const settings = (new (require('@root/settings'))()).store;
+const settings = require('@root/settings')();
 
 // Setup logging levels (match logging methods below)
 const levels = Object.freeze({

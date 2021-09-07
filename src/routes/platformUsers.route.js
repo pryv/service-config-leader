@@ -56,7 +56,8 @@ module.exports = function (
       res: express$Response,
       next: express$NextFunction,
     ) => {
-      const accountDeletions: Array<string> = platformSettings.get('vars:API_SETTINGS:settings:ACCOUNT_DELETION:value');
+      await platformSettings.load();
+      const accountDeletions: Array<string> = platformSettings.get()?.API_SETTINGS?.settings?.ACCOUNT_DELETION?.value;
       const isDeleteAllowed: boolean = accountDeletions.includes('adminToken');
       if (!isDeleteAllowed) {
         const error: any = new Error('Platform user deletion is disabled. Refer to your platform configuration.');
@@ -110,7 +111,7 @@ module.exports = function (
         });
         if (unexpectedError != null) {
           logger.warn('Error while deleting user:', unexpectedError);
-          return res.status(unexpectedError.status).json(unexpectedError.response || unexpectedError.message);
+          return res.status(unexpectedError.status || 500).json(unexpectedError.response || unexpectedError.message);
         }
         // continue with call to reg
       }

@@ -6,6 +6,7 @@ const yaml = require('js-yaml');
 const fs = require('fs/promises');
 const compareVersions = require('compare-versions');
 const _ = require('lodash');
+const bluebird = require('bluebird');
 const logger = require('@utils/logging').getLogger('migration');
 const { setupGit, getGit } = require('./git');
 const { migrations } = require('./migrations');
@@ -51,8 +52,8 @@ const checkMigrations = (platform: {}, template: {}): ScheduledMigration => {
   validate(platform, 'platform.yml');
   validate(template, 'template-platform.yml');
 
-  const platformVersion: string = platform.vars.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value;
-  const targetVersion: string = template.vars.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value;
+  const platformVersion: string = platform.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value;
+  const targetVersion: string = template.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value;
 
   const deploymentType: DeploymentType = findDeploymentType(platform);
   return {
@@ -61,11 +62,11 @@ const checkMigrations = (platform: {}, template: {}): ScheduledMigration => {
   };
 
   function validate(conf: {}, filename: string): void {
-    if (conf?.vars?.MISCELLANEOUS_SETTINGS?.settings?.TEMPLATE_VERSION?.value == null) throw new Error(`template version missing in ${filename}. "vars.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value" is undefined. Please fix the service's configuration files`);
+    if (conf?.MISCELLANEOUS_SETTINGS?.settings?.TEMPLATE_VERSION?.value == null) throw new Error(`template version missing in ${filename}. "MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value" is undefined. Please fix the service's configuration files`);
   }
 
   function findDeploymentType(platform: {}): DeploymentType {
-    if (platform.vars.MACHINES_AND_PLATFORM_SETTINGS.settings.SINGLE_MACHINE_IP_ADDRESS != null) return 'singlenode';
+    if (platform.MACHINES_AND_PLATFORM_SETTINGS.settings.SINGLE_MACHINE_IP_ADDRESS != null) return 'singlenode';
     return 'cluster';
   }
 };
@@ -123,7 +124,8 @@ const loadPlatformTemplate = async (settings: {}): Promise<{}> => {
   const platformTemplate: string = settings.get('platformSettings:platformTemplate');
   if (platformTemplate == null) throw new Error('platformSettings:platformTemplate not set in config-leader.json. Config migrations will not work.');
   try {
-    return yaml.load(await fs.readFile(platformTemplate, { encoding: 'utf-8' }));
+    const template = yaml.load(await fs.readFile(platformTemplate, { encoding: 'utf-8' }));
+    return template.vars;
   } catch (e) {
     throw new Error(`Error while reading and parsing template platform file at ${platformTemplate}. ${e}`);
   }
@@ -131,35 +133,14 @@ const loadPlatformTemplate = async (settings: {}): Promise<{}> => {
 module.exports.loadPlatformTemplate = loadPlatformTemplate;
 
 /**
- * load platform from its settings value
+ * Writes the content of platform and version it using git
  *
- * @param {*} settings
+ * @param {*} platformSettings
+ * @param {*} author
  */
-const loadPlatform = async (settings: {}): Promise<{}> => {
-  const platform: string = settings.get('platformSettings:platformConfig');
-  if (platform == null) throw new Error('platformSettings:platformConfig not set in config-leader.json. Config migrations will not work.');
-  try {
-    return yaml.load(await fs.readFile(platform, { encoding: 'utf-8' }));
-  } catch (e) {
-    throw new Error(`Error while reading and parsing platform file at ${platform}. ${e}`);
-  }
-};
-module.exports.loadPlatform = loadPlatform;
-
-/**
- * Writes the content of platform into 'platformSettings:platformConfig' from the setings
- *
- * @param {*} settings
- * @param {*} platform
- */
-const writePlatform = async (settings: {}, platform: {}, author: string): Promise<void> => {
-  const yamlWriteOptions: {} = {
-    forceQuotes: true,
-    quotingType: '"',
-  };
-  await fs.writeFile(settings.get('platformSettings:platformConfig'), yaml.dump(platform, yamlWriteOptions));
-
+const writePlatform = async (platformSettings: {}, author: string): Promise<void> => {
+  await bluebird.fromCallback(cb => platformSettings.save(cb));
   const git: {} = getGit();
-  await git.commitChanges(`update through POST /admin/migrations/apply by ${author}`);
+  await git.commitChanges(`update through POST /admin/upgrades by ${author}`);
 };
 module.exports.writePlatform = writePlatform;

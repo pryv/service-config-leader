@@ -23,13 +23,13 @@ const UsersRepository = require('@repositories/users.repository');
 const TokensRepository = require('@repositories/tokens.repository');
 const { getGit } = require('@controller/migration/git');
 const {
-  loadPlatformTemplate, loadPlatform, writePlatform, checkMigrations, migrate,
+  loadPlatformTemplate, writePlatform, checkMigrations, migrate,
 } = require('@controller/migration');
 
 module.exports = function (
   expressApp: express$Application,
   settings: Object,
-  platformSettings: Object,
+  platformSettings: {},
   usersRepository: UsersRepository,
   tokensRepository: TokensRepository,
 ) {
@@ -48,14 +48,15 @@ module.exports = function (
       res: express$Response,
       next: express$NextFunction,
     ) => {
-      const previousSettings = platformSettings.get('vars');
-      const templatesPath = settings.get('templatesPath');
-      const newSettings = { ...previousSettings, ...req.body };
-
-      const list = [];
-      listConfFiles(templatesPath, list);
-
       try {
+        await platformSettings.load();
+        const previousSettings = platformSettings.get()
+        const templatesPath = settings.get('templatesPath');
+        const newSettings = { ...previousSettings, ...req.body };
+
+        const list = [];
+        listConfFiles(templatesPath, list);
+        
         list.forEach((file) => {
           const templateConf = fs.readFileSync(file, 'utf8');
           const newConf = applySubstitutions(
@@ -69,30 +70,14 @@ module.exports = function (
             );
           }
         });
+        await platformSettings.save(newSettings, `update through PUT /admin/settings by ${res.locals.username}`);
+
+        return res.send({
+          settings: newSettings,
+        });
       } catch (err) {
         return next(err);
       }
-
-      platformSettings.set('vars', newSettings);
-
-      try {
-        await bluebird.fromCallback((cb) => platformSettings.save(cb));
-      } catch (err) {
-        platformSettings.set('vars', previousSettings);
-        return next(err);
-      }
-
-      try {
-        // perform git commit
-        const git: {} = getGit();
-        await git.commitChanges(`update through PUT /admin/settings by ${res.locals.username}`);
-      } catch (err) {
-        return next(err);
-      }
-
-      return res.send({
-        settings: newSettings,
-      });
     },
   );
 
@@ -100,18 +85,24 @@ module.exports = function (
   expressApp.get(
     '/admin/settings',
     authorizationService.verifyIsAllowedTo(SETTINGS_PERMISSIONS.READ),
-    (
+    async (
       req: express$Request,
       res: express$Response,
       next: express$NextFunction,
     ) => {
-      const currentSettings = platformSettings.get('vars');
-      if (currentSettings == null) {
-        next(new Error('Missing platform settings.'));
-      }
-      res.json({
-        settings: currentSettings,
-      });
+      try {
+        await platformSettings.load();
+        const currentSettings = platformSettings.get();
+        if (currentSettings == null) {
+          next(new Error('Missing platform settings.'));
+        }
+        res.json({
+          settings: currentSettings,
+        });
+      } catch (err) {
+        return next(err);
+      } 
+      
     },
   );
 
@@ -168,7 +159,8 @@ module.exports = function (
       next: express$NextFunction,
     ) => {
       try {
-        const platform = await loadPlatform(settings);
+        await platformSettings.load();
+        const platform = platformSettings.get();
         const platformTemplate = await loadPlatformTemplate(settings);
         const migrations = checkMigrations(platform, platformTemplate).migrations.map((m) => _.pick(m, ['versionsFrom', 'versionTo']));
         res.json({ migrations });
@@ -187,10 +179,12 @@ module.exports = function (
       next: express$NextFunction,
     ) => {
       try {
-        const platform = await loadPlatform(settings);
+        await platformSettings.load();
+        const platform = platformSettings.get();
         const platformTemplate = await loadPlatformTemplate(settings);
         const { migrations, migratedPlatform } = migrate(platform, platformTemplate);
-        if (migrations.length > 0) await writePlatform(settings, migratedPlatform, res.locals.username);
+        
+        if (migrations.length > 0) await platformSettings.save(migratedPlatform, `update through POST /admin/migrations/apply by ${res.locals.username}`);
         res.json({ migrations: migrations.map((m) => _.pick(m, ['versionsFrom', 'versionTo'])) });
       } catch (e) {
         next(e);

@@ -95,6 +95,7 @@ describe('migration', () => {
   });
 
   function parseYamlFile(filepath) {
-    return yaml.load(fs.readFileSync(filepath, { encoding: 'utf-8' }));
+    const file = yaml.load(fs.readFileSync(filepath, { encoding: 'utf-8' }));
+    return file.vars;
   }
 });

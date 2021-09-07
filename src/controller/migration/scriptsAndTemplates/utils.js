@@ -24,8 +24,8 @@ function baseWork(platform: {}, template: {}): {} {
    * @param {*} template content of template platform.yml
    */
   function updateTemplateVersion(platform: {}, template: {}): {} {
-    const templateVersion: string = template.vars.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value;
-    platform.vars.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value = templateVersion;
+    const templateVersion: string = template.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value;
+    platform.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value = templateVersion;
     logger.info(`updated template version to: ${templateVersion}`);
     return platform;
   }
@@ -37,12 +37,12 @@ function baseWork(platform: {}, template: {}): {} {
    * @param {*} template content of template platform.yml
    */
   function alignMetadata(platform: {}, template: {}): {} {
-    for (const [mainSettingKey, mainSettingValue] of Object.entries(template.vars)) {
-      platform.vars[mainSettingKey].name = mainSettingValue.name;
+    for (const [mainSettingKey, mainSettingValue] of Object.entries(template)) {
+      platform[mainSettingKey].name = mainSettingValue.name;
       for (const [subSettingKey, subSettingValue] of Object.entries(mainSettingValue.settings)) {
-        platform.vars[mainSettingKey].settings[subSettingKey].description = subSettingValue.description;
+        platform[mainSettingKey].settings[subSettingKey].description = subSettingValue.description;
         if (subSettingValue.optional != null) {
-          platform.vars[mainSettingKey].settings[subSettingKey].optional = subSettingValue.optional;
+          platform[mainSettingKey].settings[subSettingKey].optional = subSettingValue.optional;
         }
       }
     }
@@ -57,14 +57,14 @@ function baseWork(platform: {}, template: {}): {} {
    * @param {*} template content of template platform.yml
    */
   function addNewSettings(platform: {}, template: {}): {} {
-    for (const [mainSettingKey, mainSettingValue] of Object.entries(template.vars)) {
-      if (platform.vars[mainSettingKey] == null) {
-        platform.vars[mainSettingKey] = mainSettingValue;
+    for (const [mainSettingKey, mainSettingValue] of Object.entries(template)) {
+      if (platform[mainSettingKey] == null) {
+        platform[mainSettingKey] = mainSettingValue;
         logger.info(`added new root setting: ${mainSettingKey}`);
       } else {
         for (const [subSettingKey, subSettingValue] of Object.entries(mainSettingValue.settings)) {
-          if (platform.vars[mainSettingKey].settings[subSettingKey] == null) {
-            platform.vars[mainSettingKey].settings[subSettingKey] = subSettingValue;
+          if (platform[mainSettingKey].settings[subSettingKey] == null) {
+            platform[mainSettingKey].settings[subSettingKey] = subSettingValue;
             logger.info(`added new sub setting: ${subSettingKey}`);
           }
         }
@@ -83,14 +83,14 @@ module.exports.baseWork = baseWork;
  * @param {*} template
  */
 function deleteRemovedSettings(platform: {}, template: {}): {} {
-  for (const [mainSettingKey, mainSettingValue] of Object.entries(platform.vars)) {
-    if (template.vars[mainSettingKey] == null) {
-      delete platform.vars[mainSettingKey];
+  for (const [mainSettingKey, mainSettingValue] of Object.entries(platform)) {
+    if (template[mainSettingKey] == null) {
+      delete platform[mainSettingKey];
       logger.info(`removed root setting: ${mainSettingKey}`);
     } else {
       for (const subSettingKey of Object.keys(mainSettingValue.settings)) {
-        if (template.vars[mainSettingKey].settings[subSettingKey] == null) {
-          delete platform.vars[mainSettingKey].settings[subSettingKey];
+        if (template[mainSettingKey].settings[subSettingKey] == null) {
+          delete platform[mainSettingKey].settings[subSettingKey];
           logger.info(`removed sub setting: ${subSettingKey}`);
         }
       }

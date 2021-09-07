@@ -80,7 +80,6 @@ describe('Test /admin endpoint', () => {
       .put('/admin/settings')
       .set('Authorization', updateOnlyToken)
       .send({});
-
     const { headers } = res;
 
     assert.isDefined(headers['access-control-allow-origin']);
@@ -142,7 +141,7 @@ describe('Test /admin endpoint', () => {
         // for some reason, in CI, the "git commit" action can't figure out the author
         this.skip();
       }
-      const previousSettings = platformSettings.get('vars');
+      const previousSettings = platformSettings.get();
       const update = {
         updatedProp: { settings: { SOME_SETTING: { value: 'updatedVal' } } },
       };
@@ -153,11 +152,11 @@ describe('Test /admin endpoint', () => {
         .send(update)
         .set('Authorization', updateOnlyToken);
       assert.strictEqual(res.status, 200);
-      assert.deepEqual(res.body.settings, updatedSettings);
-      assert.deepEqual(platformSettings.get('vars'), updatedSettings);
+      assert.deepEqual(res.body.settings, updatedSettings, 'settings in API response do not match updated ones');
+      assert.deepEqual(platformSettings.get(), updatedSettings, 'settings in memory do not match updated ones');
       const ymlFile = fs.readFileSync(platformPath, 'utf8');
       const platform = yaml.load(ymlFile);
-      assert.deepEqual(platform.vars, updatedSettings);
+      assert.deepEqual(platform.vars, updatedSettings, 'settings on disk do not match updated ones');
 
       const logs = await gitClient.log();
       assert.equal(logs.all[0].message, 'update through PUT /admin/settings by userOnlyUpdatePerm');
@@ -331,11 +330,11 @@ describe('Test /admin endpoint', () => {
 
     describe('when there is an update', () => {
       let request; let backupPlatform; let platformPath; let
-          expectedPlatform;
+          expectedPlatform, app;
       before(async () => {
         platformPath = path.resolve(__dirname, '../fixtures/migration-needed/1.7.0/platform.yml');
         expectedPlatform = yaml.load(fs.readFileSync(path.resolve(__dirname, '../fixtures/migration-needed/1.7.0/expected.yml'), 'utf-8'));
-        const app = new Application({
+        app = new Application({
           nconfSettings: {
             platformSettings: {
               platformConfig: platformPath,
@@ -369,7 +368,8 @@ describe('Test /admin endpoint', () => {
               { versionsFrom: ['1.6.23'], versionTo: '1.7.0' },
             ]);
             const migratedPlatform = yaml.load(fs.readFileSync(platformPath));
-            assert.deepEqual(migratedPlatform, expectedPlatform);
+            assert.deepEqual(migratedPlatform, expectedPlatform, 'platform configuration not migrated on disk');
+            assert.deepEqual(app.platformSettings.get(), expectedPlatform.vars, 'platform configuration not migrated in memory');
           });
         });
 

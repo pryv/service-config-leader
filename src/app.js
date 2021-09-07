@@ -6,7 +6,7 @@ const _ = require('lodash');
 const express = require('express');
 const middlewares = require('@middlewares');
 const fs = require('fs');
-const nconfSettings = (new (require('./settings'))()).store;
+//const nconfSettings = (new (require('./settings'))()).store;
 const Database = require('better-sqlite3');
 const { CronJob } = require('cron');
 const UsersRepository = require('@repositories/users.repository');
@@ -18,7 +18,7 @@ const {
 } = require('@models/permissions.model');
 const morgan = require('morgan');
 const { setupGit } = require('@controller/migration');
-const platformSettings = require('./platform')(nconfSettings);
+//const platformSettings = require('./platform')(nconfSettings);
 
 class Application {
   express: express$Application;
@@ -37,12 +37,11 @@ class Application {
 
   git: {};
 
-  constructor(settingsOverride = {}) {
-    this.settings = _.cloneDeep(nconfSettings);
-    this.platformSettings = _.cloneDeep(platformSettings);
+  constructor(settingsOverride: {} = {}) {
+    this.settings = require('./settings')();
     if (settingsOverride.nconfSettings) this.settings.merge(settingsOverride.nconfSettings);
-    if (settingsOverride.platformSettings) this.platformSettings.merge(settingsOverride.platformSettings);
-
+    this.platformSettings = require('./platform')(this.settings);
+    if (settingsOverride.platformSettings) this.platformSettings.setOverrides(settingsOverride.platformSettings);
     this.logger = require('./utils/logging').getLogger('app');
     this.db = this.connectToDb();
     this.usersRepository = new UsersRepository(this.db);
@@ -60,6 +59,7 @@ class Application {
    * mandatory in production and tests requiring git (POST /admin/migrations/apply)
    */
   async init() {
+    await this.platformSettings.load();
     await this.git.initRepo();
   }
 

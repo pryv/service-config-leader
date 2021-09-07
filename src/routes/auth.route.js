@@ -6,7 +6,7 @@ const { createValidator } = require('express-joi-validation');
 const UsersRepository = require('@repositories/users.repository');
 const { sign } = require('jsonwebtoken');
 const TokensRepository = require('@repositories/tokens.repository');
-const nconfSettings = (new (require('@root/settings'))()).store;
+const nconfSettings = require('@root/settings')();
 const verifyToken = require('@middlewares/security/token.verification');
 const { userLoginSchema } = require('./validation/user.schema');
 

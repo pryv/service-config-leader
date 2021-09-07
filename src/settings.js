@@ -3,21 +3,21 @@
 const nconf = require('nconf');
 
 function nconfSettings() {
-  this.store = new nconf.Provider();
+  const store = new nconf.Provider();
 
   // 1. `process.env`
   // 2. `process.argv`
   //
-  this.store.env().argv();
+  store.env().argv();
 
   // 3. Values in `config.json`
   //
-  const configFile = this.store.get('config') || 'dev-config.json';
-  this.store.file({ file: configFile });
+  const configFile = store.get('config') || 'dev-config.json';
+  store.file({ file: configFile });
 
   // 4. Any default values
   //
-  this.store.defaults({
+  store.defaults({
     http: {
       port: 7000,
       ip: '127.0.0.1',
@@ -41,9 +41,9 @@ function nconfSettings() {
     },
   });
 
-  if (process.env.NODE_ENV === 'test') this.store.set('logs:console:active', false);
+  if (process.env.NODE_ENV === 'test') store.set('logs:console:active', false);
 
-  return this;
+  return store;
 }
 
 module.exports = nconfSettings;

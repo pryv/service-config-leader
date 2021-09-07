@@ -9,6 +9,7 @@ import {
 
 const path = require('path');
 const fs = require('fs');
+const bluebird = require('bluebird');
 const errorsFactory = require('@utils/errorsHandling').factory;
 const middlewares = require('@middlewares');
 const logger = require('@utils/logging').getLogger('conf');
@@ -23,7 +24,7 @@ module.exports = function (
   // GET /conf: serve full configuration for given Pryv.io role
   expressApp.get(
     '/conf',
-    (
+    async (
       req: express$Request,
       res: express$Response,
       next: express$NextFunction,
@@ -48,14 +49,14 @@ module.exports = function (
         const fullConf = [];
         let latestModifiedTime = 0;
         let latestModifiedFile = '';
-        platformSettings.load();
+        await platformSettings.load();
         list.forEach((file) => {
           const templateConf = fs.readFileSync(file, 'utf8');
           const fileName = file.replace(confFolder, '');
           const newConf = applySubstitutions(
             templateConf,
             settings,
-            platformSettings.get('vars'),
+            platformSettings.get(),
           );
           if (isJSONFile(file) && !isValidJSON(newConf)) {
             throw errorsFactory.unexpectedError(

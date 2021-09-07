@@ -1,7 +1,7 @@
 // @flow
 
 const nock = require('nock');
-const settings = (new (require('@root/settings'))()).store;
+const settings = require('@root/settings')();
 const helper = require('./followersMockHelper');
 
 module.exports.server = () => {

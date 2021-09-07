@@ -2,7 +2,7 @@
 
 /* global describe, it, beforeEach */
 
-const settings = (new (require('@root/settings'))()).store;
+const settings = require('@root/settings')();
 const middlewares = require('@middlewares');
 
 const authMiddleware = middlewares.authorization(settings);
