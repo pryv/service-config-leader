@@ -16,6 +16,7 @@ const { SETTINGS_PERMISSIONS } = require('@models/permissions.model');
 const simpleGit = require('simple-git');
 const helper = require('../fixtures/followersMockHelper');
 const mockFollowers = require('../fixtures/followersMock');
+const { injectTestSettings, getSettings } = require('@root/settings');
 
 describe('Test /admin endpoint', () => {
   let readOnlyToken;
@@ -50,9 +51,6 @@ describe('Test /admin endpoint', () => {
         users: [],
       },
     };
-    after(() => {
-      fs.writeFileSync(platformPath, platformBackup);
-    });
 
     deleteAllStmt = app.db.prepare('DELETE FROM users;');
     deleteAllStmt.run();
@@ -72,6 +70,8 @@ describe('Test /admin endpoint', () => {
 
   after(() => {
     deleteAllStmt.run();
+    fs.writeFileSync(platformPath, platformBackup);
+    injectTestSettings({});
   });
 
   it('responds with CORS related headers', async () => {

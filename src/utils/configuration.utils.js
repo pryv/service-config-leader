@@ -2,6 +2,7 @@
 
 const path = require('path');
 const fs = require('fs');
+const logger = require('./logging').getLogger('conf-utils');
 
 export function applySubstitutions(
   template: string,
@@ -61,11 +62,12 @@ export function isValidJSON(text: string) {
   try {
     JSON.parse(text);
   } catch (e) {
+    logger.error(e);
     return false;
   }
   return true;
 }
 
 export function isJSONFile(file: string): boolean {
-  return file.split('/').pop().split('.').pop() === 'json';
+  return path.extname(file) === '.json';
 }

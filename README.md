@@ -14,6 +14,7 @@ Prerequisites: Node v8+, Yarn v1+
 | Setup                        | `yarn install` |
 | Run API server               | `yarn start`   |
 | Run Tests                    | `yarn test`    |
+| Run Tests with server logs   | `yarn test-log`|
 | Create Distribution          | `yarn release` |
 | Recompile During Development | `yarn watch`   |
 

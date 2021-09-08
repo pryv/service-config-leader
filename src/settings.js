@@ -2,18 +2,23 @@
 
 const path = require('path');
 const nconf = require('nconf');
+const bluebird = require('bluebird');
 
 let store;
-function nconfSettings() {
+function getSettings() {
 
   if (store != null) return store;
-
   store = new nconf.Provider();
+
+  store.use('memory');
+  store.use('test', { type: 'literal', store: {} });
 
   // 1. `process.env`
   // 2. `process.argv`
   //
-  store.env().argv();
+  store.env({
+    separator: '__',
+  }).argv();
 
   // 3. Values in `config.json`
   //
@@ -51,4 +56,9 @@ function nconfSettings() {
   return store;
 }
 
-module.exports = nconfSettings;
+function injectTestSettings(testConf: {}) {
+  store.add('test', { type: 'literal', store: testConf });
+}
+
+module.exports.getSettings = getSettings;
+module.exports.injectTestSettings = injectTestSettings;

@@ -11,6 +11,7 @@
     "release": "node_modules/.bin/babel --verbose src/ -d dist/ --copy-files --source-maps both",
     "watch": "node_modules/.bin/babel --verbose --watch=./src --out-dir=dist/ --copy-files --source-maps both",
     "test": "NODE_ENV=test node_modules/.bin/mocha --require @babel/register --require module-alias/register --recursive test/ --exit",
+    "test-log": "logs__console__active=true yarn test",
     "lint": "./node_modules/.bin/eslint ./src ./test"
   },
   "dependencies": {

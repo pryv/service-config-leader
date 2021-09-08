@@ -6,7 +6,6 @@ const _ = require('lodash');
 const express = require('express');
 const middlewares = require('@middlewares');
 const fs = require('fs');
-//const nconfSettings = (new (require('./settings'))()).store;
 const Database = require('better-sqlite3');
 const { CronJob } = require('cron');
 const UsersRepository = require('@repositories/users.repository');
@@ -18,7 +17,7 @@ const {
 } = require('@models/permissions.model');
 const morgan = require('morgan');
 const { setupGit } = require('@controller/migration');
-//const platformSettings = require('./platform')(nconfSettings);
+const { injectTestSettings, getSettings } = require('./settings');
 
 class Application {
   express: express$Application;
@@ -38,10 +37,10 @@ class Application {
   git: {};
 
   constructor(settingsOverride: {} = {}) {
-    this.settings = require('./settings')();
-    if (settingsOverride.nconfSettings) this.settings.merge(settingsOverride.nconfSettings);
+    if (settingsOverride.nconfSettings != null) injectTestSettings(settingsOverride.nconfSettings);
+    this.settings = getSettings();
     this.platformSettings = require('./platform')(this.settings);
-    if (settingsOverride.platformSettings) this.platformSettings.setOverrides(settingsOverride.platformSettings);
+    if (settingsOverride.platformSettings != null) this.platformSettings.setOverrides(settingsOverride.platformSettings);
     this.logger = require('./utils/logging').getLogger('app');
     this.db = this.connectToDb();
     this.usersRepository = new UsersRepository(this.db);

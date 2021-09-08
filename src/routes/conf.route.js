@@ -50,6 +50,7 @@ module.exports = function (
         let latestModifiedTime = 0;
         let latestModifiedFile = '';
         await platformSettings.load();
+
         list.forEach((file) => {
           const templateConf = fs.readFileSync(file, 'utf8');
           const fileName = file.replace(confFolder, '');
