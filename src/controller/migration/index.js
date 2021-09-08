@@ -6,7 +6,6 @@ const yaml = require('js-yaml');
 const fs = require('fs/promises');
 const compareVersions = require('compare-versions');
 const _ = require('lodash');
-const bluebird = require('bluebird');
 const logger = require('@utils/logging').getLogger('migration');
 const { setupGit, getGit } = require('./git');
 const { migrations } = require('./migrations');

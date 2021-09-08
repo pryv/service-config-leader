@@ -9,7 +9,6 @@ import {
 
 const path = require('path');
 const fs = require('fs');
-const bluebird = require('bluebird');
 const errorsFactory = require('@utils/errorsHandling').factory;
 const middlewares = require('@middlewares');
 const logger = require('@utils/logging').getLogger('conf');

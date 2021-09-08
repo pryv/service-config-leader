@@ -14,9 +14,9 @@ const yaml = require('js-yaml');
 const { sign } = require('jsonwebtoken');
 const { SETTINGS_PERMISSIONS } = require('@models/permissions.model');
 const simpleGit = require('simple-git');
+const { injectTestSettings } = require('@root/settings');
 const helper = require('../fixtures/followersMockHelper');
 const mockFollowers = require('../fixtures/followersMock');
-const { injectTestSettings, getSettings } = require('@root/settings');
 
 describe('Test /admin endpoint', () => {
   let readOnlyToken;
@@ -328,8 +328,8 @@ describe('Test /admin endpoint', () => {
     });
 
     describe('when there is an update', () => {
-      let request; let backupPlatform; let platformPath; let
-          expectedPlatform, app;
+      let request; let backupPlatform; let platformPath;
+      let expectedPlatform; let app;
       before(async () => {
         platformPath = path.resolve(__dirname, '../fixtures/migration-needed/1.7.0/platform.yml');
         expectedPlatform = yaml.load(fs.readFileSync(path.resolve(__dirname, '../fixtures/migration-needed/1.7.0/expected.yml'), 'utf-8'));

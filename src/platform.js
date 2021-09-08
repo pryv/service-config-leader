@@ -3,8 +3,7 @@
 const yaml = require('js-yaml');
 const path = require('path');
 const fs = require('fs/promises');
-const { getGit } = require('@controller/migration');
-const _ = require('lodash');
+const { getGit } = require('@controller/migration');
 
 module.exports = function getPlatformSettings(mainSettings: {}): {} {
   return new PlatformSettings(mainSettings.get('platformSettings:platformConfig'));
@@ -13,9 +12,10 @@ module.exports = function getPlatformSettings(mainSettings: {}): {} {
 const DEFAULT_PATH = path.resolve(__dirname, '../platform.yml');
 
 class PlatformSettings {
-
   path: string;
+
   vars: {};
+
   overrides: {};
 
   constructor(path: string = DEFAULT_PATH) {
@@ -47,7 +47,7 @@ class PlatformSettings {
    */
   async save(newSettings: {}, gitCommitMsg: string): Promise<void> {
     this.vars = newSettings;
-    await fs.writeFile(this.path, yaml.dump({ vars: this.vars } ));
+    await fs.writeFile(this.path, yaml.dump({ vars: this.vars }));
     const git: {} = getGit();
     await git.commitChanges(gitCommitMsg);
   }

@@ -107,8 +107,8 @@ const migrations: Array<Migration> = addTemplateUpgradeToEmptyRuns([
 ]);
 
 /**
- * 
- * @param {*} migrations 
+ *
+ * @param {*} migrations
  */
 function addTemplateUpgradeToEmptyRuns(migrations: Array<Migration>): Array<Migration> {
   for (const migration of migrations) {
@@ -130,7 +130,7 @@ function addTemplateUpgradeToEmptyRuns(migrations: Array<Migration>): Array<Migr
 
 /**
  * Loads the template, returns .vars
- * 
+ *
  * @param {*} filePath the file path, relative to this directory
  */
 function loadTemplate(filePath: string): {} {

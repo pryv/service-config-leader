@@ -7,7 +7,6 @@ import {
   isJSONFile,
 } from '@utils/configuration.utils';
 
-const bluebird = require('bluebird');
 const fs = require('fs');
 const request = require('superagent');
 const _ = require('lodash');
@@ -21,7 +20,6 @@ const {
 } = require('@middlewares/security/authorization.service');
 const UsersRepository = require('@repositories/users.repository');
 const TokensRepository = require('@repositories/tokens.repository');
-const { getGit } = require('@controller/migration/git');
 const {
   loadPlatformTemplate, checkMigrations, migrate,
 } = require('@controller/migration');
@@ -50,13 +48,13 @@ module.exports = function (
     ) => {
       try {
         await platformSettings.load();
-        const previousSettings = platformSettings.get()
+        const previousSettings = platformSettings.get();
         const templatesPath = settings.get('templatesPath');
         const newSettings = { ...previousSettings, ...req.body };
 
         const list = [];
         listConfFiles(templatesPath, list);
-        
+
         list.forEach((file) => {
           const templateConf = fs.readFileSync(file, 'utf8');
           const newConf = applySubstitutions(
@@ -94,15 +92,14 @@ module.exports = function (
         await platformSettings.load();
         const currentSettings = platformSettings.get();
         if (currentSettings == null) {
-          next(new Error('Missing platform settings.'));
+          return next(new Error('Missing platform settings.'));
         }
-        res.json({
+        return res.json({
           settings: currentSettings,
         });
       } catch (err) {
         return next(err);
-      } 
-      
+      }
     },
   );
 
@@ -183,7 +180,7 @@ module.exports = function (
         const platform = platformSettings.get();
         const platformTemplate = await loadPlatformTemplate(settings);
         const { migrations, migratedPlatform } = migrate(platform, platformTemplate);
-        
+
         if (migrations.length > 0) await platformSettings.save(migratedPlatform, `update through POST /admin/migrations/apply by ${res.locals.username}`);
         res.json({ migrations: migrations.map((m) => _.pick(m, ['versionsFrom', 'versionTo'])) });
       } catch (e) {

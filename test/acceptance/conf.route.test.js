@@ -37,7 +37,7 @@ describe('GET /conf', () => {
     );
   });
 
-  it('serves a full configuration', async () => {  
+  it('serves a full configuration', async () => {
     const res = await request.get('/conf').set('Authorization', followerKey);
 
     assert.strictEqual(res.status, 200);

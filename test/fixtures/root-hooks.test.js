@@ -2,7 +2,6 @@
 
 /* global before, after */
 
-const { getSettings } = require('@root/settings');
 const fs = require('fs');
 
 before((done) => {

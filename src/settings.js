@@ -1,12 +1,9 @@
 // @flow
 
-const path = require('path');
 const nconf = require('nconf');
-const bluebird = require('bluebird');
 
 let store;
 function getSettings() {
-
   if (store != null) return store;
   store = new nconf.Provider();
 

@@ -2,7 +2,6 @@
 
 import type { UserNoPerms } from '@models/user.model';
 
-const _ = require('lodash');
 const express = require('express');
 const middlewares = require('@middlewares');
 const fs = require('fs');
@@ -17,7 +16,7 @@ const {
 } = require('@models/permissions.model');
 const morgan = require('morgan');
 const { setupGit } = require('@controller/migration');
-const { injectTestSettings, getSettings } = require('./settings');
+const { injectTestSettings, getSettings } = require('./settings');
 
 class Application {
   express: express$Application;
@@ -37,7 +36,7 @@ class Application {
   git: {};
 
   constructor(settingsOverride: {} = {}) {
-    if (settingsOverride.nconfSettings != null) injectTestSettings(settingsOverride.nconfSettings);
+    if (settingsOverride.nconfSettings != null) injectTestSettings(settingsOverride.nconfSettings);
     this.settings = getSettings();
     this.platformSettings = require('./platform')(this.settings);
     if (settingsOverride.platformSettings != null) this.platformSettings.setOverrides(settingsOverride.platformSettings);
