@@ -39,22 +39,31 @@ describe('GET /conf', () => {
 
   it('serves a full configuration', async () => {
     const res = await request.get('/conf').set('Authorization', followerKey);
-
     assert.strictEqual(res.status, 200);
 
     const { files } = res.body;
-    assert.isDefined(files);
+    assert.exists(files);
 
     ['core', 'register', 'mfa'].forEach((component) => {
       const conf = files.find(
         (f) => f.path === `/${component}/conf/${component}.json`,
       );
-      assert.isNotNull(conf);
+      assert.exists(conf);
       assert.deepEqual(
         conf.content.replace(/\s/g, ''),
-        expectedConf(follower.role, component),
+        getExpectedConf(follower.role, component),
       );
     });
+
+    // verify ignoring .json for .yml
+    const jsonFile = files.find((f) => f.path === '/new-one/conf/new.json');
+    assert.notExists(jsonFile);
+    const yamlFile = files.find((f) => f.path === '/new-one/conf/new.yml');
+    assert.exists(yamlFile);
+    assert.deepEqual(
+      yamlFile.content.replace(/\s/g, ''),
+      getExpectedConf(follower.role, 'new-one', 'expected.yml', true),
+    );
   });
 
   it('loads a fresh template from disk at each call', async () => {
@@ -117,9 +126,15 @@ describe('GET /conf', () => {
     fs.writeFileSync(path, backup);
   });
 
-  function expectedConf(role: string, component: string) {
+  function getExpectedConf(role: string, component: string, expectedFilename: string = 'expected.json', isYaml: boolean = false) {
     const dataFolder = path.resolve(settings.get('templatesPath'));
-    const expectedConf = require(`${dataFolder}/${role}/${component}/conf/expected.json`);
-    return JSON.stringify(expectedConf).replace(/\s/g, '');
+    const filePath = `${dataFolder}/${role}/${component}/conf/${expectedFilename}`;
+    let expectedConf;
+    if (isYaml) {
+      expectedConf = fs.readFileSync(filePath, 'utf-8');
+    } else {
+      expectedConf = JSON.stringify(require(filePath));
+    }
+    return expectedConf.replace(/\s/g, '');
   }
 });

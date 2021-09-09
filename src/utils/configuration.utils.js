@@ -47,15 +47,52 @@ export function applySubstitutions(
   }
 }
 
-export function listConfFiles(dir: string, files: Array<string>): void {
+/**
+ * Accumulates all files found in dir and its children into files
+ * 
+ * @param {*} dir the source directory
+ * @param {*} files the array where (full) file names will be stored.
+ */
+export function listConfFiles(dir: string, files: Array<string>, seen: Map<string, string>): void {
+
+  /**
+   * Map: fullPath (without extension) -> fullpath
+   */
+  if (seen == null) seen = new Map();
+
   fs.readdirSync(dir).forEach((file) => {
     const fullPath = path.join(dir, file);
+    const fullPathWithoutExtension = path.parse(fullPath).name;
     if (fs.lstatSync(fullPath).isDirectory()) {
-      listConfFiles(fullPath, files);
+      listConfFiles(fullPath, files, seen);
     } else {
+      /**
+       * 1. new -> push
+       * 2. seen with json -> remove and push
+       * 3. seen with other -> do nothing
+       */
+      if (seen[fullPathWithoutExtension] != null && ! seen[fullPathWithoutExtension].endsWith('.json') && fullPath.endsWith('.json')) {
+        return;
+      }
+      if (seen[fullPathWithoutExtension] != null && seen[fullPathWithoutExtension].endsWith('.json')) {
+        files = remove(seen[fullPathWithoutExtension], files);
+      }
+      seen[fullPathWithoutExtension] = fullPath;
       files.push(fullPath);
     }
   });
+
+  /**
+   * removes the filname from the files array, and returns the modified array
+   * 
+   * @param {*} filename the filename to remove
+   * @param {*} files
+   */
+  function remove(filename: string, files: Array<string>): Array<string> {
+    const index = files.indexOf(filename);
+    if (index > -1) files.splice(index, 1);
+    return files;
+  }
 }
 
 export function isValidJSON(text: string) {
