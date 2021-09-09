@@ -18,11 +18,10 @@ module.exports.getGit = getGit;
 class Git {
   git: {};
 
-  author: string;
-
   constructor(params: {}) {
     this.git = new SimpleGit(params);
-    this.author = 'Pryv config <support@pryv.com>';
+    this.git.addConfig('user.name', 'Pryv config');
+    this.git.addConfig('user.email', 'support@pryv.com');
   }
 
   async initRepo(): Promise<void> {
@@ -31,6 +30,6 @@ class Git {
 
   async commitChanges(message: string = 'update'): Promise<void> {
     await this.git.add('.');
-    await this.git.commit(message, { '--author': this.author });
+    await this.git.commit(message);
   }
 }

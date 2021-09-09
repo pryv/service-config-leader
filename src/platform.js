@@ -40,7 +40,7 @@ class PlatformSettings {
   }
 
   /**
-   * Writes the content of platform and version it using git
+   * Writes the content of platform and versions it using git
    *
    * @param {*} platformSettings
    * @param {*} author

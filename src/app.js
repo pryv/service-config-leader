@@ -59,6 +59,7 @@ class Application {
   async init() {
     await this.platformSettings.load();
     await this.git.initRepo();
+    await this.git.commitChanges('config leader boot');
     await this.generateSecretsIfNeeded();
   }
 
