@@ -40,7 +40,8 @@ module.exports = {
         "import/no-dynamic-require": "off",
         "no-param-reassign": "off",
         "max-classes-per-file": "off",
-        "no-plusplus": "off"
+        "no-plusplus": "off",
+        "space-unary-ops": "off",
       }
     }
   ]
