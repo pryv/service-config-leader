@@ -49,12 +49,11 @@ export function applySubstitutions(
 
 /**
  * Accumulates all files found in dir and its children into files
- * 
+ *
  * @param {*} dir the source directory
  * @param {*} files the array where (full) file names will be stored.
  */
 export function listConfFiles(dir: string, files: Array<string>, seen: Map<string, string>): void {
-
   /**
    * Map: fullPath (without extension) -> fullpath
    */
@@ -84,7 +83,7 @@ export function listConfFiles(dir: string, files: Array<string>, seen: Map<strin
 
   /**
    * removes the filname from the files array, and returns the modified array
-   * 
+   *
    * @param {*} filename the filename to remove
    * @param {*} files
    */

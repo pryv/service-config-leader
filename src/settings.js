@@ -49,8 +49,8 @@ function getSettings() {
     gitRepoPath: '/app/conf/',
     platformSettings: {
       platformConfig: '/app/conf/platform.yml',
-      platformTemplate: '/app/conf/template-platform.yml'
-    }
+      platformTemplate: '/app/conf/template-platform.yml',
+    },
   });
 
   if (process.env.NODE_ENV === 'test') store.set('logs:console:active', false);
