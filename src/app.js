@@ -2,6 +2,7 @@
 
 import type { UserNoPerms } from '@models/user.model';
 
+const bluebird = require('bluebird');
 const express = require('express');
 const middlewares = require('@middlewares');
 const fs = require('fs');
@@ -44,8 +45,7 @@ class Application {
     this.db = this.connectToDb();
     this.usersRepository = new UsersRepository(this.db);
     this.tokensRepository = new TokensRepository(this.db);
-    this.express = this.setupExpressApp(this.settings, this.platformSettings);
-    this.generateSecrets(this.settings);
+    this.express = this.setupExpressApp();
     this.generateInitialUser();
     this.startTokensBlacklistCleanupJob();
     this.git = setupGit({
@@ -59,24 +59,27 @@ class Application {
   async init() {
     await this.platformSettings.load();
     await this.git.initRepo();
+    await this.generateSecretsIfNeeded();
   }
 
-  generateSecrets(settings: Object): void {
-    const internalSettings = settings.get('internals');
+  async generateSecretsIfNeeded(): Promise<void> {
+    const internalSettings = this.settings.get('internals');
 
     if (internalSettings == null) return;
 
+    let isChanged = false;
     for (const [key, value] of Object.entries(internalSettings)) {
       if (value === 'SECRET') {
-        settings.set(`internals:${key}`, randomAlphaNumKey(32));
+        this.settings.set(`internals:${key}`, randomAlphaNumKey(32));
+        isChanged = true;
       }
     }
 
-    settings.save((err) => {
-      if (err) {
-        this.logger.error('Error when saving secrets.', err);
-      }
-    });
+    try {
+      if (isChanged) await bluebird.fromCallback(cb => this.settings.save(cb));
+    } catch (err) {
+      this.logger.error('Error when saving secrets.', err);
+    }
 
     function randomAlphaNumKey(size: number): string {
       return Array(size)
@@ -96,10 +99,9 @@ class Application {
     this.db.close();
   }
 
-  setupExpressApp(
-    settings: Object,
-    platformSettings: Object,
-  ): express$Application {
+  setupExpressApp(): express$Application {
+    const settings = this.settings;
+    const platformSettings = this.platformSettings;
     const expressApp = express();
 
     expressApp.use(express.json());
