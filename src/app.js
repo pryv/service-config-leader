@@ -58,9 +58,10 @@ class Application {
    */
   async init() {
     await this.platformSettings.load();
-    await this.git.initRepo();
-    await this.git.commitChanges('config leader boot');
     await this.generateSecretsIfNeeded();
+    await this.git.initRepo();
+    // for some reason, in CI, the "git commit" action can't figure out the author
+    if (! process.env.IS_CI) await this.git.commitChanges('config leader boot');
   }
 
   async generateSecretsIfNeeded(): Promise<void> {
