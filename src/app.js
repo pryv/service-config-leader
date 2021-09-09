@@ -77,7 +77,7 @@ class Application {
     }
 
     try {
-      if (isChanged) await bluebird.fromCallback(cb => this.settings.save(cb));
+      if (isChanged) await bluebird.fromCallback((cb) => this.settings.save(cb));
     } catch (err) {
       this.logger.error('Error when saving secrets.', err);
     }
@@ -101,8 +101,7 @@ class Application {
   }
 
   setupExpressApp(): express$Application {
-    const settings = this.settings;
-    const platformSettings = this.platformSettings;
+    const { settings, platformSettings } = this;
     const expressApp = express();
 
     expressApp.use(express.json());
