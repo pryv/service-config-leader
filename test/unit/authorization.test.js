@@ -1,25 +1,23 @@
 // @flow
 
-/*global describe, it, beforeEach */
+/* global describe, it, beforeEach */
 
-// eslint-disable-next-line no-unused-vars
-const regeneratorRuntime = require('regenerator-runtime');
-
-const settings = (new (require('@root/settings'))()).store;
+const settings = require('@root/settings').getSettings();
 const middlewares = require('@middlewares');
-const authMiddleware = middlewares.authorization(settings);
-const assert = require('chai').assert;
 
-describe('Authorization middleware', function () {
-  let req, res;
+const authMiddleware = middlewares.authorization(settings);
+const { assert } = require('chai');
+
+describe('Authorization middleware', () => {
+  let req; let
+      res;
   beforeEach(async () => {
     req = { headers: {}, context: {}, query: {} };
     res = {};
   });
 
   it('fails if follower key is missing', async () => {
-    const expectedErrorMsg =
-      'Missing \'Authorization\' header or \'auth\' query parameter.';
+    const expectedErrorMsg = 'Missing \'Authorization\' header or \'auth\' query parameter.';
     // FLOW: mocking req, res
     authMiddleware(req, res, expectAPIError(expectedErrorMsg, 401));
   });

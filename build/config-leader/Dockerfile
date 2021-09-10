@@ -1,4 +1,4 @@
-FROM pryvio/base:1.5.1
+FROM eu.gcr.io/pryvio/base:1.7.0
 LABEL "Tech@Pryv" <tech@pryv.com>
 
 ADD . /pd_build

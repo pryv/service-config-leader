@@ -2,18 +2,19 @@
 
 const path = require('path');
 const fs = require('fs');
+const logger = require('./logging').getLogger('conf-utils');
 
 export function applySubstitutions(
   template: string,
   settings: Object,
-  platformSettingsVars: Object
+  platformSettingsVars: Object,
 ): string {
   const platformVars = retrieveFlatSettings(platformSettingsVars);
   const internalVars = settings.get('internals');
 
   if (platformVars == null && internalVars == null) return template;
 
-  let substitutions = Object.assign({}, internalVars, platformVars);
+  const substitutions = { ...internalVars, ...platformVars };
 
   const re = new RegExp(Object.keys(substitutions).join('|'), 'g');
   return replaceInString(template);
@@ -36,36 +37,73 @@ export function applySubstitutions(
   }
 
   function retrieveFlatSettings(rootSettings: Object): Object {
-    let settings = {};
+    const settings = {};
     for (const group of Object.keys(rootSettings)) {
-      for (const setting of Object.keys(rootSettings[group]['settings'])) {
-        settings[setting] = rootSettings[group]['settings'][setting].value;
+      for (const setting of Object.keys(rootSettings[group].settings)) {
+        settings[setting] = rootSettings[group].settings[setting].value;
       }
     }
     return settings;
   }
 }
 
-export function listConfFiles(dir: string, files: Array<string>): void {
+/**
+ * Accumulates all files found in dir and its children into files
+ *
+ * @param {*} dir the source directory
+ * @param {*} files the array where (full) file names will be stored.
+ */
+export function listConfFiles(dir: string, files: Array<string>, seen: Map<string, string>): void {
+  /**
+   * Map: fullPath (without extension) -> fullpath
+   */
+  if (seen == null) seen = new Map();
+
   fs.readdirSync(dir).forEach((file) => {
-    let fullPath = path.join(dir, file);
+    const fullPath = path.join(dir, file);
+    const fullPathWithoutExtension = path.parse(fullPath).name;
     if (fs.lstatSync(fullPath).isDirectory()) {
-      listConfFiles(fullPath, files);
+      listConfFiles(fullPath, files, seen);
     } else {
+      /**
+       * 1. new -> push
+       * 2. seen with json -> remove and push
+       * 3. seen with other -> do nothing
+       */
+      if (seen[fullPathWithoutExtension] != null && ! seen[fullPathWithoutExtension].endsWith('.json') && fullPath.endsWith('.json')) {
+        return;
+      }
+      if (seen[fullPathWithoutExtension] != null && seen[fullPathWithoutExtension].endsWith('.json')) {
+        files = remove(seen[fullPathWithoutExtension], files);
+      }
+      seen[fullPathWithoutExtension] = fullPath;
       files.push(fullPath);
     }
   });
+
+  /**
+   * removes the filname from the files array, and returns the modified array
+   *
+   * @param {*} filename the filename to remove
+   * @param {*} files
+   */
+  function remove(filename: string, files: Array<string>): Array<string> {
+    const index = files.indexOf(filename);
+    if (index > -1) files.splice(index, 1);
+    return files;
+  }
 }
 
 export function isValidJSON(text: string) {
   try {
     JSON.parse(text);
   } catch (e) {
+    logger.error(e);
     return false;
   }
   return true;
 }
 
 export function isJSONFile(file: string): boolean {
-  return file.split('/').pop().split('.').pop() === 'json';
+  return path.extname(file) === '.json';
 }

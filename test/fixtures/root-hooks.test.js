@@ -1,12 +1,12 @@
 // @flow
 
-/*global before, after */
+/* global before, after */
 
 const fs = require('fs');
 
 before((done) => {
-  fs.copyFileSync('dev-config.json', 'dev-config-copy.json', 0);
-  fs.copyFileSync('platform.yml', 'platform-copy.yml', 0);
+  fs.copyFileSync('dev-config.json', 'dev-config-copy.json');
+  fs.copyFileSync('platform.yml', 'platform-copy.yml');
   done();
 });
 

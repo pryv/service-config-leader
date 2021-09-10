@@ -1,31 +1,33 @@
 // @flow
 
-const assert = require('chai').assert;
-const { describe, beforeEach, after, it } = require('mocha');
+import TokensRepository from '@repositories/tokens.repository';
+
+const { assert } = require('chai');
+const {
+  describe, beforeEach, after, it,
+} = require('mocha');
 const Database = require('better-sqlite3');
 
-import { TokensRepository } from '@repositories/tokens.repository';
-
-describe('Test Tokens Repository', function () {
-  const db: Database = new Database(':memory:', { verbose: console.log });
+describe('Test Tokens Repository', () => {
+  const db: Database = new Database(':memory:', { /* verbose: console.log */ });
   const tokensRepository: TokensRepository = new TokensRepository(db);
   const selectAllTokensStmt = db.prepare('SELECT * FROM blacklisted_tokens;');
   const deleteAllTokensStmt = db.prepare('DELETE FROM blacklisted_tokens;');
   const addTokenStmt = db.prepare(
-    'INSERT INTO blacklisted_tokens(token) VALUES(?);'
+    'INSERT INTO blacklisted_tokens(token) VALUES(?);',
   );
 
   const token = 'some_token';
 
-  beforeEach(function () {
+  beforeEach(() => {
     deleteAllTokensStmt.run();
   });
 
-  after(function () {
+  after(() => {
     db.close();
   });
 
-  it('must save token in db', function () {
+  it('must save token in db', () => {
     tokensRepository.blacklist(token);
 
     const rows = selectAllTokensStmt.all();
@@ -34,19 +36,19 @@ describe('Test Tokens Repository', function () {
     assert.equal(rows.length, 1);
     assert.equal(rows[0].token, token);
   });
-  it('must return true if token exists in db', function () {
+  it('must return true if token exists in db', () => {
     addTokenStmt.run(token);
 
     const isSavedInDb = tokensRepository.contains(token);
 
     assert.exists(isSavedInDb);
   });
-  it('must return false if token does not exist in db', function () {
+  it('must return false if token does not exist in db', () => {
     const isSavedInDb = tokensRepository.contains(token);
 
     assert.isFalse(isSavedInDb);
   });
-  it('must remove all tokens from db', function () {
+  it('must remove all tokens from db', () => {
     addTokenStmt.run(token);
     addTokenStmt.run('token2');
 

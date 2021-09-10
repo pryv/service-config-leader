@@ -1,11 +1,8 @@
 // @flow
 
-// eslint-disable-next-line no-unused-vars
-const regeneratorRuntime = require('regenerator-runtime');
+import SimpleGit from 'simple-git';
 
-import simpleGit from "simple-git";
-
-let git = null
+let git = null;
 function setupGit(settings): {} {
   git = new Git(settings);
   return getGit();
@@ -19,21 +16,20 @@ function getGit() {
 module.exports.getGit = getGit;
 
 class Git {
-
   git: {};
-  author: string;
 
   constructor(params: {}) {
-    this.git = new simpleGit(params);
-    this.author = 'Pryv config <support@pryv.com>';
+    this.git = new SimpleGit(params);
+    this.git.addConfig('user.name', 'Pryv config');
+    this.git.addConfig('user.email', 'support@pryv.com');
   }
 
-  async initRepo() {
-    return await this.git.init();
+  async initRepo(): Promise<void> {
+    return this.git.init();
   }
 
-  async commitChanges(message: string = 'update') {
+  async commitChanges(message: string = 'update'): Promise<void> {
     await this.git.add('.');
-    await this.git.commit(message, { '--author': this.author });
+    await this.git.commit(message);
   }
 }

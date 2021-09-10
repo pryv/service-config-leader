@@ -28,5 +28,8 @@ jobs:
       - name: Npm packages installation
         run: yarn install --frozen-lockfile # equivalent to "npm ci"
 
+      - name: lint
+        run: yarn lint
+
       - name: Tests
         run: IS_CI=true yarn test

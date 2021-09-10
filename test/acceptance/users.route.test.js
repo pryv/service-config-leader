@@ -1,18 +1,19 @@
 // @flow
 
-// eslint-disable-next-line no-unused-vars
-const regeneratorRuntime = require('regenerator-runtime');
+import type { User, UserNoPerms, UserPasswordChange } from '@models/user.model';
 
-const assert = require('chai').assert;
-const { describe, before, it, afterEach, beforeEach, after } = require('mocha');
+const { assert } = require('chai');
+const {
+  describe, before, it, afterEach, beforeEach, after,
+} = require('mocha');
 const Application = require('@root/app');
+
 const app = new Application();
 const request = require('supertest')(app.express);
 const { sign } = require('jsonwebtoken');
 const { USERS_PERMISSIONS } = require('@root/models/permissions.model');
-import type { User, UserNoPerms, UserPasswordChange } from '@models/user.model';
 
-describe('Test /users endpoint', function () {
+describe('Test /users endpoint', () => {
   const user = {
     username: 'nameX',
     password: 'pass',
@@ -36,14 +37,14 @@ describe('Test /users endpoint', function () {
 
   const generateToken = function (username) {
     return sign(
-      { username: username },
-      app.settings.get('internals:configLeaderTokenSecret')
+      { username },
+      app.settings.get('internals:configLeaderTokenSecret'),
     );
   };
 
   const permissionsListExcept = function (permissionToOmit?: string) {
     return Object.values(USERS_PERMISSIONS).filter(
-      (perm) => perm !== permissionToOmit
+      (perm) => perm !== permissionToOmit,
     );
   };
 
@@ -51,32 +52,32 @@ describe('Test /users endpoint', function () {
     token = generateToken(user.username);
   });
 
-  before(function () {
+  before(() => {
     deleteAllStmt = app.db.prepare('DELETE FROM users;');
     deleteAllExceptMainStmt = app.db.prepare(
-      'DELETE FROM users WHERE username != ?;'
+      'DELETE FROM users WHERE username != ?;',
     );
 
     deleteAllStmt.run();
     app.usersRepository.createUser(user);
   });
 
-  afterEach(function () {
+  afterEach(() => {
     deleteAllExceptMainStmt.run(user.username);
   });
 
-  after(function () {
+  after(() => {
     deleteAllStmt.run();
   });
 
-  describe('POST /users', function () {
+  describe('POST /users', () => {
     const userToCreate = {
       username: 'someName',
       password: 'somePass',
       permissions: { users: [], settings: [], platformUsers: [] },
     };
 
-    afterEach(function () {
+    afterEach(() => {
       app.usersRepository.deleteUser(userToCreate.username);
     });
 
@@ -88,7 +89,7 @@ describe('Test /users endpoint', function () {
 
       assert.strictEqual(res.status, 201);
       assert.exists(res.body.user);
-      const user = res.body.user;
+      const { user } = res.body;
       assert.equal(user.username, userToCreate.username);
       assert.deepEqual(user.permissions, userToCreate.permissions);
       assert.notExists(user.password);
@@ -111,7 +112,7 @@ describe('Test /users endpoint', function () {
       const res = await request
         .post('/users')
         .set('Authorization', token)
-        .send(Object.assign({}, user, { some_extra_param: 4 }));
+        .send({ ...user, some_extra_param: 4 });
 
       assert.strictEqual(res.status, 400);
       assert.include(res.error.text, 'Error validating request body');
@@ -127,7 +128,7 @@ describe('Test /users endpoint', function () {
       const res = await request
         .post('/users')
         .set('Authorization', generateToken(userNoCreatePerm.username))
-        .send(Object.assign({}, user, { some_extra_param: 4 }));
+        .send({ ...user, some_extra_param: 4 });
 
       assert.strictEqual(res.status, 401);
       assert.include(res.error.text, 'Insufficient permissions');
@@ -147,27 +148,28 @@ describe('Test /users endpoint', function () {
         .post('/users')
         .set('Authorization', generateToken(userLimitedPerms.username))
         .send(
-          Object.assign({}, userToCreate, {
+          {
+            ...userToCreate,
             permissions: {
               users: permissionsListExcept(),
               settings: [],
               platformUsers: [],
             },
-          })
+          },
         );
 
       assert.strictEqual(res.status, 401);
       assert.include(res.error.text, 'Insufficient permissions');
     });
   });
-  describe('GET /users/:username', function () {
+  describe('GET /users/:username', () => {
     const userInDb = {
       username: 'someName',
       password: 'somePass',
       permissions: { users: [] },
     };
 
-    before(function () {
+    before(() => {
       app.usersRepository.createUser(userInDb);
     });
 
@@ -178,7 +180,7 @@ describe('Test /users endpoint', function () {
 
       assert.strictEqual(res.status, 200);
       assert.exists(res.body.user);
-      const user = res.body.user;
+      const { user } = res.body;
       assert.equal(user.username, userInDb.username);
       assert.deepEqual(user.permissions, userInDb.permissions);
       assert.notExists(user.password);
@@ -211,8 +213,8 @@ describe('Test /users endpoint', function () {
       assert.include(res.error.text, 'Insufficient permissions');
     });
   });
-  describe('GET /users', function () {
-    before(function () {
+  describe('GET /users', () => {
+    before(() => {
       app.usersRepository.createUser({
         username: 'user1',
         password: 'some_pass1',
@@ -230,7 +232,7 @@ describe('Test /users endpoint', function () {
 
       assert.strictEqual(res.status, 200);
       assert.exists(res.body.users);
-      const users = res.body.users;
+      const { users } = res.body;
       assert.equal(users.length, 3);
       assert.equal(users[0].username, user.username);
       assert.deepEqual(users[0].permissions, user.permissions);
@@ -252,14 +254,14 @@ describe('Test /users endpoint', function () {
       assert.include(res.error.text, 'Insufficient permissions');
     });
   });
-  describe('PUT /users/:username/permissions', function () {
+  describe('PUT /users/:username/permissions', () => {
     const userToUpdate = {
       username: 'toupdate',
       password: 'somePass',
       permissions: { users: [] },
     };
 
-    beforeEach(function () {
+    beforeEach(() => {
       app.usersRepository.createUser(((userToUpdate: any): User));
     });
 
@@ -279,7 +281,7 @@ describe('Test /users endpoint', function () {
 
       assert.strictEqual(res.status, 200);
       assert.exists(res.body.user);
-      const user = res.body.user;
+      const { user } = res.body;
       assert.notExists(user.username);
       assert.deepEqual(user.permissions, newPerms.permissions);
       assert.notExists(user.password);
@@ -318,20 +320,20 @@ describe('Test /users endpoint', function () {
       assert.include(res.error.text, 'Insufficient permissions');
     });
   });
-  describe('POST /users/:username/reset-password', function () {
+  describe('POST /users/:username/reset-password', () => {
     const userToResetPassFor = {
       username: 'toresetpass',
       password: 'somePass',
       permissions: { users: [] },
     };
 
-    beforeEach(function () {
+    beforeEach(() => {
       app.usersRepository.createUser(((userToResetPassFor: any): User));
     });
 
     it('must respond with 200 and new password in body', async () => {
       const res = await request
-        .post('/users/' + userToResetPassFor.username + '/reset-password')
+        .post(`/users/${userToResetPassFor.username}/reset-password`)
         .set('Authorization', token);
 
       assert.equal(res.status, 200);
@@ -355,7 +357,7 @@ describe('Test /users endpoint', function () {
       assert.include(res.error.text, 'Insufficient permissions');
     });
   });
-  describe('POST /users/:username/change-password', function () {
+  describe('POST /users/:username/change-password', () => {
     const passwordChangeInput: UserPasswordChange = {
       oldPassword: 'oldpass',
       newPassword: 'newPass',
@@ -363,7 +365,7 @@ describe('Test /users endpoint', function () {
     };
     const usernameToChangePasswordOn = 'usernameToChangePasswordOn';
     let tokenToChangePasswordOn;
-    beforeEach(function () {
+    beforeEach(() => {
       app.usersRepository.createUser(
         (({
           username: usernameToChangePasswordOn,
@@ -372,7 +374,7 @@ describe('Test /users endpoint', function () {
             settings: [],
             users: [],
           },
-        }: any): User)
+        }: any): User),
       );
       tokenToChangePasswordOn = generateToken(usernameToChangePasswordOn);
     });
@@ -381,7 +383,7 @@ describe('Test /users endpoint', function () {
       const username = 'userPX';
 
       const res = await request
-        .post('/users/' + username + '/change-password')
+        .post(`/users/${username}/change-password`)
         .set('Authorization', token)
         .send(passwordChangeInput);
 
@@ -393,7 +395,7 @@ describe('Test /users endpoint', function () {
         .post(`/users/${usernameToChangePasswordOn}/change-password`)
         .set('Authorization', tokenToChangePasswordOn)
         .send(
-          Object.assign({}, passwordChangeInput, { oldPassword: 'wrongpass' })
+          { ...passwordChangeInput, oldPassword: 'wrongpass' },
         );
 
       assert.strictEqual(res.status, 401);
@@ -404,9 +406,7 @@ describe('Test /users endpoint', function () {
         .post(`/users/${usernameToChangePasswordOn}/change-password`)
         .set('Authorization', tokenToChangePasswordOn)
         .send(
-          Object.assign({}, passwordChangeInput, {
-            newPasswordCheck: 'wrongpass',
-          })
+          { ...passwordChangeInput, newPasswordCheck: 'wrongpass' },
         );
 
       assert.strictEqual(res.status, 400);
@@ -415,27 +415,27 @@ describe('Test /users endpoint', function () {
 
     it('must respond with 200 and new password in body when given valid input', async () => {
       const res = await request
-        .post('/users/' + usernameToChangePasswordOn + '/change-password')
+        .post(`/users/${usernameToChangePasswordOn}/change-password`)
         .set('Authorization', tokenToChangePasswordOn)
         .send(passwordChangeInput);
 
       assert.strictEqual(res.status, 200);
     });
   });
-  describe('DELETE /users/:username', function () {
+  describe('DELETE /users/:username', () => {
     const userToDelete = {
       username: 'todel',
       password: 'somePass',
       permissions: { users: [] },
     };
 
-    beforeEach(function () {
+    beforeEach(() => {
       app.usersRepository.createUser(((userToDelete: any): User));
     });
 
     it('must respond with 200 and deleted username in body', async () => {
       const res = await request
-        .delete('/users/' + userToDelete.username)
+        .delete(`/users/${userToDelete.username}`)
         .set('Authorization', token);
 
       assert.strictEqual(res.status, 200);

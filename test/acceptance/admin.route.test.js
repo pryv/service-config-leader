@@ -1,30 +1,31 @@
 // @flow
 
-/*global describe, it, before, after */
+/* global describe, it, before, beforeEach, after */
 
-// eslint-disable-next-line no-unused-vars
-const regeneratorRuntime = require('regenerator-runtime');
+import type { User } from '@models/user.model';
+
 const sinon = require('sinon');
-const assert = require('chai').assert;
+const { assert } = require('chai');
 const path = require('path');
 const Application = require('@root/app');
 const supertest = require('supertest');
 const fs = require('fs');
 const yaml = require('js-yaml');
-const mockFollowers = require('../fixtures/followersMock');
-const helper = require('../fixtures/followersMockHelper');
 const { sign } = require('jsonwebtoken');
 const { SETTINGS_PERMISSIONS } = require('@models/permissions.model');
-import type { User } from '@models/user.model';
 const simpleGit = require('simple-git');
+const { injectTestSettings } = require('@root/settings');
+const helper = require('../fixtures/followersMockHelper');
+const mockFollowers = require('../fixtures/followersMock');
 
-describe('Test /admin endpoint', function () {
+describe('Test /admin endpoint', () => {
   let readOnlyToken;
   let updateOnlyToken;
 
   let deleteAllStmt;
 
-  let app, settings, platformPath, platformSettings, request, platformBackup;
+  let app; let settings; let platformPath; let platformSettings; let request; let
+      platformBackup;
   before(async () => {
     app = new Application();
     await app.init();
@@ -50,12 +51,8 @@ describe('Test /admin endpoint', function () {
         users: [],
       },
     };
-    after(() => {
-      fs.writeFileSync(platformPath, platformBackup);
-    });
 
     deleteAllStmt = app.db.prepare('DELETE FROM users;');
-
     deleteAllStmt.run();
 
     app.usersRepository.createUser(userOnlyReadPerm);
@@ -63,16 +60,18 @@ describe('Test /admin endpoint', function () {
 
     readOnlyToken = sign(
       { username: userOnlyReadPerm.username },
-      settings.get('internals:configLeaderTokenSecret')
+      settings.get('internals:configLeaderTokenSecret'),
     );
     updateOnlyToken = sign(
       { username: userOnlyUpdatePerm.username },
-      settings.get('internals:configLeaderTokenSecret')
+      settings.get('internals:configLeaderTokenSecret'),
     );
   });
 
-  after(function () {
+  after(() => {
     deleteAllStmt.run();
+    fs.writeFileSync(platformPath, platformBackup);
+    injectTestSettings({});
   });
 
   it('responds with CORS related headers', async () => {
@@ -80,8 +79,7 @@ describe('Test /admin endpoint', function () {
       .put('/admin/settings')
       .set('Authorization', updateOnlyToken)
       .send({});
-
-    const headers = res.headers;
+    const { headers } = res;
 
     assert.isDefined(headers['access-control-allow-origin']);
     assert.equal(headers['access-control-allow-origin'], '*');
@@ -89,13 +87,13 @@ describe('Test /admin endpoint', function () {
     assert.isDefined(headers['access-control-allow-methods']);
     assert.equal(
       headers['access-control-allow-methods'],
-      'POST, GET, PUT, OPTIONS, DELETE'
+      'POST, GET, PUT, OPTIONS, DELETE',
     );
 
     assert.isDefined(headers['access-control-allow-headers']);
     assert.equal(
       headers['access-control-allow-headers'],
-      'Authorization, Content-Type'
+      'Authorization, Content-Type',
     );
 
     assert.isDefined(headers['access-control-max-age']);
@@ -109,7 +107,7 @@ describe('Test /admin endpoint', function () {
     assert.strictEqual(res.status, 200);
   });
 
-  describe('GET /admin/settings', function () {
+  describe('GET /admin/settings', () => {
     it('retrieves the current platform settings', async () => {
       const res = await request
         .get('/admin/settings')
@@ -131,34 +129,33 @@ describe('Test /admin endpoint', function () {
     });
   });
 
-  describe('PUT /admin/settings', function () {
-
+  describe('PUT /admin/settings', () => {
     let gitClient;
     before(() => {
       gitClient = simpleGit({ baseDir: path.resolve(settings.get('platformSettings:platformConfig'), '..') });
-    })
+    });
 
     it('updates settings in memory and on disk, with a git commit', async function () {
       if (process.env.IS_CI) {
         // for some reason, in CI, the "git commit" action can't figure out the author
-        this.skip(); 
+        this.skip();
       }
-      const previousSettings = platformSettings.get('vars');
+      const previousSettings = platformSettings.get();
       const update = {
         updatedProp: { settings: { SOME_SETTING: { value: 'updatedVal' } } },
       };
-      const updatedSettings = Object.assign({}, previousSettings, update);
+      const updatedSettings = { ...previousSettings, ...update };
 
       const res = await request
         .put('/admin/settings')
         .send(update)
         .set('Authorization', updateOnlyToken);
       assert.strictEqual(res.status, 200);
-      assert.deepEqual(res.body.settings, updatedSettings);
-      assert.deepEqual(platformSettings.get('vars'), updatedSettings);
+      assert.deepEqual(res.body.settings, updatedSettings, 'settings in API response do not match updated ones');
+      assert.deepEqual(platformSettings.get(), updatedSettings, 'settings in memory do not match updated ones');
       const ymlFile = fs.readFileSync(platformPath, 'utf8');
       const platform = yaml.load(ymlFile);
-      assert.deepEqual(platform.vars, updatedSettings);
+      assert.deepEqual(platform.vars, updatedSettings, 'settings on disk do not match updated ones');
 
       const logs = await gitClient.log();
       assert.equal(logs.all[0].message, 'update through PUT /admin/settings by userOnlyUpdatePerm');
@@ -193,7 +190,7 @@ describe('Test /admin endpoint', function () {
     });
   });
 
-  describe('POST /admin/notify', function () {
+  describe('POST /admin/notify', () => {
     beforeEach(async () => {
       // Mocking followers
       mockFollowers.server();
@@ -204,21 +201,21 @@ describe('Test /admin endpoint', function () {
         .post('/admin/notify')
         .set('Authorization', updateOnlyToken);
 
-      const body = res.body;
-      const successes = body.successes;
-      const failures = body.failures;
+      const { body } = res;
+      const { successes } = body;
+      const { failures } = body;
 
       assert.isDefined(failures);
       assert.isDefined(successes);
       const followers = settings.get('followers');
       for (const [token, follower] of Object.entries(followers)) {
         if (token === 'failing') {
-          const failure = failures.find(failure => failure.url === follower.url);
+          const failure = failures.find((failure) => failure.url === follower.url);
           assert.exists(failure);
           assert.equal(failure.role, follower.role);
         } else {
-          const success = successes.find(success => success.url === follower.url);
-          assert.exists(success);
+          const success = successes.find((success) => success.url === follower.url);
+          assert.exists(success, `expected success with ${follower.role} not found`);
           assert.equal(success.role, follower.role);
         }
       }
@@ -233,18 +230,18 @@ describe('Test /admin endpoint', function () {
 
     it('must notify followers to restart some services', async () => {
       const services = ['service1', 'service2'];
-      let spy = sinon.spy(helper, 'spy');
+      const spy = sinon.spy(helper, 'spy');
       const res = await request
         .post('/admin/notify')
         .set('Authorization', updateOnlyToken)
-        .send({ services: services });
+        .send({ services });
       assert.strictEqual(res.status, 200);
       sinon.assert.calledWith(spy, services);
       spy.restore();
     });
 
     it('must notify followers to restart all services', async () => {
-      let spy = sinon.spy(helper, 'spy');
+      const spy = sinon.spy(helper, 'spy');
       const res = await request
         .post('/admin/notify')
         .set('Authorization', updateOnlyToken);
@@ -254,15 +251,13 @@ describe('Test /admin endpoint', function () {
     });
   });
 
-  describe('GET /admin/migrations', function () {
-
+  describe('GET /admin/migrations', () => {
     let templatePath;
     before(() => {
       templatePath = path.resolve(__dirname, '../../src/controller/migration/scriptsAndTemplates/cluster/1.7.0-template.yml');
-    })
+    });
 
     describe('when there is an update', () => {
-
       let request;
       before(() => {
         const app = new Application({
@@ -270,8 +265,8 @@ describe('Test /admin endpoint', function () {
             platformSettings: {
               platformConfig: path.resolve(__dirname, '../fixtures/migration-needed/1.7.0/platform.yml'),
               platformTemplate: templatePath,
-            }
-          }
+            },
+          },
         });
         request = supertest(app.express);
       });
@@ -282,12 +277,12 @@ describe('Test /admin endpoint', function () {
             .get('/admin/migrations')
             .set('Authorization', readOnlyToken);
           assert.equal(res.status, 200);
-          const migrations = res.body.migrations;
+          const { migrations } = res.body;
           assert.exists(migrations);
           assert.deepEqual(migrations, [
-            { versionsFrom: ['1.6.21'], versionTo: '1.6.22' }, 
-            { versionsFrom: ['1.6.22'], versionTo: '1.6.23' }, 
-            { versionsFrom: ['1.6.23'], versionTo: '1.7.0' }
+            { versionsFrom: ['1.6.21'], versionTo: '1.6.22' },
+            { versionsFrom: ['1.6.22'], versionTo: '1.6.23' },
+            { versionsFrom: ['1.6.23'], versionTo: '1.7.0' },
           ]);
         });
       });
@@ -302,7 +297,6 @@ describe('Test /admin endpoint', function () {
     });
     describe('when there is no update', () => {
       describe('when the user has sufficient permissions', () => {
-
         let request;
         before(() => {
           const app = new Application({
@@ -310,8 +304,8 @@ describe('Test /admin endpoint', function () {
               platformSettings: {
                 platformConfig: path.resolve(__dirname, '../fixtures/migration-not-needed/config/platform.yml'),
                 platformTemplate: templatePath,
-              }
-            }
+              },
+            },
           });
           request = supertest(app.express);
         });
@@ -325,29 +319,27 @@ describe('Test /admin endpoint', function () {
         });
       });
     });
-
   });
 
-  describe('POST /admin/migrations', function () {
-
+  describe('POST /admin/migrations/apply', () => {
     let templatePath;
     before(() => {
       templatePath = path.resolve(__dirname, '../../src/controller/migration/scriptsAndTemplates/cluster/1.7.0-template.yml');
     });
 
     describe('when there is an update', () => {
-
-      let request, backupPlatform, platformPath, expectedPlatform;
+      let request; let backupPlatform; let platformPath;
+      let expectedPlatform; let app;
       before(async () => {
         platformPath = path.resolve(__dirname, '../fixtures/migration-needed/1.7.0/platform.yml');
         expectedPlatform = yaml.load(fs.readFileSync(path.resolve(__dirname, '../fixtures/migration-needed/1.7.0/expected.yml'), 'utf-8'));
-        const app = new Application({
+        app = new Application({
           nconfSettings: {
             platformSettings: {
               platformConfig: platformPath,
               platformTemplate: templatePath,
-            }
-          }
+            },
+          },
         });
         await app.init();
         request = supertest(app.express);
@@ -355,7 +347,6 @@ describe('Test /admin endpoint', function () {
       });
 
       describe('when the user has sufficient permissions', () => {
-
         describe('when the configuration is correct', () => {
           after(() => {
             fs.writeFileSync(platformPath, backupPlatform);
@@ -363,25 +354,27 @@ describe('Test /admin endpoint', function () {
           it('must migrate the platform configuration and return the executed migrations', async function () {
             if (process.env.IS_CI) {
               // for some reason, in CI, the "git commit" action can't figure out the author
-              this.skip(); 
+              this.skip();
             }
             const res = await request
-              .post('/admin/migrations')
+              .post('/admin/migrations/apply')
               .set('Authorization', updateOnlyToken);
             assert.equal(res.status, 200);
-            const migrations = res.body.migrations;
+            const { migrations } = res.body;
             assert.deepEqual(migrations, [
-              { versionsFrom: ['1.6.21'], versionTo: '1.6.22' }, 
-              { versionsFrom: ['1.6.22'], versionTo: '1.6.23' }, 
-              { versionsFrom: ['1.6.23'], versionTo: '1.7.0' }
+              { versionsFrom: ['1.6.21'], versionTo: '1.6.22' },
+              { versionsFrom: ['1.6.22'], versionTo: '1.6.23' },
+              { versionsFrom: ['1.6.23'], versionTo: '1.7.0' },
             ]);
             const migratedPlatform = yaml.load(fs.readFileSync(platformPath));
-            assert.deepEqual(migratedPlatform, expectedPlatform);
+            assert.deepEqual(migratedPlatform, expectedPlatform, 'platform configuration not migrated on disk');
+            assert.deepEqual(app.platformSettings.get(), expectedPlatform.vars, 'platform configuration not migrated in memory');
           });
-        })
+        });
 
         describe('when there is an error in the platform.yml', () => {
-          let request, platformPath, originalPlatform;
+          let request; let platformPath; let
+              originalPlatform;
           before(() => {
             platformPath = path.resolve(__dirname, '../fixtures/migration-broken/config/platform.yml');
             const app = new Application({
@@ -389,22 +382,23 @@ describe('Test /admin endpoint', function () {
                 platformSettings: {
                   platformConfig: platformPath,
                   platformTemplate: templatePath,
-                }
-              }
+                },
+              },
             });
             request = supertest(app.express);
-            originalPlatform = fs.readFileSync(platformPath, 'utf-8' );
+            originalPlatform = fs.readFileSync(platformPath, 'utf-8');
           });
           it('must return a 400 error and not alter the platform.yml', async () => {
             const res = await request
-              .post('/admin/migrations')
+              .post('/admin/migrations/apply')
               .set('Authorization', updateOnlyToken);
             assert.equal(res.status, 500);
-            assert.equal(fs.readFileSync(platformPath, 'utf-8' ), originalPlatform);
+            assert.equal(fs.readFileSync(platformPath, 'utf-8'), originalPlatform);
           });
         });
         describe('when there is no migration path from the platform.yml to the template', () => {
-          let request, platformPath, originalPlatform;
+          let request; let platformPath; let
+              originalPlatform;
           before(() => {
             platformPath = path.resolve(__dirname, '../fixtures/migration-broken/unavailable-migration/platform.yml');
             const app = new Application({
@@ -412,26 +406,26 @@ describe('Test /admin endpoint', function () {
                 platformSettings: {
                   platformConfig: platformPath,
                   platformTemplate: templatePath,
-                }
-              }
+                },
+              },
             });
             request = supertest(app.express);
-            originalPlatform = fs.readFileSync(platformPath, 'utf-8' );
+            originalPlatform = fs.readFileSync(platformPath, 'utf-8');
           });
           it('must return a 400 error and not alter the platform.yml', async () => {
             const res = await request
-              .post('/admin/migrations')
+              .post('/admin/migrations/apply')
               .set('Authorization', updateOnlyToken);
             assert.equal(res.status, 500);
             assert.equal(res.body.error.message, 'No migration available from 1.2.3 to 1.7.0. Contact Pryv support for more information');
-            assert.equal(fs.readFileSync(platformPath, 'utf-8' ), originalPlatform);
+            assert.equal(fs.readFileSync(platformPath, 'utf-8'), originalPlatform);
           });
         });
       });
       describe('when the user has insufficient permissions', () => {
         it('must return a 401 error', async () => {
           const res = await request
-            .post('/admin/migrations')
+            .post('/admin/migrations/apply')
             .set('Authorization', readOnlyToken);
           assert.equal(res.status, 401);
         });
@@ -439,8 +433,8 @@ describe('Test /admin endpoint', function () {
     });
     describe('when there is no update', () => {
       describe('when the user has sufficient permissions', () => {
-
-        let request, backupPlatform, platformPath;
+        let request; let backupPlatform; let
+            platformPath;
         before(() => {
           platformPath = path.resolve(__dirname, '../fixtures/migration-not-needed/config/platform.yml');
           const app = new Application({
@@ -448,19 +442,19 @@ describe('Test /admin endpoint', function () {
               platformSettings: {
                 platformConfig: platformPath,
                 platformTemplate: templatePath,
-              }
-            }
+              },
+            },
           });
           request = supertest(app.express);
           backupPlatform = fs.readFileSync(platformPath, 'utf-8');
         });
         after(() => {
           fs.writeFileSync(platformPath, backupPlatform);
-        })
+        });
 
         it('must not alter the platform configuration and return an empty list', async () => {
           const res = await request
-            .post('/admin/migrations')
+            .post('/admin/migrations/apply')
             .set('Authorization', updateOnlyToken);
           assert.equal(res.status, 200);
           assert.deepEqual(res.body.migrations, []);
@@ -469,6 +463,5 @@ describe('Test /admin endpoint', function () {
         });
       });
     });
-
   });
 });

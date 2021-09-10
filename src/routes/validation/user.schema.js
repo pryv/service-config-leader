@@ -12,7 +12,7 @@ export const permissionsSchema = joi.object().keys({
     .items(
       joi
         .string()
-        .valid('read', 'create', 'changePermissions', 'resetPassword', 'delete')
+        .valid('read', 'create', 'changePermissions', 'resetPassword', 'delete'),
     ),
   settings: joi.array().required().items(joi.string().valid('read', 'update')),
   platformUsers: joi

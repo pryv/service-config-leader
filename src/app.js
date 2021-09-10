@@ -1,49 +1,51 @@
 // @flow
 
-// eslint-disable-next-line no-unused-vars
-const regeneratorRuntime = require('regenerator-runtime');
+import type { UserNoPerms } from '@models/user.model';
 
-const _ = require('lodash');
+const bluebird = require('bluebird');
 const express = require('express');
 const middlewares = require('@middlewares');
 const fs = require('fs');
-const nconfSettings = (new (require('./settings'))).store;
-const platformSettings = require('./platform')(nconfSettings);
 const Database = require('better-sqlite3');
-const CronJob = require('cron').CronJob;
-const { UsersRepository } = require('@repositories/users.repository');
-import type { UserNoPerms } from '@models/user.model';
-const { TokensRepository } = require('@repositories/tokens.repository');
+const { CronJob } = require('cron');
+const UsersRepository = require('@repositories/users.repository');
+const TokensRepository = require('@repositories/tokens.repository');
 const {
   USERS_PERMISSIONS,
   SETTINGS_PERMISSIONS,
-  PLATFORM_USERS_PERMISSIONS
+  PLATFORM_USERS_PERMISSIONS,
 } = require('@models/permissions.model');
 const morgan = require('morgan');
 const { setupGit } = require('@controller/migration');
+const { injectTestSettings, getSettings } = require('./settings');
 
 class Application {
   express: express$Application;
+
   settings: Object;
+
   platformSettings: Object;
+
   logger: Object;
+
   db: Database;
+
   usersRepository: UsersRepository;
+
   tokensRepository: TokensRepository;
+
   git: {};
 
-  constructor(settingsOverride = {}) {
-    this.settings = _.cloneDeep(nconfSettings);
-    this.platformSettings = _.cloneDeep(platformSettings);
-    if (settingsOverride.nconfSettings) this.settings.merge(settingsOverride.nconfSettings);
-    if (settingsOverride.platformSettings) this.platformSettings.merge(settingsOverride.platformSettings);
-
+  constructor(settingsOverride: {} = {}) {
+    if (settingsOverride.nconfSettings != null) injectTestSettings(settingsOverride.nconfSettings);
+    this.settings = getSettings();
+    this.platformSettings = require('./platform')(this.settings);
+    if (settingsOverride.platformSettings != null) this.platformSettings.setOverrides(settingsOverride.platformSettings);
     this.logger = require('./utils/logging').getLogger('app');
     this.db = this.connectToDb();
     this.usersRepository = new UsersRepository(this.db);
     this.tokensRepository = new TokensRepository(this.db);
-    this.express = this.setupExpressApp(this.settings, this.platformSettings);
-    this.generateSecrets(this.settings);
+    this.express = this.setupExpressApp();
     this.generateInitialUser();
     this.startTokensBlacklistCleanupJob();
     this.git = setupGit({
@@ -52,28 +54,34 @@ class Application {
   }
 
   /**
-   * mandatory in production and tests requiring git (POST /admin/migrations)
+   * mandatory in production and tests requiring git (POST /admin/migrations/apply)
    */
   async init() {
+    await this.platformSettings.load();
+    await this.generateSecretsIfNeeded();
     await this.git.initRepo();
+    // for some reason, in CI, the "git commit" action can't figure out the author
+    if (! process.env.IS_CI) await this.git.commitChanges('config leader boot');
   }
 
-  generateSecrets(settings: Object): void {
-    const internalSettings = settings.get('internals');
+  async generateSecretsIfNeeded(): Promise<void> {
+    const internalSettings = this.settings.get('internals');
 
     if (internalSettings == null) return;
 
+    let isChanged = false;
     for (const [key, value] of Object.entries(internalSettings)) {
       if (value === 'SECRET') {
-        settings.set(`internals:${key}`, randomAlphaNumKey(32));
+        this.settings.set(`internals:${key}`, randomAlphaNumKey(32));
+        isChanged = true;
       }
     }
 
-    settings.save((err) => {
-      if (err) {
-        this.logger.error('Error when saving secrets.', err);
-      }
-    });
+    try {
+      if (isChanged) await bluebird.fromCallback((cb) => this.settings.save(cb));
+    } catch (err) {
+      this.logger.error('Error when saving secrets.', err);
+    }
 
     function randomAlphaNumKey(size: number): string {
       return Array(size)
@@ -85,7 +93,7 @@ class Application {
 
   connectToDb(): Database {
     return new Database(
-      `${this.settings.get('databasePath')}/config-user-management.db`
+      `${this.settings.get('databasePath')}/config-user-management.db`,
     );
   }
 
@@ -93,10 +101,8 @@ class Application {
     this.db.close();
   }
 
-  setupExpressApp(
-    settings: Object,
-    platformSettings: Object
-  ): express$Application {
+  setupExpressApp(): express$Application {
+    const { settings, platformSettings } = this;
     const expressApp = express();
 
     expressApp.use(express.json());
@@ -109,24 +115,24 @@ class Application {
       settings,
       platformSettings,
       this.usersRepository,
-      this.tokensRepository
+      this.tokensRepository,
     );
     require('./routes/users.route')(
       expressApp,
       this.usersRepository,
-      this.tokensRepository
+      this.tokensRepository,
     );
     require('./routes/auth.route')(
       expressApp,
       this.usersRepository,
-      this.tokensRepository
+      this.tokensRepository,
     );
     require('./routes/platformUsers.route')(
       expressApp,
       settings,
       platformSettings,
       this.usersRepository,
-      this.tokensRepository
+      this.tokensRepository,
     );
 
     expressApp.use(middlewares.errors);
@@ -137,11 +143,11 @@ class Application {
   startTokensBlacklistCleanupJob() {
     const job = new CronJob(
       '0 0 * * 0,3,5',
-      function () {
+      (() => {
         this.tokensRepository.clean();
-      }.bind(this),
+      }),
       null,
-      false
+      false,
     );
     job.start();
   }
@@ -170,10 +176,10 @@ class Application {
     this.usersRepository.deleteUser(initialUser.username);
     this.usersRepository.createUser(initialUser);
     const createdUser: UserNoPerms = this.usersRepository.resetPassword(
-      initialUser.username
+      initialUser.username,
     );
     this.logger.info(
-      `Initial user generated. Username: ${initialUser.username}, password: ${createdUser.password}`
+      `Initial user generated. Username: ${initialUser.username}, password: ${createdUser.password}`,
     );
     // also set password in the credentials volume - this directory should be set in docker-compose
     const credentialsFilePath = this.settings.get('credentials:filePath');

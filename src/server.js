@@ -7,8 +7,8 @@ const logger = require('./utils/logging').getLogger('server');
 (async () => {
   // Launch the app and server
   const app = new Application();
-  await app.init() // init git repo
-  const settings = app.settings;
+  await app.init(); // init git repo
+  const { settings } = app;
   const port = settings.get('http:port');
   const ip = settings.get('http:ip');
 

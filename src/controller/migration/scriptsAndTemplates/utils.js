@@ -6,7 +6,7 @@ const logger = require('../../../utils/logging').getLogger('migration-utils');
 
 /**
  * Performs base migration work on copy of platform
- * 
+ *
  * @param {*} platform content of platform.yml
  * @param {*} template content of template platform.yml
  */
@@ -19,57 +19,54 @@ function baseWork(platform: {}, template: {}): {} {
 
   /**
    * Update the platform template version to the one of the template
-   * 
+   *
    * @param {*} platform content of platform.yml
    * @param {*} template content of template platform.yml
    */
   function updateTemplateVersion(platform: {}, template: {}): {} {
-    const templateVersion: string = template.vars.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value
-    platform.vars.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value = templateVersion;
+    const templateVersion: string = template.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value;
+    platform.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value = templateVersion;
     logger.info(`updated template version to: ${templateVersion}`);
     return platform;
   }
-  
+
   /**
    * sets all metedata to the ones of the template
-   * 
+   *
    * @param {*} platform content of platform.yml
    * @param {*} template content of template platform.yml
    */
   function alignMetadata(platform: {}, template: {}): {} {
-    for (const [mainSettingKey, mainSettingValue] of Object.entries(template.vars)) {
-      platform.vars[mainSettingKey].name = mainSettingValue.name;
+    for (const [mainSettingKey, mainSettingValue] of Object.entries(template)) {
+      platform[mainSettingKey].name = mainSettingValue.name;
       for (const [subSettingKey, subSettingValue] of Object.entries(mainSettingValue.settings)) {
-        platform.vars[mainSettingKey].settings[subSettingKey].description = subSettingValue.description;
+        platform[mainSettingKey].settings[subSettingKey].description = subSettingValue.description;
         if (subSettingValue.optional != null) {
-          platform.vars[mainSettingKey].settings[subSettingKey].optional = subSettingValue.optional;
+          platform[mainSettingKey].settings[subSettingKey].optional = subSettingValue.optional;
         }
       }
     }
     logger.info('aligned metadata to template');
     return platform;
   }
-  
+
   /**
    * Adds all new settings from the template
-   * 
+   *
    * @param {*} platform content of platform.yml
    * @param {*} template content of template platform.yml
    */
   function addNewSettings(platform: {}, template: {}): {} {
-  
-    for (const [mainSettingKey, mainSettingValue] of Object.entries(template.vars)) {
-  
-      if (platform.vars[mainSettingKey] == null) {
-        platform.vars[mainSettingKey] = mainSettingValue;
-        logger.info(`added new root setting: ${mainSettingKey}`)
+    for (const [mainSettingKey, mainSettingValue] of Object.entries(template)) {
+      if (platform[mainSettingKey] == null) {
+        platform[mainSettingKey] = mainSettingValue;
+        logger.info(`added new root setting: ${mainSettingKey}`);
       } else {
         for (const [subSettingKey, subSettingValue] of Object.entries(mainSettingValue.settings)) {
-          if (platform.vars[mainSettingKey].settings[subSettingKey] == null) {
-            platform.vars[mainSettingKey].settings[subSettingKey] = subSettingValue;
-            logger.info(`added new sub setting: ${subSettingKey}`)
+          if (platform[mainSettingKey].settings[subSettingKey] == null) {
+            platform[mainSettingKey].settings[subSettingKey] = subSettingValue;
+            logger.info(`added new sub setting: ${subSettingKey}`);
           }
-          
         }
       }
     }
@@ -81,19 +78,19 @@ module.exports.baseWork = baseWork;
 /**
  * Deletes from platform.yml settings that are gone from the template
  * This is a destructive
- * 
- * @param {*} platform 
- * @param {*} template 
+ *
+ * @param {*} platform
+ * @param {*} template
  */
 function deleteRemovedSettings(platform: {}, template: {}): {} {
-  for (const [mainSettingKey, mainSettingValue] of Object.entries(platform.vars)) {
-    if (template.vars[mainSettingKey] == null) {
-      delete platform.vars[mainSettingKey];
+  for (const [mainSettingKey, mainSettingValue] of Object.entries(platform)) {
+    if (template[mainSettingKey] == null) {
+      delete platform[mainSettingKey];
       logger.info(`removed root setting: ${mainSettingKey}`);
     } else {
-      for (const [subSettingKey, subSettingValue] of Object.entries(mainSettingValue.settings)) {
-        if (template.vars[mainSettingKey].settings[subSettingKey] == null) {
-          delete platform.vars[mainSettingKey].settings[subSettingKey];
+      for (const subSettingKey of Object.keys(mainSettingValue.settings)) {
+        if (template[mainSettingKey].settings[subSettingKey] == null) {
+          delete platform[mainSettingKey].settings[subSettingKey];
           logger.info(`removed sub setting: ${subSettingKey}`);
         }
       }

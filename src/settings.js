@@ -1,24 +1,30 @@
 // @flow
 
 const nconf = require('nconf');
-const path = require('path');
 
-function nconfSettings() {
-  this.store = new nconf.Provider();
+let store;
+function getSettings() {
+  if (store != null) return store;
+  store = new nconf.Provider();
+
+  store.use('memory');
+  store.use('test', { type: 'literal', store: {} });
 
   // 1. `process.env`
   // 2. `process.argv`
   //
-  this.store.env().argv();
+  store.env({
+    separator: '__',
+  }).argv();
 
   // 3. Values in `config.json`
   //
-  const configFile = this.store.get('config') || 'dev-config.json';
-  this.store.file({ file: configFile });
+  const configFile = store.get('config') || 'dev-config.json';
+  store.file({ file: configFile });
 
   // 4. Any default values
   //
-  this.store.defaults({
+  store.defaults({
     http: {
       port: 7000,
       ip: '127.0.0.1',
@@ -40,11 +46,21 @@ function nconfSettings() {
     credentials: {
       filePath: '/app/credentials/credentials.txt',
     },
+    gitRepoPath: '/app/conf/',
+    platformSettings: {
+      platformConfig: '/app/conf/platform.yml',
+      platformTemplate: '/app/conf/template-platform.yml',
+    },
   });
 
-  if (process.env.NODE_ENV === 'test') this.store.set('logs:console:active', false);
+  if (process.env.NODE_ENV === 'test') store.set('logs:console:active', false);
 
-  return this;
+  return store;
 }
 
-module.exports = nconfSettings;
+function injectTestSettings(testConf: {}) {
+  store.add('test', { type: 'literal', store: testConf });
+}
+
+module.exports.getSettings = getSettings;
+module.exports.injectTestSettings = injectTestSettings;

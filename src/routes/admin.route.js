@@ -1,40 +1,38 @@
 // @flow
 
-// eslint-disable-next-line no-unused-vars
-const regeneratorRuntime = require('regenerator-runtime');
+import {
+  listConfFiles,
+  applySubstitutions,
+  isValidJSON,
+  isJSONFile,
+} from '@utils/configuration.utils';
 
-const bluebird = require('bluebird');
 const fs = require('fs');
 const request = require('superagent');
 const _ = require('lodash');
 const logger = require('@utils/logging').getLogger('admin');
 const errorsFactory = require('@utils/errorsHandling').factory;
 const { SETTINGS_PERMISSIONS } = require('@models/permissions.model');
-const { verifyToken } = require('@middlewares/security/token.verification');
+const verifyToken = require('@middlewares/security/token.verification');
 const {
   getAuthorizationService,
   AuthorizationService,
 } = require('@middlewares/security/authorization.service');
-const { UsersRepository } = require('@repositories/users.repository');
-const { TokensRepository } = require('@repositories/tokens.repository');
-const { getGit } = require('@controller/migration/git');
-import {
-  listConfFiles,
-  applySubstitutions,
-  isValidJSON,
-  isJSONFile
-} from '@utils/configuration.utils';
-const { loadPlatformTemplate, loadPlatform, writePlatform, checkMigrations, migrate } = require('@controller/migration');
+const UsersRepository = require('@repositories/users.repository');
+const TokensRepository = require('@repositories/tokens.repository');
+const {
+  loadPlatformTemplate, checkMigrations, migrate,
+} = require('@controller/migration');
 
 module.exports = function (
   expressApp: express$Application,
   settings: Object,
-  platformSettings: Object,
+  platformSettings: {},
   usersRepository: UsersRepository,
-  tokensRepository: TokensRepository
+  tokensRepository: TokensRepository,
 ) {
   const authorizationService: AuthorizationService = getAuthorizationService(
-    usersRepository
+    usersRepository,
   );
 
   expressApp.all('/admin*', verifyToken(tokensRepository));
@@ -46,74 +44,63 @@ module.exports = function (
     async (
       req: express$Request,
       res: express$Response,
-      next: express$NextFunction
+      next: express$NextFunction,
     ) => {
-      const previousSettings = platformSettings.get('vars');
-      const templatesPath = settings.get('templatesPath');
-      const newSettings = Object.assign({}, previousSettings, req.body);
-
-      let list = [];
-      listConfFiles(templatesPath, list);
-
       try {
+        await platformSettings.load();
+        const previousSettings = platformSettings.get();
+        const templatesPath = settings.get('templatesPath');
+        const newSettings = { ...previousSettings, ...req.body };
+
+        const list = [];
+        listConfFiles(templatesPath, list);
+
         list.forEach((file) => {
           const templateConf = fs.readFileSync(file, 'utf8');
           const newConf = applySubstitutions(
             templateConf,
             settings,
-            newSettings
+            newSettings,
           );
           if (isJSONFile(file) && !isValidJSON(newConf)) {
             throw errorsFactory.invalidInput(
-              'Configuration format invalid'
+              'Configuration format invalid',
             );
           }
+        });
+        await platformSettings.save(newSettings, `update through PUT /admin/settings by ${res.locals.username}`);
+
+        return res.send({
+          settings: newSettings,
         });
       } catch (err) {
         return next(err);
       }
-      
-
-      platformSettings.set('vars', newSettings);
-
-      try {
-        await bluebird.fromCallback(cb => platformSettings.save(cb));
-      } catch (err) {
-        platformSettings.set('vars', previousSettings);
-        return next(err);
-      }
-
-      try {
-        // perform git commit
-        const git: {} = getGit();
-        await git.commitChanges(`update through PUT /admin/settings by ${res.locals.username}`);
-      } catch (err) {
-        return next(err);
-      }
-      
-      res.send({ 
-        settings: newSettings
-      });
-    }
+    },
   );
 
   // returns current settings as json
   expressApp.get(
     '/admin/settings',
     authorizationService.verifyIsAllowedTo(SETTINGS_PERMISSIONS.READ),
-    (
+    async (
       req: express$Request,
       res: express$Response,
-      next: express$NextFunction
+      next: express$NextFunction,
     ) => {
-      const currentSettings = platformSettings.get('vars');
-      if (currentSettings == null) {
-        next(new Error('Missing platform settings.'));
+      try {
+        await platformSettings.load();
+        const currentSettings = platformSettings.get();
+        if (currentSettings == null) {
+          return next(new Error('Missing platform settings.'));
+        }
+        return res.json({
+          settings: currentSettings,
+        });
+      } catch (err) {
+        return next(err);
       }
-      res.json({
-        settings: currentSettings
-      });
-    }
+    },
   );
 
   // notifies followers about configuration changes
@@ -123,35 +110,41 @@ module.exports = function (
     async (
       req: express$Request,
       res: express$Response,
-      next: express$NextFunction
+      next: express$NextFunction,
     ) => {
       const followers = settings.get('followers');
-      const services = req.body.services;
+      const { services } = req.body;
       if (followers == null) {
         next(new Error('Missing followers settings.'));
       }
 
-      let successes = [];
-      let failures = [];
+      const successes = [];
+      const failures = [];
+
+      const requests: Array<Promise<any>> = [];
       for (const [auth, follower] of Object.entries(followers)) {
-        const followerUrl = follower.url;
-        try {
-          await request
-            .post(`${followerUrl}/notify`)
-            .set('Authorization', auth)
-            .send({ services: services });
-          successes.push(follower);
-        } catch (err) {
-          logger.warn('Error while notifying follower:', err);
-          failures.push(Object.assign({}, follower, { error: err }));
-        }
+        requests.push((async () => {
+          const followerUrl = follower.url;
+          try {
+            await request
+              .post(`${followerUrl}/notify`)
+              .set('Authorization', auth)
+              .send({ services });
+            successes.push(follower);
+          } catch (e) {
+            logger.error('Error while notifying follower:', e);
+            failures.push({ ...follower, error: e });
+          }
+        })());
       }
+      await Promise.allSettled(requests);
 
       res.json({
-        successes: successes,
-        failures: failures
+        successes,
+        failures,
       });
-    });
+    },
+  );
 
   // returns list of available config migrations
   expressApp.get(
@@ -160,36 +153,39 @@ module.exports = function (
     async (
       req: express$Request,
       res: express$Response,
-      next: express$NextFunction
+      next: express$NextFunction,
     ) => {
       try {
-        const platform = await loadPlatform(settings);
+        await platformSettings.load();
+        const platform = platformSettings.get();
         const platformTemplate = await loadPlatformTemplate(settings);
-        const migrations = checkMigrations(platform, platformTemplate).migrations.map(m => _.pick(m, ['versionsFrom', 'versionTo']));
+        const migrations = checkMigrations(platform, platformTemplate).migrations.map((m) => _.pick(m, ['versionsFrom', 'versionTo']));
         res.json({ migrations });
       } catch (err) {
-        next (err);
+        next(err);
       }
-    }
+    },
   );
 
   expressApp.post(
-    '/admin/migrations',
+    '/admin/migrations/apply',
     authorizationService.verifyIsAllowedTo(SETTINGS_PERMISSIONS.UPDATE),
     async (
       req: express$Request,
       res: express$Response,
-      next: express$NextFunction
+      next: express$NextFunction,
     ) => {
       try {
-        const platform = await loadPlatform(settings);
+        await platformSettings.load();
+        const platform = platformSettings.get();
         const platformTemplate = await loadPlatformTemplate(settings);
         const { migrations, migratedPlatform } = migrate(platform, platformTemplate);
-        if (migrations.length > 0) await writePlatform(settings, migratedPlatform, res.locals.username);
-        res.json({ migrations: migrations.map(m => _.pick(m, ['versionsFrom', 'versionTo'])) });
+
+        if (migrations.length > 0) await platformSettings.save(migratedPlatform, `update through POST /admin/migrations/apply by ${res.locals.username}`);
+        res.json({ migrations: migrations.map((m) => _.pick(m, ['versionsFrom', 'versionTo'])) });
       } catch (e) {
         next(e);
       }
-    }
+    },
   );
 };
