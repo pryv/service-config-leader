@@ -2,8 +2,14 @@
 
 ### 1.1.7
 
-- add /admin/migrations routes to check and apply platform config migrations
-  - including git-based versioning
+add /admin/migrations routes to check and apply platform config migrations:
+
+- including git-based versioning for modifications to platform.yml
+- new scheme with active platform.yml and template
+- settings and platformSettings refactoring
+- update linter
+- upgrade to node 16
+- replace transpilation with the one from core, cleaning up garbage such as regenerator-runtime
 
 ### 1.1.4-5-6
 
