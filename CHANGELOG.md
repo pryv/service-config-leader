@@ -1,6 +1,6 @@
 ## 1.0
 
-### 1.1.7
+### 1.2.0 (1.1.7)
 
 add /admin/migrations routes to check and apply platform config migrations:
 
