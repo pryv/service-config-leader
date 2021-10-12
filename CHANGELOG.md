@@ -1,5 +1,9 @@
 ## 1.0
 
+### 1.2.1-2
+
+Update templates and adapt tests
+
 ### 1.2.0 (1.1.7)
 
 add /admin/migrations routes to check and apply platform config migrations:
