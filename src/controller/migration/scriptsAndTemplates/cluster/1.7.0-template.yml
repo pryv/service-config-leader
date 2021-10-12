@@ -87,7 +87,7 @@ vars:
         value: 20
         description: "The value of the maximum upload size in Mega Bytes."
       DISABLE_GET_USERNAME_BY_EMAIL:
-        description: "Whether to disable endpoint GET /:email/username"
+        description: "Whether to disable endpoint GET /:email/username (https://api.pryv.com/reference-system/#get-username-from-email)"
         value: false
       ACCOUNT_DELETION:
         description: "Whether platform user account is available and by which command.
@@ -96,6 +96,14 @@ vars:
           - personalToken: User account deletion will be available by the user with a personal token. Contact Pryv for the API route details."
         value:
           - adminToken
+      INTEGRITY_SETTINGS:
+        description: "Wether integrity computations are active. This feature has a considerable performance cost. We recommend activating it if you require this for compliance. Available algorithms: sha256, sha512, sha1, md5."
+        value:
+          isActive:
+            attachments: false
+            events: false
+            accesses: false
+          algorithm: sha256
   SERVICE_INFORMATION_SETTINGS:
     name: "Service information settings"
     optional: true
@@ -112,7 +120,7 @@ vars:
         description: "URL to the Terms of use of the service. eg.: https://pryv.com/terms-of-use/"
       SERVICE_INFO_ASSETS:
         value: 
-          definitions: "https://pryv.github.io/assets-pryv.me/index.json"
+          definitions: "https://api.pryv.com/assets-pryv.me/index.json"
         description: "URL of platform visual assets. See: https://github.com/pryv/assets-pryv.me"
   DNS_SETTINGS:
     name: "DNS settings"
@@ -141,6 +149,9 @@ vars:
       DNS_ROOT_TXT_ARRAY:
         value: []
         description: "DNS TXT records for @ value for ${DOMAIN}. Ex.: [\"_globalsign-domain-verification=n3PT\",\"v=spf1 include:_mailcust.gandi.net ?all\"]"
+      DNS_MX_RECORDS:
+        description: "MX Records for the platform domain. See the DNS configuration document: https://api.pryv.com/customer-resources/#documents. Default value: []"
+        value: []
   EMAIL_CONFIGURATION_SETTINGS:
     optional: true
     description: "See the Emails configuration document: https://api.pryv.com/customer-resources/#documents"
@@ -305,7 +316,8 @@ vars:
           - deletionMode: defines the behaviour of events deletion
           - 'keep-nothing': Delete history, keep head as itemDeletion as it is now by default.
           - 'keep-authors': Keep fields 'headId', 'id', 'modified', 'modifiedBy' in head and history.
-          - 'keep-everything': Add 'deleted' field to head item, leave history as is."
+          - 'keep-everything': Add 'deleted' field to head item, leave history as is.
+          WARNING: Activating this has a performance cost on events.update and events.delete operations."
         value:
           forceKeepHistory: false
           deletionMode: keep-nothing
@@ -339,6 +351,12 @@ vars:
         description: "Makes the API accept and return system streams with the old '.' (dot) prefix (ex.: '.account'). When activated, you can migrate applications by making API calls with the 'disable-backward-compatibility-prefix: true' header.
         Default value: false"
         value: false
+      BACKWARD_COMPATIBILITY_TAGS:
+        description: "This provides tags to streamIds conversion. When creating an event with tags, it creates streams if necessary and assigns the event to these streamIds. The new streams are created as children of a stream with id ${rootStreamId} and each streamId is assigned the ${streamIdPrefix}. Activating this has a considerable performance cost, it is recommmended to activate this if you were using tags and need to perform a transition out of them."
+        value: 
+          isActive: false
+          rootStreamId: 'tags-migrated'  
+          streamIdPrefix: 'tag-migrated-'
   AUDIT_SETTINGS:
     name: "Audit settings"
     settings:
