@@ -1,6 +1,6 @@
 ## 1.0
 
-### 1.2.1-2
+### 1.2.1-3
 
 Update templates and adapt tests
 
