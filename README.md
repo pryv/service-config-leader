@@ -18,6 +18,22 @@ Prerequisites: Node v8+, Yarn v1+
 | Create Distribution          | `yarn release` |
 | Recompile During Development | `yarn watch`   |
 
+## Add template
+
+1. Create the following files (find inspiration from previous entries):
+1.1 `src/controller/migration/scriptsAndTemplates/cluster/${version}.js`
+1.2 `src/controller/migration/scriptsAndTemplates/cluster/${version}-template.yml`
+1.1 `src/controller/migration/scriptsAndTemplates/single-node/${version}.js`
+1.2 `src/controller/migration/scriptsAndTemplates/single-node/${version}-template.yml`
+
+2. Add links to the files you added in the `migrations` object in `src/controller/migration/migrations.js`
+
+3. Run tests
+
+4. Build new image
+
+5. Update config-leader image version in config-template-pryv.io
+
 ## How it works
 
 Takes variables from:
