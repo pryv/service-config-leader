@@ -1,6 +1,6 @@
 ## 1.0
 
-### 1.2.5
+### 1.2.5-6
 
 In migration process, handle if a value is a JSON or not.
 

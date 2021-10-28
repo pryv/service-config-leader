@@ -104,9 +104,9 @@ module.exports.deleteRemovedSettings = deleteRemovedSettings;
  * To use when the value retrieved from the platform config is:
  * - either a JSON object
  * - or a JavaScript object
- * 
- * @param {*} fieldName 
- * @param {*} jsonOrObject 
+ *
+ * @param {*} fieldName
+ * @param {*} jsonOrObject
  */
 function getObjectOrParseJSON(fieldName, jsonOrObject): {} {
   try {
@@ -114,7 +114,7 @@ function getObjectOrParseJSON(fieldName, jsonOrObject): {} {
     return parsedObject;
   } catch (e) {
     if (e.message.includes('Unexpected token') && e.message.includes('in JSON at position')) {
-      logger.info(`attempted to parse ${fieldName} which was in fact an object and did not require parsing`)
+      logger.info(`attempted to parse ${fieldName} which was in fact an object and did not require parsing`);
       return jsonOrObject;
     }
     throw e;
