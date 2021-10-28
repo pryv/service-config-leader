@@ -1,12 +1,11 @@
 // @flow
 
 const { cloneAndApply } = require('@utils/treeUtils');
-const { baseWork, deleteRemovedSettings } = require('../utils');
+const { baseWork, deleteRemovedSettings, getObjectOrParseJSON } = require('../utils');
 
 module.exports = (platform: {}, template: {}): {} => {
   let platformCopy: {} = baseWork(platform, template);
-
-  let old = JSON.parse(platformCopy.ADVANCED_API_SETTINGS.settings.CUSTOM_SYSTEM_STREAMS.value);
+  let old = getObjectOrParseJSON('platformCopy.ADVANCED_API_SETTINGS.settings.CUSTOM_SYSTEM_STREAMS.value', platformCopy.ADVANCED_API_SETTINGS.settings.CUSTOM_SYSTEM_STREAMS.value);
 
   old = convertRootKeysToStreams(old);
   old = cloneAndApply(old, (s) => {

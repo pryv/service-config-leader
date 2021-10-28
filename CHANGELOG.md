@@ -1,6 +1,10 @@
 ## 1.0
 
-### 1.2.1-3
+### 1.2.5
+
+In migration process, handle if a value is a JSON or not.
+
+### 1.2.1-4
 
 Update templates and adapt tests
 
