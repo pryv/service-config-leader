@@ -20,7 +20,7 @@ Prerequisites: Node v8+, Yarn v1+
 
 ## Add template
 
-1. Create the following files (find inspiration from previous entries), if there is no difference between cluster and single-node, write only the `.js` for cluster and put only `module.exports = require('../cluster/1.7.0');` in single-node:
+1. Create the following files (find inspiration from previous entries), if there is no difference between cluster and single-node, write only the `.js` for cluster and put only `module.exports = require('../cluster/1.7.0');` in single-node:  
 1.1 `src/controller/migration/scriptsAndTemplates/cluster/${version}.js`  
 1.2 `src/controller/migration/scriptsAndTemplates/cluster/${version}-template.yml`  
 1.1 `src/controller/migration/scriptsAndTemplates/single-node/${version}.js`  
