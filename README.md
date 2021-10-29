@@ -33,6 +33,8 @@ If there is no difference between cluster and single-node, write only the `.js` 
 module.exports = require('../cluster/1.7.0');
 ```
 
+If you need to manipulate some object, use [utils.getObjectOrParseJSON()](https://github.com/pryv/service-config-leader/blob/master/src/controller/migration/scriptsAndTemplates/utils.js#L111) to parse it, for it may be JSON or not.
+
 2. Add links to the files you added in the `migrations` object in `src/controller/migration/migrations.js`
 
 3. Run tests
