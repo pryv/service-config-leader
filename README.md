@@ -21,10 +21,11 @@ Prerequisites: Node v8+, Yarn v1+
 ## Add template
 
 1. Create the following files (find inspiration from previous entries):  
-1.1 `src/controller/migration/scriptsAndTemplates/cluster/${version}.js`  
-1.2 `src/controller/migration/scriptsAndTemplates/cluster/${version}-template.yml`  
-1.3 `src/controller/migration/scriptsAndTemplates/single-node/${version}.js`  
-1.4 `src/controller/migration/scriptsAndTemplates/single-node/${version}-template.yml`  
+
+- `src/controller/migration/scriptsAndTemplates/cluster/${version}.js`  
+- `src/controller/migration/scriptsAndTemplates/cluster/${version}-template.yml`  
+- `src/controller/migration/scriptsAndTemplates/single-node/${version}.js`  
+- `src/controller/migration/scriptsAndTemplates/single-node/${version}-template.yml`  
 
 If there is no difference between cluster and single-node, write only the `.js` for cluster and put the following in single-node:  
 
