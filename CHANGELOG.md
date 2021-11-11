@@ -1,5 +1,10 @@
 ## 1.0
 
+### 1.2.7-9
+
+- add instructions in readme on how to generate new template
+- release new templates
+
 ### 1.2.5-6
 
 In migration process, handle if a value is a JSON or not.
