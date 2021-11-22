@@ -1,5 +1,9 @@
 ## 1.0
 
+### 1.2.10
+
+- template 1.7.5
+
 ### 1.2.7-9
 
 - add instructions in readme on how to generate new template
