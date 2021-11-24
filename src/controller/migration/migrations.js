@@ -152,6 +152,18 @@ const migrations: Array<Migration> = addTemplateUpgradeToEmptyRuns([
       template: loadTemplate('scriptsAndTemplates/cluster/1.7.5-template.yml'),
     },
   },
+  {
+    versionsFrom: ['1.7.5'],
+    versionTo: '1.7.6',
+    singlenode: {
+      run: require('./scriptsAndTemplates/single-node/1.7.6'),
+      template: loadTemplate('scriptsAndTemplates/single-node/1.7.6-template.yml'),
+    },
+    cluster: {
+      run: require('./scriptsAndTemplates/cluster/1.7.6'),
+      template: loadTemplate('scriptsAndTemplates/cluster/1.7.6-template.yml'),
+    },
+  },
 ]);
 
 /**
