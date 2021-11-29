@@ -162,7 +162,12 @@ module.exports = function (
         return next(errors.unexpectedError(new Error(`Error while making delete MFA request to core at: ${coreUrl}. Core error: ${err.message}`)));
       }
 
-      auditLogger.appendToLogFile(res.locals.username, MODIFY_USER_ACTION, username);
+      try {
+        auditLogger.appendToLogFile(res.locals.username, MODIFY_USER_ACTION, username);
+      } catch(err) {
+        return next(errors.unexpectedError(new Error(`Error while logging MFA deactivation: ${err.message}`)));
+      }
+      
 
       return res.status(204).end();
     },
