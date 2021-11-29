@@ -164,10 +164,9 @@ module.exports = function (
 
       try {
         auditLogger.appendToLogFile(res.locals.username, MODIFY_USER_ACTION, username);
-      } catch(err) {
+      } catch (err) {
         return next(errors.unexpectedError(new Error(`Error while logging MFA deactivation: ${err.message}`)));
       }
-      
 
       return res.status(204).end();
     },
