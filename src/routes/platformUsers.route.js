@@ -171,7 +171,7 @@ module.exports = function (
           return next(errors.unexpectedError(new Error(`Error while fetching user's core from register at: ${registerUrl}. Register error: ${err.message}`)));
         }
       }
-      
+
       // send request
       try {
         await request
