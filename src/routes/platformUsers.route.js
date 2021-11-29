@@ -144,6 +144,7 @@ module.exports = function (
       const registerUrl = settings.get('registerUrl');
       let coreUrl: string;
       // find core
+      logger.info(`going to query core to register on "${registerUrl}" for username "${username}"`);
       try {
         const res = await request
           .get(url.resolve(registerUrl, '/cores'))
@@ -152,7 +153,7 @@ module.exports = function (
       } catch (err) {
         return next(errors.unexpectedError(new Error(`Error while fetching user's core from register at: ${registerUrl}. Register error: ${err.message}`)));
       }
-
+      logger.info(`retrieved core url: "${coreUrl}"`);
       // send request
       try {
         await request
@@ -161,12 +162,14 @@ module.exports = function (
       } catch (err) {
         return next(errors.unexpectedError(new Error(`Error while making delete MFA request to core at: ${coreUrl}. Core error: ${err.message}`)));
       }
+      logger.info(`delete MFA for ${username}!`);
 
       try {
         auditLogger.appendToLogFile(res.locals.username, MODIFY_USER_ACTION, username);
       } catch (err) {
         return next(errors.unexpectedError(new Error(`Error while logging MFA deactivation: ${err.message}`)));
       }
+      logger.info('logged stufff');
 
       return res.status(204).end();
     },
