@@ -142,18 +142,36 @@ module.exports = function (
       const authKeyCore = settings.get('internals:CORE_SYSTEM_KEY');
       const { username } = req.params;
       const registerUrl = settings.get('registerUrl');
-      let coreUrl: string;
-      // find core
-      logger.info(`going to query core to register on "${registerUrl}" for username "${username}"`);
-      try {
-        const res = await request
-          .get(url.resolve(registerUrl, '/cores'))
-          .query({ username });
-        coreUrl = res.body.core.url;
-      } catch (err) {
-        return next(errors.unexpectedError(new Error(`Error while fetching user's core from register at: ${registerUrl}. Register error: ${err.message}`)));
+      let coreUrl: string = '';
+
+      const followers = settings.get('followers');
+      if (followers == null) {
+        return next(new Error('Missing followers settings'));
       }
-      logger.info(`retrieved core url: "${coreUrl}"`);
+      const cores = Object.entries(followers)
+        .filter((follower) => (follower[1].role === 'core') || (follower[1].role === 'singlenode'))
+        .map((core) => core[1]);
+
+      if (cores == null || cores.length === 0) {
+        return next(
+          new Error('No core machines defined in followers settings'),
+        );
+      }
+
+      if (cores[0].role === 'singlenode') {
+        coreUrl = 'http://core:3000';
+      } else {
+        // find core
+        try {
+          const res = await request
+            .get(url.resolve(registerUrl, '/cores'))
+            .query({ username });
+          coreUrl = res.body.core.url;
+        } catch (err) {
+          return next(errors.unexpectedError(new Error(`Error while fetching user's core from register at: ${registerUrl}. Register error: ${err.message}`)));
+        }
+      }
+      
       // send request
       try {
         await request
@@ -162,14 +180,12 @@ module.exports = function (
       } catch (err) {
         return next(errors.unexpectedError(new Error(`Error while making delete MFA request to core at: ${coreUrl}. Core error: ${err.message}`)));
       }
-      logger.info(`delete MFA for ${username}!`);
 
       try {
         auditLogger.appendToLogFile(res.locals.username, MODIFY_USER_ACTION, username);
       } catch (err) {
         return next(errors.unexpectedError(new Error(`Error while logging MFA deactivation: ${err.message}`)));
       }
-      logger.info('logged stufff');
 
       return res.status(204).end();
     },
