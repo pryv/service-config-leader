@@ -8,6 +8,7 @@ const {
 const charlatan = require('charlatan');
 const nock = require('nock');
 const Application = require('@root/app');
+const { injectTestSettings } = require('@root/settings');
 
 const app = new Application();
 const request = require('supertest')(app.express);
@@ -223,6 +224,7 @@ describe('/platform-users', () => {
           after(() => {
             app.settings.set('followers', followersBackup);
             app.settings.set('registerUrl', registerUrlBackup);
+            injectTestSettings({});
           });
           it('must respond with 200', () => {
             assert.strictEqual(res.status, 200);

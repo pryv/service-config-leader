@@ -107,3 +107,31 @@ export function isValidJSON(text: string) {
 export function isJSONFile(file: string): boolean {
   return path.extname(file) === '.json';
 }
+
+export function isSingleNode(followers: {}): boolean {
+  if (followers == null) {
+    throw new Error('Missing followers settings');
+  }
+  const singleNodeFollowers = Object.entries(followers)
+    .filter((follower) => follower[1].role === 'singlenode');
+
+  if (singleNodeFollowers.length === 1) {
+    return true;
+  }
+  return false;
+}
+
+export function findCoresUrls(followers: {}): Array<string> {
+  if (followers == null) {
+    throw new Error('Missing followers settings');
+  }
+  const coreUrls = Object.entries(followers)
+    .filter((follower) => (follower[1].role === 'core'))
+    .map((core) => core[1].url);
+
+  if (coreUrls == null || coreUrls.length === 0) {
+    throw new Error('No core machines defined in followers settings');
+  }
+
+  return coreUrls;
+}

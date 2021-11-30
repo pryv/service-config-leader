@@ -14,6 +14,7 @@ const {
 const { PLATFORM_USERS_PERMISSIONS } = require('@models/permissions.model');
 const { getAuditLogger, DELETE_USER_ACTION, MODIFY_USER_ACTION } = require('@utils/auditLogger');
 const errors = require('@utils/errorsHandling').factory;
+const { isSingleNode, findCoresUrls } = require('@utils/configuration.utils');
 
 module.exports = function (
   expressApp: express$Application,
@@ -69,36 +70,20 @@ module.exports = function (
       const authKeyReg = settings.get('internals:REGISTER_SYSTEM_KEY_1');
       const registerUrl = settings.get('registerUrl');
 
-      const followers = settings.get('followers');
-      if (followers == null) {
-        return next(new Error('Missing followers settings'));
-      }
-      const cores = Object.entries(followers)
-        .filter((follower) => (follower[1].role === 'core') || (follower[1].role === 'singlenode'))
-        .map((core) => core[1]);
-
-      if (cores == null || cores.length === 0) {
-        return next(
-          new Error('No core machines defined in followers settings'),
-        );
-      }
-
       try {
         const deleteFromCoresPromises = [];
-        for (const core of cores) {
-          if (core.role === 'singlenode') {
-            deleteFromCoresPromises.push(
-              request
-                .delete(`http://core:3000/users/${usernameToDelete}`)
-                .set('Authorization', authKeyCore),
-            );
-          } else {
-            deleteFromCoresPromises.push(
-              request
-                .delete(url.resolve(core.url, `/users/${usernameToDelete}`))
-                .set('Authorization', authKeyCore),
-            );
-          }
+        let coreUrls: Array<string> = [];
+        if (isSingleNode(settings.get('followers'))) {
+          coreUrls.push('http://core:3000');
+        } else {
+          coreUrls = findCoresUrls(settings.get('followers'));
+        }
+        for (const coreUrl: string of coreUrls) {
+          deleteFromCoresPromises.push(
+            request
+              .delete(url.resolve(coreUrl, `/users/${usernameToDelete}`))
+              .set('Authorization', authKeyCore),
+          );
         }
 
         await bluebird.any(deleteFromCoresPromises);
@@ -144,21 +129,7 @@ module.exports = function (
       const registerUrl = settings.get('registerUrl');
       let coreUrl: string = '';
 
-      const followers = settings.get('followers');
-      if (followers == null) {
-        return next(new Error('Missing followers settings'));
-      }
-      const cores = Object.entries(followers)
-        .filter((follower) => (follower[1].role === 'core') || (follower[1].role === 'singlenode'))
-        .map((core) => core[1]);
-
-      if (cores == null || cores.length === 0) {
-        return next(
-          new Error('No core machines defined in followers settings'),
-        );
-      }
-
-      if (cores[0].role === 'singlenode') {
+      if (isSingleNode(settings.get('followers'))) {
         coreUrl = 'http://core:3000';
       } else {
         // find core
