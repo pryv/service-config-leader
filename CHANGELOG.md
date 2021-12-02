@@ -1,5 +1,9 @@
 ## 1.0
 
+### 1.2.13
+
+- template 1.7.8
+
 ### 1.2.12
 
 - Fix deactivate MFA for singlenode - fixes network issues where requests cannot be made on public hostname from within same network
