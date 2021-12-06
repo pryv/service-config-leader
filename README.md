@@ -1,11 +1,12 @@
-# Service-configuration
+# Service-config-leader
 
-A service for centralization of Pryv.io configuration and distribution among all Pryv.io components.
+Service enabling centralized configuration of all Pryv.io components; paired with [service-config-follower](https://github.com/pryv/service-config-follower).
 
 Exposes HTTP REST API to retrieve and update platform configuration.
 Exposes also HTTP REST API to manage users having access to the platform configuration API.
 
 Prerequisites: Node v8+, Yarn v1+
+
 
 ## How to?
 
@@ -17,6 +18,7 @@ Prerequisites: Node v8+, Yarn v1+
 | Run Tests with server logs   | `yarn test-log`|
 | Create Distribution          | `yarn release` |
 | Recompile During Development | `yarn watch`   |
+
 
 ## Add template
 
@@ -42,6 +44,7 @@ If you need to manipulate some object, use [utils.getObjectOrParseJSON()](https:
 4. Build new image
 
 5. Update config-leader image version in config-template-pryv.io
+
 
 ## How it works
 
@@ -69,6 +72,7 @@ VAR*NAME: {...}
 ->
 *.../\${role}.json\_
 VAR_KEY: VAR_NAME
+
 
 ## Platform configuration with the API
 
