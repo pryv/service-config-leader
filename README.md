@@ -20,30 +20,9 @@ Prerequisites: Node v8+, Yarn v1+
 | Recompile During Development | `yarn watch`   |
 
 
-## Add template
+## Adding a new template
 
-1. Create the following files (find inspiration from previous entries):  
-
-- `src/controller/migration/scriptsAndTemplates/cluster/${version}.js`  
-- `src/controller/migration/scriptsAndTemplates/cluster/${version}-template.yml`  
-- `src/controller/migration/scriptsAndTemplates/single-node/${version}.js`  
-- `src/controller/migration/scriptsAndTemplates/single-node/${version}-template.yml`  
-
-If there is no difference between cluster and single-node, write only the `.js` for cluster and put the following in single-node:  
-
-```javascript
-module.exports = require('../cluster/1.7.0');
-```
-
-If you need to manipulate some object, use [utils.getObjectOrParseJSON()](https://github.com/pryv/service-config-leader/blob/master/src/controller/migration/scriptsAndTemplates/utils.js#L111) to parse it, for it may be JSON or not.
-
-2. Add links to the files you added in the `migrations` object in `src/controller/migration/migrations.js`
-
-3. Run tests
-
-4. Build new image
-
-5. Update config-leader image version in config-template-pryv.io
+See the [steps to publish a new release](https://github.com/pryv/intranet/blob/master/Engineering/Codebase/Publishing%20a%20new%20release.md#in-config-leader) on the intranet.
 
 
 ## How it works
