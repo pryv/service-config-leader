@@ -1,6 +1,6 @@
 {
   "name": "service-config-leader",
-  "version": "1.0.11",
+  "version": "1.2.16",
   "description": "A service for centralization of Pryv.io configuration and distribution among all Pryv.io components.",
   "main": "index.js",
   "author": "Thiébaud Modoux",
