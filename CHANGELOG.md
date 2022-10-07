@@ -1,4 +1,11 @@
 ## 1.0
+### 1.2.20
+
+- new password rules entries
+
+### 1.2.19
+
+- template 1.8.0
 
 ### 1.2.19
 
