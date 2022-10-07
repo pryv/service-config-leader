@@ -268,6 +268,22 @@ vars:
       PASSWORD_RESET_MAX_AGE:
         value: 3600000
         description: "Validity (in milliseconds) of a password reset request"
+      PASSWORD_COMPLEXITY_MIN_CHAR_CATS:
+        value: 1
+        description: "Value between 1 and 4. Minimal number of character categories contained in a password. 
+        Categories are: lowercase, uppercase, number, symbol"
+      PASSWORD_COMPLEXITY_MIN_LENGTH:
+        value: 6
+        description: "Minimal length of password."
+      PASSWORD_AGE_MAX_DAYS:
+        value: 0
+        description: "How many days a password must be used before it can be changed. Default 0 = can be changed right away."
+      PASSWORD_AGE_MIN_DAYS:
+        value: 0
+        description: "How many days a password can be used before it must be changed. Default 0 = never expire."
+      PASSWORD_PREVENT_REUSE_HISTORY_LENGTH:
+        value: 0
+        description: "How many unique passwords must be used before an old password can be reused. Default 0 = password can be reused right away."
       UPDATES_IGNORE_PROTECTED_FIELDS:
         value: false
         description: "When true, updates will ignore protected fields and print a warning log.
