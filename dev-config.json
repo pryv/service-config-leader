@@ -26,7 +26,6 @@
     "REGISTER_ADMIN_KEY_1": "test-admin-key",
     "REGISTER_SYSTEM_KEY_1": "test-system-key"
   },
-  "adminKey": "4dmink3y",
   "followers": {
     "singlenode-machine-key": {
       "url": "http://singlenode-follower",
