@@ -1,10 +1,12 @@
 {
   "name": "service-config-leader",
   "version": "1.2.20",
+  "private": true,
   "description": "A service for centralization of Pryv.io configuration and distribution among all Pryv.io components.",
-  "main": "index.js",
-  "author": "Thiébaud Modoux",
+  "homepage": "https://pryv.com",
   "license": "UNLICENSED",
+  "author": "Pryv S.A. <info@pryv.com> (https://pryv.com)",
+  "main": "index.js",
   "scripts": {
     "test": "echo 'This project doesn’t use npm scripts – enter `just` for the available development commands\n' && exit 1"
   },
@@ -38,6 +40,7 @@
     "mocha": "^6.2.0",
     "nock": "^10.0.6",
     "sinon": "^9.0.3",
+    "source-licenser": "^2.0.5",
     "supertest": "^4.0.2"
   },
   "_moduleAliases": {

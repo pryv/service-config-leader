@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright (C) 2019–2023 Pryv S.A. https://pryv.com - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ */
 const settings = require('@root/settings').getSettings();
 const middlewares = require('@middlewares');
 const authMiddleware = middlewares.authorization(settings);
