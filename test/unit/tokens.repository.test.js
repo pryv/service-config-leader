@@ -1,7 +1,8 @@
-import TokensRepository from '@repositories/tokens.repository';
+const TokensRepository = require('@repositories/tokens.repository');
 const { assert } = require('chai');
 const { describe, beforeEach, after, it } = require('mocha');
 const Database = require('better-sqlite3');
+
 describe('Test Tokens Repository', () => {
   const db = new Database(':memory:', {
     /* verbose: console.log */

@@ -1,4 +1,4 @@
-import { listConfFiles, applySubstitutions, isValidJSON, isJSONFile } from '@utils/configuration.utils';
+const { listConfFiles, applySubstitutions, isValidJSON, isJSONFile } = require('@utils/configuration.utils');
 
 const path = require('path');
 const fs = require('fs');

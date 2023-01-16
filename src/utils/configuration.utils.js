@@ -2,13 +2,22 @@ const path = require('path');
 const fs = require('fs');
 const logger = require('./logging').getLogger('conf-utils');
 
+module.exports = {
+  applySubstitutions,
+  listConfFiles,
+  isValidJSON,
+  isJSONFile,
+  isSingleNode,
+  findCoresUrls
+};
+
 /**
  * @param {string} template
  * @param {any} settings
  * @param {any} platformSettingsVars
  * @returns {string}
  */
-export function applySubstitutions(template, settings, platformSettingsVars) {
+function applySubstitutions(template, settings, platformSettingsVars) {
   const platformVars = retrieveFlatSettings(platformSettingsVars);
   const internalVars = settings.get('internals');
   if (platformVars == null && internalVars == null) return template;
@@ -52,7 +61,7 @@ export function applySubstitutions(template, settings, platformSettingsVars) {
  * @param {Map<string, string>} seen
  * @returns {void}
  */
-export function listConfFiles(dir, files, seen) {
+function listConfFiles(dir, files, seen) {
   /**
    * Map: fullPath (without extension) -> fullpath
    */
@@ -103,7 +112,7 @@ export function listConfFiles(dir, files, seen) {
  * @param {string} text
  * @returns {boolean}
  */
-export function isValidJSON(text) {
+function isValidJSON(text) {
   try {
     JSON.parse(text);
   } catch (e) {
@@ -117,7 +126,7 @@ export function isValidJSON(text) {
  * @param {string} file
  * @returns {boolean}
  */
-export function isJSONFile(file) {
+function isJSONFile(file) {
   return path.extname(file) === '.json';
 }
 
@@ -125,7 +134,7 @@ export function isJSONFile(file) {
  * @param {{}} followers
  * @returns {boolean}
  */
-export function isSingleNode(followers) {
+function isSingleNode(followers) {
   if (followers == null) {
     throw new Error('Missing followers settings');
   }
@@ -142,7 +151,7 @@ export function isSingleNode(followers) {
  * @param {{}} followers
  * @returns {string[]}
  */
-export function findCoresUrls(followers) {
+function findCoresUrls(followers) {
   if (followers == null) {
     throw new Error('Missing followers settings');
   }

@@ -1,9 +1,9 @@
-import {
+const {
   listConfFiles,
   applySubstitutions,
   isValidJSON,
   isJSONFile
-} from '@utils/configuration.utils';
+} = require('@utils/configuration.utils');
 const fs = require('fs');
 const request = require('superagent');
 const _ = require('lodash');
@@ -22,6 +22,7 @@ const {
   checkMigrations,
   migrate
 } = require('@controller/migration');
+
 module.exports = function (
   expressApp,
   settings,

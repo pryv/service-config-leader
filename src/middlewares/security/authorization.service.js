@@ -3,14 +3,14 @@ const UsersRepository = require('@repositories/users.repository');
 
 let AUTHORIZATION_SERVICE;
 
-export const getAuthorizationService = function (usersRepository) {
+const getAuthorizationService = function (usersRepository) {
   if (!AUTHORIZATION_SERVICE) {
     AUTHORIZATION_SERVICE = new AuthorizationService(usersRepository);
   }
   return AUTHORIZATION_SERVICE;
 };
 
-export class AuthorizationService {
+class AuthorizationService {
   /**
    * @type {UsersRepository}
    */
@@ -149,3 +149,8 @@ export class AuthorizationService {
     }
   }
 }
+
+module.exports = {
+  getAuthorizationService,
+  AuthorizationService
+};

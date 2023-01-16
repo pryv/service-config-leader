@@ -1,2 +1,2 @@
 #!/bin/sh
-exec chpst -u app node /app/bin/dist/server.js --config /app/conf/config-leader.json
+exec chpst -u app node /app/bin/src/server.js --config /app/conf/config-leader.json

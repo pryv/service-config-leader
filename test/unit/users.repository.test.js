@@ -1,7 +1,8 @@
-import UsersRepository from '@repositories/users.repository';
+const UsersRepository = require('@repositories/users.repository');
 const { assert } = require('chai');
 const Database = require('better-sqlite3');
 const { describe, before, it, after } = require('mocha');
+
 describe('Test Users Repository', () => {
   let db;
   let usersRepository;

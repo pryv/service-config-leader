@@ -1,21 +1,21 @@
-export const SETTINGS_PERMISSIONS = Object.freeze({
-  READ: 'read',
-  UPDATE: 'update'
-});
-
-export const USERS_PERMISSIONS = Object.freeze({
-  READ: 'read',
-  RESET_PASSWORD: 'resetPassword',
-  CHANGE_PERMISSIONS: 'changePermissions',
-  CREATE: 'create',
-  DELETE: 'delete'
-});
-
-export const PLATFORM_USERS_PERMISSIONS = Object.freeze({
-  READ: 'read',
-  DELETE: 'delete',
-  MODIFY: 'modify'
-});
+module.exports = {
+  SETTINGS_PERMISSIONS: Object.freeze({
+    READ: 'read',
+    UPDATE: 'update'
+  }),
+  USERS_PERMISSIONS: Object.freeze({
+    READ: 'read',
+    RESET_PASSWORD: 'resetPassword',
+    CHANGE_PERMISSIONS: 'changePermissions',
+    CREATE: 'create',
+    DELETE: 'delete'
+  }),
+  PLATFORM_USERS_PERMISSIONS: Object.freeze({
+    READ: 'read',
+    DELETE: 'delete',
+    MODIFY: 'modify'
+  })
+};
 
 /**
  * @typedef {"read" | "delete"} PlatformUsersPermission

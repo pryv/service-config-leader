@@ -1,4 +1,4 @@
-import SimpleGit from 'simple-git';
+const SimpleGit = require('simple-git');
 
 let git = null;
 /**
