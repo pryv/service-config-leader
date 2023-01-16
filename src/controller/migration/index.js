@@ -1,7 +1,9 @@
-// @flow
-
-import type { Migration } from './migrations';
-
+/**
+ * @license
+ * Copyright (C) 2019–2023 Pryv S.A. https://pryv.com - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ */
 const yaml = require('js-yaml');
 const fs = require('fs/promises');
 const compareVersions = require('compare-versions');
@@ -9,16 +11,6 @@ const _ = require('lodash');
 const logger = require('@utils/logging').getLogger('migration');
 const { setupGit, getGit } = require('./git');
 const { migrations } = require('./migrations');
-
-type DeploymentType = 'singlenode' | 'cluster';
-type ScheduledMigration = {
-  migrations: Array<Migration>,
-  deploymentType: DeploymentType,
-};
-type ExecutedMigration = {
-  migrations: Array<Migration>,
-  migratedPlatform: {},
-};
 
 module.exports.setupGit = setupGit;
 module.exports.getGit = getGit;
@@ -29,8 +21,8 @@ module.exports.getGit = getGit;
  * @param {*} platform the content of the platform.yml, used to figure out type of deployment (cluster/singlenode)
  * @param {*} template used to figure out the target version
  */
-const migrate = (platform: {}, template: {}): ExecutedMigration => {
-  const ScheduledMigration: ScheduledMigration = checkMigrations(platform, template);
+const migrate = (platform, template) => {
+  const ScheduledMigration = checkMigrations(platform, template);
   const { migrations } = ScheduledMigration;
   const { deploymentType } = ScheduledMigration;
   let migratedPlatform = _.cloneDeep(platform);
@@ -47,24 +39,23 @@ module.exports.migrate = migrate;
  * @param {*} platform the platform.yml content
  * @param {*} template the template-platform.yml content
  */
-const checkMigrations = (platform: {}, template: {}): ScheduledMigration => {
+const checkMigrations = (platform, template) => {
   validate(platform, 'platform.yml');
   validate(template, 'template-platform.yml');
 
-  const platformVersion: string = platform.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value;
-  const targetVersion: string = template.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value;
+  const platformVersion = platform.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value;
+  const targetVersion = template.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value;
 
-  const deploymentType: DeploymentType = findDeploymentType(platform);
+  const deploymentType = findDeploymentType(platform);
   return {
     migrations: computeNeededMigrations(platformVersion, targetVersion, deploymentType),
-    deploymentType,
+    deploymentType
   };
 
-  function validate(conf: {}, filename: string): void {
+  function validate (conf, filename) {
     if (conf?.MISCELLANEOUS_SETTINGS?.settings?.TEMPLATE_VERSION?.value == null) throw new Error(`template version missing in ${filename}. "MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value" is undefined. Please fix the service's configuration files`);
   }
-
-  function findDeploymentType(platform: {}): DeploymentType {
+  function findDeploymentType (platform) {
     if (platform.MACHINES_AND_PLATFORM_SETTINGS.settings.SINGLE_MACHINE_IP_ADDRESS != null) return 'singlenode';
     return 'cluster';
   }
@@ -74,17 +65,18 @@ module.exports.checkMigrations = checkMigrations;
 /**
  * Returns an array of version migrations
  *
- * @param {*} platformVersion
- * @param {*} targetVersion
+ * @param {string} platformVersion  undefined
+ * @param {string} targetVersion  undefined
+ * @returns {any[]}
  */
-function computeNeededMigrations(platformVersion: string, targetVersion: string): Array<Migration> {
-  const foundMigrations: Array<Migration> = [];
+function computeNeededMigrations (platformVersion, targetVersion) {
+  const foundMigrations = [];
 
   if (platformVersion === targetVersion) return foundMigrations;
 
-  let versionCounter: string = platformVersion;
+  let versionCounter = platformVersion;
   for (let i = 0; i < migrations.length && isSmallerOrEqual(migrations[i].versionTo, targetVersion); i++) {
-    const migration: Migration = migrations[i];
+    const migration = migrations[i];
     if (isPartOfVersionsFrom(migration.versionsFrom, versionCounter)) {
       foundMigrations.push(migration);
       versionCounter = migration.versionTo;
@@ -98,7 +90,7 @@ function computeNeededMigrations(platformVersion: string, targetVersion: string)
   logger.info(`available migrations found: ${foundMigrations.map((m) => ({ from: m.versionsFrom, to: m.versionTo }))}`);
   return foundMigrations;
 
-  function isPartOfVersionsFrom(versionsFrom: Array<string>, targetVersion: string): boolean {
+  function isPartOfVersionsFrom (versionsFrom, targetVersion) {
     return versionsFrom.includes(targetVersion);
   }
 
@@ -108,8 +100,8 @@ function computeNeededMigrations(platformVersion: string, targetVersion: string)
    * @param {*} versionA
    * @param {*} versionB
    */
-  function isSmallerOrEqual(versionA: string, versionB: string): boolean {
-    const cv: number = compareVersions(versionA, versionB);
+  function isSmallerOrEqual (versionA, versionB) {
+    const cv = compareVersions(versionA, versionB);
     return cv === -1 || cv === 0;
   }
 }
@@ -119,8 +111,8 @@ function computeNeededMigrations(platformVersion: string, targetVersion: string)
  *
  * @param {*} settings
  */
-const loadPlatformTemplate = async (settings: {}): Promise<{}> => {
-  const platformTemplate: string = settings.get('platformSettings:platformTemplate');
+const loadPlatformTemplate = async (settings) => {
+  const platformTemplate = settings.get('platformSettings:platformTemplate');
   if (platformTemplate == null) throw new Error('platformSettings:platformTemplate not set in config-leader.json. Config migrations will not work.');
   try {
     const template = yaml.load(await fs.readFile(platformTemplate, { encoding: 'utf-8' }));
@@ -130,3 +122,21 @@ const loadPlatformTemplate = async (settings: {}): Promise<{}> => {
   }
 };
 module.exports.loadPlatformTemplate = loadPlatformTemplate;
+
+/**
+ * @typedef {"singlenode" | "cluster"} DeploymentType
+ */
+
+/**
+ * @typedef {{
+ *   migrations: Array<Migration>
+ *   deploymentType: DeploymentType
+ * }} ScheduledMigration
+ */
+
+/**
+ * @typedef {{
+ *   migrations: Array<Migration>
+ *   migratedPlatform: {}
+ * }} ExecutedMigration
+ */

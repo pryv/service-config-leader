@@ -1,25 +1,37 @@
-// @flow
-
+/**
+ * @license
+ * Copyright (C) 2019–2023 Pryv S.A. https://pryv.com - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ */
 const path = require('path');
 const fs = require('fs');
 const logger = require('./logging').getLogger('conf-utils');
 
-export function applySubstitutions(
-  template: string,
-  settings: Object,
-  platformSettingsVars: Object,
-): string {
+module.exports = {
+  applySubstitutions,
+  listConfFiles,
+  isValidJSON,
+  isJSONFile,
+  isSingleNode,
+  findCoresUrls
+};
+
+/**
+ * @param {string} template
+ * @param {any} settings
+ * @param {any} platformSettingsVars
+ * @returns {string}
+ */
+function applySubstitutions (template, settings, platformSettingsVars) {
   const platformVars = retrieveFlatSettings(platformSettingsVars);
   const internalVars = settings.get('internals');
-
   if (platformVars == null && internalVars == null) return template;
-
   const substitutions = { ...internalVars, ...platformVars };
-
   const re = new RegExp(Object.keys(substitutions).join('|'), 'g');
   return replaceInString(template);
 
-  function replaceInString(myString: string): string {
+  function replaceInString (myString) {
     return myString.replace(re, (match) => {
       let replacement = substitutions[match];
       if (isObjectWithValueProp(substitutions[match])) {
@@ -32,11 +44,11 @@ export function applySubstitutions(
     });
   }
 
-  function isObjectWithValueProp(obj) {
+  function isObjectWithValueProp (obj) {
     return obj != null && obj.value != null;
   }
 
-  function retrieveFlatSettings(rootSettings: Object): Object {
+  function retrieveFlatSettings (rootSettings) {
     const settings = {};
     for (const group of Object.keys(rootSettings)) {
       for (const setting of Object.keys(rootSettings[group].settings)) {
@@ -50,15 +62,16 @@ export function applySubstitutions(
 /**
  * Accumulates all files found in dir and its children into files
  *
- * @param {*} dir the source directory
- * @param {*} files the array where (full) file names will be stored.
+ * @param {string} dir  the source directory
+ * @param {Array<string>} files  the array where (full) file names will be stored.
+ * @param {Map<string, string>} seen
+ * @returns {void}
  */
-export function listConfFiles(dir: string, files: Array<string>, seen: Map<string, string>): void {
+function listConfFiles (dir, files, seen) {
   /**
    * Map: fullPath (without extension) -> fullpath
    */
   if (seen == null) seen = new Map();
-
   fs.readdirSync(dir).forEach((file) => {
     const fullPath = path.join(dir, file);
     const fullPathWithoutExtension = path.parse(fullPath).name;
@@ -70,10 +83,17 @@ export function listConfFiles(dir: string, files: Array<string>, seen: Map<strin
        * 2. seen with json -> remove and push
        * 3. seen with other -> do nothing
        */
-      if (seen[fullPathWithoutExtension] != null && ! seen[fullPathWithoutExtension].endsWith('.json') && fullPath.endsWith('.json')) {
+      if (
+        seen[fullPathWithoutExtension] != null &&
+        !seen[fullPathWithoutExtension].endsWith('.json') &&
+        fullPath.endsWith('.json')
+      ) {
         return;
       }
-      if (seen[fullPathWithoutExtension] != null && seen[fullPathWithoutExtension].endsWith('.json')) {
+      if (
+        seen[fullPathWithoutExtension] != null &&
+        seen[fullPathWithoutExtension].endsWith('.json')
+      ) {
         files = remove(seen[fullPathWithoutExtension], files);
       }
       seen[fullPathWithoutExtension] = fullPath;
@@ -87,14 +107,18 @@ export function listConfFiles(dir: string, files: Array<string>, seen: Map<strin
    * @param {*} filename the filename to remove
    * @param {*} files
    */
-  function remove(filename: string, files: Array<string>): Array<string> {
+  function remove (filename, files) {
     const index = files.indexOf(filename);
     if (index > -1) files.splice(index, 1);
     return files;
   }
 }
 
-export function isValidJSON(text: string) {
+/**
+ * @param {string} text
+ * @returns {boolean}
+ */
+function isValidJSON (text) {
   try {
     JSON.parse(text);
   } catch (e) {
@@ -104,34 +128,44 @@ export function isValidJSON(text: string) {
   return true;
 }
 
-export function isJSONFile(file: string): boolean {
+/**
+ * @param {string} file
+ * @returns {boolean}
+ */
+function isJSONFile (file) {
   return path.extname(file) === '.json';
 }
 
-export function isSingleNode(followers: {}): boolean {
+/**
+ * @param {{}} followers
+ * @returns {boolean}
+ */
+function isSingleNode (followers) {
   if (followers == null) {
     throw new Error('Missing followers settings');
   }
-  const singleNodeFollowers = Object.entries(followers)
-    .filter((follower) => follower[1].role === 'singlenode');
-
+  const singleNodeFollowers = Object.entries(followers).filter(
+    (follower) => follower[1].role === 'singlenode'
+  );
   if (singleNodeFollowers.length === 1) {
     return true;
   }
   return false;
 }
 
-export function findCoresUrls(followers: {}): Array<string> {
+/**
+ * @param {{}} followers
+ * @returns {string[]}
+ */
+function findCoresUrls (followers) {
   if (followers == null) {
     throw new Error('Missing followers settings');
   }
   const coreUrls = Object.entries(followers)
-    .filter((follower) => (follower[1].role === 'core'))
+    .filter((follower) => follower[1].role === 'core')
     .map((core) => core[1].url);
-
   if (coreUrls == null || coreUrls.length === 0) {
     throw new Error('No core machines defined in followers settings');
   }
-
   return coreUrls;
 }

@@ -1,42 +1,45 @@
-// @flow
-
-import type { Permission, PermissionsGroup, Permissions } from '@models/permissions.model';
-import type {
-  User,
-  UserNoPass,
-  UserNoPerms,
-  UserPasswordChange,
-} from '@models/user.model';
-
+/**
+ * @license
+ * Copyright (C) 2019–2023 Pryv S.A. https://pryv.com - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ */
 const errorsFactory = require('@utils/errorsHandling').factory;
-const UsersRepository = require('@repositories/users.repository');
 
-let AUTHORIZATION_SERVICE: AuthorizationService;
+/**
+ * @typedef {import('@repositories/users.repository')} UsersRepository
+ */
 
-export const getAuthorizationService = function (
-  usersRepository: UsersRepository,
-) {
+let AUTHORIZATION_SERVICE;
+
+const getAuthorizationService = function (usersRepository) {
   if (!AUTHORIZATION_SERVICE) {
     AUTHORIZATION_SERVICE = new AuthorizationService(usersRepository);
   }
   return AUTHORIZATION_SERVICE;
 };
 
-export class AuthorizationService {
-  usersRepository: UsersRepository;
+class AuthorizationService {
+  /**
+   * @type {UsersRepository}
+   */
+  usersRepository;
 
-  constructor(usersRepository: UsersRepository) {
+  /**
+   * @param {UsersRepository} usersRepository
+   */
+  constructor (usersRepository) {
     this.usersRepository = usersRepository;
   }
 
-  verifyIsAllowedTo(permission: Permission) {
-    return function (
-      req: express$Request,
-      res: express$Response,
-      next: express$NextFunction,
-    ) {
+  /**
+   * @param {Permission} permission
+   * @returns {any}
+   */
+  verifyIsAllowedTo (permission) {
+    return function (req, res, next) {
       try {
-        let permissionsGroup: PermissionsGroup;
+        let permissionsGroup;
         if (req.path.startsWith('/users')) {
           permissionsGroup = 'users';
         } else if (req.path.startsWith('/platform-users')) {
@@ -45,7 +48,7 @@ export class AuthorizationService {
           permissionsGroup = 'settings';
         }
 
-        const username = ((res.locals.username: any): string);
+        const username = res.locals.username;
         const user = this.usersRepository.findUser(username);
 
         if (!user) {
@@ -61,12 +64,12 @@ export class AuthorizationService {
     }.bind(this);
   }
 
-  static verifyChangesItself() {
-    return function (
-      req: express$Request,
-      res: express$Response,
-      next: express$NextFunction,
-    ) {
+  /**
+   * @static
+   * @returns {(req: any, res: any, next: any) => void}
+   */
+  static verifyChangesItself () {
+    return function (req, res, next) {
       const usernameFromToken = res.locals.username;
       const usernameFromPath = req.params.username;
 
@@ -77,23 +80,17 @@ export class AuthorizationService {
     };
   }
 
-  verifyOldPasswordValid() {
-    return function (
-      req: express$Request,
-      res: express$Response,
-      next: express$NextFunction,
-    ) {
+  /**
+   * @returns {any}
+   */
+  verifyOldPasswordValid () {
+    return function (req, res, next) {
       const { username } = res.locals;
-      const {
-        oldPassword,
-        newPassword,
-        newPasswordCheck,
-      } = ((req.body: any): UserPasswordChange);
-
-      const user: UserNoPerms = ({
+      const { oldPassword, newPassword, newPasswordCheck } = req.body;
+      const user = {
         username,
-        password: oldPassword,
-      }: UserNoPerms);
+        password: oldPassword
+      };
       const passwordValid = this.usersRepository.isPasswordValid(user);
       if (!passwordValid) {
         throw errorsFactory.unauthorized('Invalid password');
@@ -105,14 +102,13 @@ export class AuthorizationService {
     }.bind(this);
   }
 
-  verifyGivenPermissionsNotExceedOwned() {
-    return function (
-      req: express$Request,
-      res: express$Response,
-      next: express$NextFunction,
-    ) {
+  /**
+   * @returns {any}
+   */
+  verifyGivenPermissionsNotExceedOwned () {
+    return function (req, res, next) {
       try {
-        const username = ((res.locals.username: any): string);
+        const username = res.locals.username;
         const user = this.usersRepository.findUser(username);
 
         if (!user) {
@@ -121,13 +117,12 @@ export class AuthorizationService {
 
         AuthorizationService.checkHasPermissionsOnGroup(user, 'users');
 
-        const userToCreatePermissions: Permissions = ((req.body: any): User)
-          .permissions;
+        const userToCreatePermissions = req.body.permissions;
         for (const permissionsGroup of ['users', 'settings', 'platformUsers']) {
           for (const permission of userToCreatePermissions[permissionsGroup]) {
             AuthorizationService.checkHasPermission(
               permission,
-              user.permissions[permissionsGroup],
+              user.permissions[permissionsGroup]
             );
           }
         }
@@ -139,18 +134,32 @@ export class AuthorizationService {
     }.bind(this);
   }
 
-  static checkHasPermission(
-    expectedPermission: Permission,
-    permissions: Permission[],
-  ) {
+  /**
+   * @static
+   * @param {Permission} expectedPermission
+   * @param {Permission[]} permissions
+   * @returns {void}
+   */
+  static checkHasPermission (expectedPermission, permissions) {
     if (!permissions.includes(expectedPermission)) {
       throw new Error();
     }
   }
 
-  static checkHasPermissionsOnGroup(user: UserNoPass, group: PermissionsGroup): void {
+  /**
+   * @static
+   * @param {UserNoPass} user
+   * @param {PermissionsGroup} group
+   * @returns {void}
+   */
+  static checkHasPermissionsOnGroup (user, group) {
     if (!user || !user.permissions || !user.permissions[group]) {
       throw new Error();
     }
   }
 }
+
+module.exports = {
+  getAuthorizationService,
+  AuthorizationService
+};

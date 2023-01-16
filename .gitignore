@@ -10,14 +10,11 @@
 .settings
 .vscode/*
 !.vscode/launch.json
-/flow-coverage/
 /out
 build/build_tag
 build/release.tar
 config-user-management.db
 coverage/
 credentials.txt
-dist
 node_modules/
 test_results/
-yarn-error.log

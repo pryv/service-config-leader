@@ -1,5 +1,9 @@
-// @flow
-
+/**
+ * @license
+ * Copyright (C) 2019–2023 Pryv S.A. https://pryv.com - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ */
 const _ = require('lodash');
 
 const logger = require('../../../utils/logging').getLogger('migration-utils');
@@ -7,11 +11,12 @@ const logger = require('../../../utils/logging').getLogger('migration-utils');
 /**
  * Performs base migration work on copy of platform
  *
- * @param {*} platform content of platform.yml
- * @param {*} template content of template platform.yml
+ * @param {{}} platform  content of platform.yml
+ * @param {{}} template  content of template platform.yml
+ * @returns {{}}
  */
-function baseWork(platform: {}, template: {}): {} {
-  let platformCopy: {} = _.cloneDeep(platform);
+function baseWork (platform, template) {
+  let platformCopy = _.cloneDeep(platform);
   platformCopy = updateTemplateVersion(platformCopy, template);
   platformCopy = addNewSettings(platformCopy, template);
   platformCopy = alignMetadata(platformCopy, template);
@@ -23,8 +28,8 @@ function baseWork(platform: {}, template: {}): {} {
    * @param {*} platform content of platform.yml
    * @param {*} template content of template platform.yml
    */
-  function updateTemplateVersion(platform: {}, template: {}): {} {
-    const templateVersion: string = template.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value;
+  function updateTemplateVersion (platform, template) {
+    const templateVersion = template.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value;
     platform.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value = templateVersion;
     logger.info(`updated template version to: ${templateVersion}`);
     return platform;
@@ -36,13 +41,17 @@ function baseWork(platform: {}, template: {}): {} {
    * @param {*} platform content of platform.yml
    * @param {*} template content of template platform.yml
    */
-  function alignMetadata(platform: {}, template: {}): {} {
+  function alignMetadata (platform, template) {
     for (const [mainSettingKey, mainSettingValue] of Object.entries(template)) {
       platform[mainSettingKey].name = mainSettingValue.name;
-      for (const [subSettingKey, subSettingValue] of Object.entries(mainSettingValue.settings)) {
-        platform[mainSettingKey].settings[subSettingKey].description = subSettingValue.description;
+      for (const [subSettingKey, subSettingValue] of Object.entries(
+        mainSettingValue.settings
+      )) {
+        platform[mainSettingKey].settings[subSettingKey].description =
+          subSettingValue.description;
         if (subSettingValue.optional != null) {
-          platform[mainSettingKey].settings[subSettingKey].optional = subSettingValue.optional;
+          platform[mainSettingKey].settings[subSettingKey].optional =
+            subSettingValue.optional;
         }
       }
     }
@@ -56,7 +65,7 @@ function baseWork(platform: {}, template: {}): {} {
    * @param {*} platform content of platform.yml
    * @param {*} template content of template platform.yml
    */
-  function addNewSettings(platform: {}, template: {}): {} {
+  function addNewSettings (platform, template) {
     for (const [mainSettingKey, mainSettingValue] of Object.entries(template)) {
       if (platform[mainSettingKey] == null) {
         platform[mainSettingKey] = mainSettingValue;
@@ -79,10 +88,11 @@ module.exports.baseWork = baseWork;
  * Deletes from platform.yml settings that are gone from the template
  * This is a destructive
  *
- * @param {*} platform
- * @param {*} template
+ * @param {{}} platform  undefined
+ * @param {{}} template  undefined
+ * @returns {{}}
  */
-function deleteRemovedSettings(platform: {}, template: {}): {} {
+function deleteRemovedSettings (platform, template) {
   for (const [mainSettingKey, mainSettingValue] of Object.entries(platform)) {
     if (template[mainSettingKey] == null) {
       delete platform[mainSettingKey];
@@ -107,8 +117,9 @@ module.exports.deleteRemovedSettings = deleteRemovedSettings;
  *
  * @param {*} fieldName
  * @param {*} jsonOrObject
+ * @returns {{}}
  */
-function getObjectOrParseJSON(fieldName, jsonOrObject): {} {
+function getObjectOrParseJSON (fieldName, jsonOrObject) {
   try {
     const parsedObject = JSON.parse(jsonOrObject);
     return parsedObject;

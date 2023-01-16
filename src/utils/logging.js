@@ -1,5 +1,9 @@
-// @flow
-
+/**
+ * @license
+ * Copyright (C) 2019–2023 Pryv S.A. https://pryv.com - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ */
 const winston = require('winston');
 const settings = require('@root/settings').getSettings();
 
@@ -8,14 +12,14 @@ const levels = Object.freeze({
   debug: 3,
   info: 2,
   warn: 1,
-  error: 0,
+  error: 0
 });
 winston.setLevels(levels);
 winston.addColors({
   debug: 'blue',
   info: 'green',
   warn: 'yellow',
-  error: 'red',
+  error: 'red'
 });
 
 // Spply settings
@@ -40,17 +44,17 @@ if (logsSettings.file.active) {
     maxsize: logsSettings.file.maxFileBytes,
     maxFiles: logsSettings.file.maxNbFiles,
     timestamp: true,
-    json: false,
+    json: false
   });
 }
 
-const loggers: Map<string, Logger> = new Map();
+const loggers = new Map();
 const { prefix } = logsSettings;
 
 // Returns a logger singleton for the given component. Keeps track of initialized
 // loggers to only use one logger per component name.
 //
-module.exports.getLogger = function (componentName: string): Logger {
+module.exports.getLogger = function (componentName) {
   const context = `${prefix}:${componentName}`;
 
   // Return memoized instance if we have produced it before.
@@ -64,44 +68,72 @@ module.exports.getLogger = function (componentName: string): Logger {
   return logger;
 };
 
-interface Logger {
-  debug(msg: string, metaData?: {}): void;
-  info(msg: string, metaData?: {}): void;
-  warn(msg: string, metaData?: {}): void;
-  error(msg: string, metaData?: {}): void;
-}
+class LoggerImpl {
+  /**
+   * @type {string}
+   */
+  messagePrefix;
+  winstonLogger;
 
-class LoggerImpl implements Logger {
-  messagePrefix: string;
-
-  winstonLogger: any;
-
-  // Creates a new logger for the given component.
-  constructor(context?: string, winstonLogger) {
+  /**
+   * Creates a new logger for the given component.
+   * @param {string} context
+   * @param {*} winstonLogger
+   */
+  constructor (context, winstonLogger) {
     this.messagePrefix = context ? `[${context}] ` : '';
     this.winstonLogger = winstonLogger;
   }
 
-  debug(msg: string, metaData?: {}) {
+  /**
+   * @param {string} msg
+   * @param {{}} metaData
+   * @returns {void}
+   */
+  debug (msg, metaData) {
     this.log('debug', msg, metaData);
   }
 
-  info(msg: string, metaData?: {}) {
+  /**
+   * @param {string} msg
+   * @param {{}} metaData
+   * @returns {void}
+   */
+  info (msg, metaData) {
     this.log('info', msg, metaData);
   }
 
-  warn(msg: string, metaData?: {}) {
+  /**
+   * @param {string} msg
+   * @param {{}} metaData
+   * @returns {void}
+   */
+  warn (msg, metaData) {
     this.log('warn', msg, metaData);
   }
 
-  error(msg: string, metaData?: {}) {
+  /**
+   * @param {string} msg
+   * @param {{}} metaData
+   * @returns {void}
+   */
+  error (msg, metaData) {
     this.log('error', msg, metaData);
   }
 
-  log(level: string, message: string, metaData?: {}) {
+  /**
+   * @param {string} level
+   * @param {string} message
+   * @param {{}} metaData
+   * @returns {void}
+   */
+  log (level, message, metaData) {
     const msg = this.messagePrefix + message;
     const meta = metaData ? JSON.stringify(metaData) : {};
-
     this.winstonLogger[level](msg, meta);
   }
 }
+
+/**
+ * @typedef {Object} Logger
+ */

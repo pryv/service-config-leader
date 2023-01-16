@@ -1,41 +1,53 @@
-// @flow
-
-type PlatformUsersPermission = 'read' | 'delete';
-type SettingsPermission = 'read' | 'update';
-type UsersPermission =
-  | 'read'
-  | 'resetPassword'
-  | 'changePermissions'
-  | 'create'
-  | 'delete';
-export type PermissionsGroup = 'users' | 'settings' | 'platformUsers';
-export type Permission =
-  | SettingsPermission
-  | UsersPermission
-  | PlatformUsersPermission;
-
-export type Permissions = {
-  users: UsersPermission[],
-  settings: SettingsPermission[],
-  platformUsers: PlatformUsersPermission[],
-  [key: PermissionsGroup]: Permission[],
+/**
+ * @license
+ * Copyright (C) 2019–2023 Pryv S.A. https://pryv.com - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ */
+module.exports = {
+  SETTINGS_PERMISSIONS: Object.freeze({
+    READ: 'read',
+    UPDATE: 'update'
+  }),
+  USERS_PERMISSIONS: Object.freeze({
+    READ: 'read',
+    RESET_PASSWORD: 'resetPassword',
+    CHANGE_PERMISSIONS: 'changePermissions',
+    CREATE: 'create',
+    DELETE: 'delete'
+  }),
+  PLATFORM_USERS_PERMISSIONS: Object.freeze({
+    READ: 'read',
+    DELETE: 'delete',
+    MODIFY: 'modify'
+  })
 };
 
-export const SETTINGS_PERMISSIONS = Object.freeze({
-  READ: 'read',
-  UPDATE: 'update',
-});
+/**
+ * @typedef {"read" | "delete"} PlatformUsersPermission
+ */
 
-export const USERS_PERMISSIONS = Object.freeze({
-  READ: 'read',
-  RESET_PASSWORD: 'resetPassword',
-  CHANGE_PERMISSIONS: 'changePermissions',
-  CREATE: 'create',
-  DELETE: 'delete',
-});
+/**
+ * @typedef {"read" | "update"} SettingsPermission
+ */
 
-export const PLATFORM_USERS_PERMISSIONS = Object.freeze({
-  READ: 'read',
-  DELETE: 'delete',
-  MODIFY: 'modify',
-});
+/**
+ * @typedef {"read" | "resetPassword" | "changePermissions" | "create" | "delete"} UsersPermission
+ */
+
+/**
+ * @typedef {"users" | "settings" | "platformUsers"} PermissionsGroup
+ */
+
+/**
+ * @typedef {SettingsPermission | UsersPermission | PlatformUsersPermission} Permission
+ */
+
+/**
+ * @typedef {{
+ *   users: UsersPermission[]
+ *   settings: SettingsPermission[]
+ *   platformUsers: PlatformUsersPermission[]
+ *   [key: PermissionsGroup]: Permission[]
+ * }} Permissions
+ */

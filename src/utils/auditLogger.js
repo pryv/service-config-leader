@@ -1,10 +1,18 @@
-// @flow
-
+/**
+ * @license
+ * Copyright (C) 2019–2023 Pryv S.A. https://pryv.com - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ */
 const fs = require('fs');
 
 let auditLogger = null;
 
-function getAuditLogger(filePath: string): AuditLogger {
+/**
+ * @param {string} filePath
+ * @returns {AuditLogger}
+ */
+function getAuditLogger (filePath) {
   if (auditLogger == null) {
     auditLogger = new AuditLogger(filePath);
   }
@@ -17,17 +25,29 @@ const MODIFY_USER_ACTION = 'MODIFY /platform-users/:username';
 module.exports = {
   getAuditLogger,
   DELETE_USER_ACTION,
-  MODIFY_USER_ACTION,
+  MODIFY_USER_ACTION
 };
 
 class AuditLogger {
-  filePath: string;
+  /**
+   * @type {string}
+   */
+  filePath;
 
-  constructor(filePath: string) {
+  /**
+   * @param {string} filePath
+   */
+  constructor (filePath) {
     this.filePath = filePath;
   }
 
-  appendToLogFile(adminUser: string, action: string, platformUser: string): void {
+  /**
+   * @param {string} adminUser
+   * @param {string} action
+   * @param {string} platformUser
+   * @returns {void}
+   */
+  appendToLogFile (adminUser, action, platformUser) {
     fs.appendFileSync(this.filePath, `${new Date()} admin:${adminUser} ${action} platformUser:${platformUser}\n`);
   }
 }

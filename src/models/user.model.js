@@ -1,37 +1,51 @@
-// @flow
+/**
+ * @license
+ * Copyright (C) 2019–2023 Pryv S.A. https://pryv.com - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ */
+/**
+ * @typedef {{
+ *   username: string
+ *   password: string
+ *   permissions: Permissions
+ * }} User
+ */
 
-import type { Permissions } from './permissions.model';
+/**
+ * @typedef {{
+ *   username: string
+ *   permissions: Permissions
+ * }} UserNoPass
+ */
 
-export type User = {
-  username: string,
-  password: string,
-  permissions: Permissions,
-};
+/**
+ * @typedef {{
+ *   username: string
+ *   password: string
+ * }} UserNoPerms
+ */
 
-export type UserNoPass = {
-  username: string,
-  permissions: Permissions,
-};
+/**
+ * @typedef {{
+ *   username?: string | null
+ *   password?: string | null
+ *   permissions?: Permissions | null
+ * }} UserOptional
+ */
 
-export type UserNoPerms = {
-  username: string,
-  password: string,
-};
+/**
+ * @typedef {{
+ *   username: string
+ *   password: string
+ *   permissions: Permissions | string
+ * }} UserDB
+ */
 
-export type UserOptional = {
-  username?: ?string,
-  password?: ?string,
-  permissions?: ?Permissions,
-};
-
-export type UserDB = {
-  username: string,
-  password: string,
-  permissions: Permissions | string,
-};
-
-export type UserPasswordChange = {
-  oldPassword: string,
-  newPassword: string,
-  newPasswordCheck: string,
-};
+/**
+ * @typedef {{
+ *   oldPassword: string
+ *   newPassword: string
+ *   newPasswordCheck: string
+ * }} UserPasswordChange
+ */

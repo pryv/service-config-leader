@@ -3,7 +3,7 @@
 set -e
 
 export NODE_ENV=production
-export NODE_PATH=/app/bin/dist/
+export NODE_PATH=/app/bin/src/
 
 create_links() {
 	remove_links # Remove all existing service, if any
@@ -18,7 +18,7 @@ remove_links() {
 	rm -Rf /etc/service/app
 }
 
-case "$1" in 
+case "$1" in
     start)   create_links ;;
     stop)    remove_links ;;
     restart) create_links ;; # no need to call remove_link, it will be called by create_links

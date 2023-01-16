@@ -1,9 +1,17 @@
-// @flow
-
+/**
+ * @license
+ * Copyright (C) 2019–2023 Pryv S.A. https://pryv.com - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ */
 const nconf = require('nconf');
 
 let store;
-function getSettings() {
+
+/**
+ * @returns {any}
+ */
+function getSettings () {
   if (store != null) return store;
   store = new nconf.Provider();
 
@@ -14,7 +22,7 @@ function getSettings() {
   // 2. `process.argv`
   //
   store.env({
-    separator: '__',
+    separator: '__'
   }).argv();
 
   // 3. Values in `config.json`
@@ -27,30 +35,30 @@ function getSettings() {
   store.defaults({
     http: {
       port: 7000,
-      ip: '127.0.0.1',
+      ip: '127.0.0.1'
     },
     logs: {
       prefix: 'service-configuration',
       console: {
         active: true,
         level: 'info',
-        colorize: true,
+        colorize: true
       },
       file: {
-        active: false,
-      },
+        active: false
+      }
     },
     internals: {
-      configLeaderTokenSecret: 'SECRET',
+      configLeaderTokenSecret: 'SECRET'
     },
     credentials: {
-      filePath: '/app/credentials/credentials.txt',
+      filePath: '/app/credentials/credentials.txt'
     },
     gitRepoPath: '/app/conf/',
     platformSettings: {
       platformConfig: '/app/conf/platform.yml',
-      platformTemplate: '/app/conf/template-platform.yml',
-    },
+      platformTemplate: '/app/conf/template-platform.yml'
+    }
   });
 
   if (process.env.NODE_ENV === 'test') store.set('logs:console:active', false);
@@ -58,7 +66,11 @@ function getSettings() {
   return store;
 }
 
-function injectTestSettings(testConf: {}) {
+/**
+ * @param {object} testConf
+ * @returns {void}
+ */
+function injectTestSettings (testConf) {
   store.add('test', { type: 'literal', store: testConf });
 }
 

@@ -1,11 +1,10 @@
-// @flow
-
-import {
-  listConfFiles,
-  applySubstitutions,
-  isValidJSON,
-  isJSONFile,
-} from '@utils/configuration.utils';
+/**
+ * @license
+ * Copyright (C) 2019–2023 Pryv S.A. https://pryv.com - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ */
+const { listConfFiles, applySubstitutions, isValidJSON, isJSONFile } = require('@utils/configuration.utils');
 
 const path = require('path');
 const fs = require('fs');
@@ -13,21 +12,13 @@ const errorsFactory = require('@utils/errorsHandling').factory;
 const middlewares = require('@middlewares');
 const logger = require('@utils/logging').getLogger('conf');
 
-module.exports = function (
-  expressApp: express$Application,
-  settings: Object,
-  platformSettings: Object,
-) {
+module.exports = function (expressApp, settings, platformSettings) {
   expressApp.all('/conf', middlewares.authorization(settings));
 
   // GET /conf: serve full configuration for given Pryv.io role
   expressApp.get(
     '/conf',
-    async (
-      req: express$Request,
-      res: express$Response,
-      next: express$NextFunction,
-    ) => {
+    async (req, res, next) => {
       try {
         const { role } = req.context;
         logger.info(`Received request from ${role}.`);
@@ -35,11 +26,11 @@ module.exports = function (
         const confFolder = path.join(templatesPath, role);
 
         if (
-          !fs.existsSync(confFolder)
-          || !fs.lstatSync(confFolder).isDirectory()
+          !fs.existsSync(confFolder) ||
+          !fs.lstatSync(confFolder).isDirectory()
         ) {
           throw errorsFactory.notFound(
-            `Configuration folder not found for '${role}'.`,
+            `Configuration folder not found for '${role}'.`
           );
         }
 
@@ -56,18 +47,18 @@ module.exports = function (
           const newConf = applySubstitutions(
             templateConf,
             settings,
-            platformSettings.get(),
+            platformSettings.get()
           );
           if (isJSONFile(file) && !isValidJSON(newConf)) {
             throw errorsFactory.unexpectedError(
               new Error(
-                `Configuration file: ${fileName} has invalid format after filling it with platform properties`,
-              ),
+                `Configuration file: ${fileName} has invalid format after filling it with platform properties`
+              )
             );
           }
           fullConf.push({
             path: fileName,
-            content: newConf,
+            content: newConf
           });
           const stats = fs.statSync(file);
           const modifiedTime = stats.mtimeMs;
@@ -78,14 +69,14 @@ module.exports = function (
         });
         logger.info(
           `Sent configuration files. Latest modification on "${latestModifiedFile}" at ${new Date(
-            latestModifiedTime,
-          )}`,
+            latestModifiedTime
+          )}`
         );
         res.json({ files: fullConf });
       } catch (err) {
         logger.error(err);
         next(err);
       }
-    },
+    }
   );
 };

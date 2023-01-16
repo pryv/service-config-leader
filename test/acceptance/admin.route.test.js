@@ -1,9 +1,9 @@
-// @flow
-
-/* global describe, it, before, beforeEach, after */
-
-import type { User } from '@models/user.model';
-
+/**
+ * @license
+ * Copyright (C) 2019–2023 Pryv S.A. https://pryv.com - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ */
 const sinon = require('sinon');
 const { assert } = require('chai');
 const path = require('path');
@@ -21,11 +21,13 @@ const mockFollowers = require('../fixtures/followersMock');
 describe('Test /admin endpoint', () => {
   let readOnlyToken;
   let updateOnlyToken;
-
   let deleteAllStmt;
-
-  let app; let settings; let platformPath; let platformSettings; let request; let
-      platformBackup;
+  let app;
+  let settings;
+  let platformPath;
+  let platformSettings;
+  let request;
+  let platformBackup;
   before(async () => {
     app = new Application();
     await app.init();
@@ -34,37 +36,33 @@ describe('Test /admin endpoint', () => {
     platformBackup = fs.readFileSync(platformPath, 'utf-8');
     platformSettings = app.platformSettings;
     request = supertest(app.express);
-
-    const userOnlyReadPerm: User = {
+    const userOnlyReadPerm = {
       username: 'userOnlyReadPerm',
       password: 'pass',
       permissions: {
         settings: [SETTINGS_PERMISSIONS.READ],
-        users: [],
-      },
+        users: []
+      }
     };
-    const userOnlyUpdatePerm: User = {
+    const userOnlyUpdatePerm = {
       username: 'userOnlyUpdatePerm',
       password: 'pass',
       permissions: {
         settings: [SETTINGS_PERMISSIONS.UPDATE],
-        users: [],
-      },
+        users: []
+      }
     };
-
     deleteAllStmt = app.db.prepare('DELETE FROM users;');
     deleteAllStmt.run();
-
     app.usersRepository.createUser(userOnlyReadPerm);
     app.usersRepository.createUser(userOnlyUpdatePerm);
-
     readOnlyToken = sign(
       { username: userOnlyReadPerm.username },
-      settings.get('internals:configLeaderTokenSecret'),
+      settings.get('internals:configLeaderTokenSecret')
     );
     updateOnlyToken = sign(
       { username: userOnlyUpdatePerm.username },
-      settings.get('internals:configLeaderTokenSecret'),
+      settings.get('internals:configLeaderTokenSecret')
     );
   });
 
@@ -80,30 +78,25 @@ describe('Test /admin endpoint', () => {
       .set('Authorization', updateOnlyToken)
       .send({});
     const { headers } = res;
-
     assert.isDefined(headers['access-control-allow-origin']);
     assert.equal(headers['access-control-allow-origin'], '*');
-
     assert.isDefined(headers['access-control-allow-methods']);
     assert.equal(
       headers['access-control-allow-methods'],
-      'POST, GET, PUT, OPTIONS, DELETE',
+      'POST, GET, PUT, OPTIONS, DELETE'
     );
-
     assert.isDefined(headers['access-control-allow-headers']);
     assert.equal(
       headers['access-control-allow-headers'],
-      'Authorization, Content-Type',
+      'Authorization, Content-Type'
     );
-
     assert.isDefined(headers['access-control-max-age']);
-
     assert.isDefined(headers['access-control-allow-credentials']);
     assert.equal(headers['access-control-allow-credentials'], 'true');
   });
+
   it('responds with 200 to OPTIONS request', async () => {
     const res = await request.options('/');
-
     assert.strictEqual(res.status, 200);
   });
 
@@ -112,19 +105,17 @@ describe('Test /admin endpoint', () => {
       const res = await request
         .get('/admin/settings')
         .set('Authorization', readOnlyToken);
-
       const ymlFile = fs.readFileSync('platform.yml', 'utf8');
       const platform = yaml.load(ymlFile);
-
       assert.strictEqual(res.status, 200);
       assert.include(res.headers['content-type'], 'application/json');
       assert.deepEqual(res.body.settings, platform.vars);
     });
+
     it('must return 401 when given token with insufficient permissions', async () => {
       const res = await request
         .get('/admin/settings')
         .set('Authorization', updateOnlyToken);
-
       assert.strictEqual(res.status, 401);
     });
   });
@@ -132,7 +123,12 @@ describe('Test /admin endpoint', () => {
   describe('PUT /admin/settings', () => {
     let gitClient;
     before(() => {
-      gitClient = simpleGit({ baseDir: path.resolve(settings.get('platformSettings:platformConfig'), '..') });
+      gitClient = simpleGit({
+        baseDir: path.resolve(
+          settings.get('platformSettings:platformConfig'),
+          '..'
+        )
+      });
     });
 
     it('updates settings in memory and on disk, with a git commit', async function () {
@@ -142,50 +138,62 @@ describe('Test /admin endpoint', () => {
       }
       const previousSettings = platformSettings.get();
       const update = {
-        updatedProp: { settings: { SOME_SETTING: { value: 'updatedVal' } } },
+        updatedProp: { settings: { SOME_SETTING: { value: 'updatedVal' } } }
       };
       const updatedSettings = { ...previousSettings, ...update };
-
       const res = await request
         .put('/admin/settings')
         .send(update)
         .set('Authorization', updateOnlyToken);
       assert.strictEqual(res.status, 200);
-      assert.deepEqual(res.body.settings, updatedSettings, 'settings in API response do not match updated ones');
-      assert.deepEqual(platformSettings.get(), updatedSettings, 'settings in memory do not match updated ones');
+      assert.deepEqual(
+        res.body.settings,
+        updatedSettings,
+        'settings in API response do not match updated ones'
+      );
+      assert.deepEqual(
+        platformSettings.get(),
+        updatedSettings,
+        'settings in memory do not match updated ones'
+      );
       const ymlFile = fs.readFileSync(platformPath, 'utf8');
       const platform = yaml.load(ymlFile);
-      assert.deepEqual(platform.vars, updatedSettings, 'settings on disk do not match updated ones');
-
+      assert.deepEqual(
+        platform.vars,
+        updatedSettings,
+        'settings on disk do not match updated ones'
+      );
       const logs = await gitClient.log();
-      assert.equal(logs.all[0].message, 'update through PUT /admin/settings by userOnlyUpdatePerm');
+      assert.equal(
+        logs.all[0].message,
+        'update through PUT /admin/settings by userOnlyUpdatePerm'
+      );
     });
+
     it('must respond with 400 when given properties that create invalid config', async () => {
       const invalidProps = {
         ADVANCED_API_SETTINGS: {
           settings: {
             INVITATION_TOKENS: {
-              value: '',
+              value: ''
             },
             VERSIONING_SETTINGS: {
-              value: 55,
-            },
-          },
-        },
+              value: 55
+            }
+          }
+        }
       };
-
       const res = await request
         .put('/admin/settings')
         .set('Authorization', updateOnlyToken)
         .send(invalidProps);
-
       assert.strictEqual(res.status, 400);
     });
+
     it('must return 401 when given token with insufficient permissions', async () => {
       const res = await request
         .put('/admin/settings')
         .set('Authorization', readOnlyToken);
-
       assert.strictEqual(res.status, 401);
     });
   });
@@ -200,31 +208,36 @@ describe('Test /admin endpoint', () => {
       const res = await request
         .post('/admin/notify')
         .set('Authorization', updateOnlyToken);
-
       const { body } = res;
       const { successes } = body;
       const { failures } = body;
-
       assert.isDefined(failures);
       assert.isDefined(successes);
       const followers = settings.get('followers');
       for (const [token, follower] of Object.entries(followers)) {
         if (token === 'failing') {
-          const failure = failures.find((failure) => failure.url === follower.url);
+          const failure = failures.find(
+            (failure) => failure.url === follower.url
+          );
           assert.exists(failure);
           assert.equal(failure.role, follower.role);
         } else {
-          const success = successes.find((success) => success.url === follower.url);
-          assert.exists(success, `expected success with ${follower.role} not found`);
+          const success = successes.find(
+            (success) => success.url === follower.url
+          );
+          assert.exists(
+            success,
+            `expected success with ${follower.role} not found`
+          );
           assert.equal(success.role, follower.role);
         }
       }
     });
+
     it('must return 401 when given token with insufficient permissions', async () => {
       const res = await request
         .post('/admin/notify')
         .set('Authorization', readOnlyToken);
-
       assert.strictEqual(res.status, 401);
     });
 
@@ -254,7 +267,10 @@ describe('Test /admin endpoint', () => {
   describe('GET /admin/migrations', () => {
     let templatePath;
     before(() => {
-      templatePath = path.resolve(__dirname, '../../src/controller/migration/scriptsAndTemplates/cluster/1.7.0-template.yml');
+      templatePath = path.resolve(
+        __dirname,
+        '../../src/controller/migration/scriptsAndTemplates/cluster/1.7.0-template.yml'
+      );
     });
 
     describe('when there is an update', () => {
@@ -263,10 +279,13 @@ describe('Test /admin endpoint', () => {
         const app = new Application({
           nconfSettings: {
             platformSettings: {
-              platformConfig: path.resolve(__dirname, '../fixtures/migration-needed/1.7.0/platform.yml'),
-              platformTemplate: templatePath,
-            },
-          },
+              platformConfig: path.resolve(
+                __dirname,
+                '../fixtures/migration-needed/1.7.0/platform.yml'
+              ),
+              platformTemplate: templatePath
+            }
+          }
         });
         request = supertest(app.express);
       });
@@ -282,10 +301,11 @@ describe('Test /admin endpoint', () => {
           assert.deepEqual(migrations, [
             { versionsFrom: ['1.6.21'], versionTo: '1.6.22' },
             { versionsFrom: ['1.6.22'], versionTo: '1.6.23' },
-            { versionsFrom: ['1.6.23'], versionTo: '1.7.0' },
+            { versionsFrom: ['1.6.23'], versionTo: '1.7.0' }
           ]);
         });
       });
+
       describe('when the user has insufficient permissions', () => {
         it('must return a 401 error', async () => {
           const res = await request
@@ -295,6 +315,7 @@ describe('Test /admin endpoint', () => {
         });
       });
     });
+
     describe('when there is no update', () => {
       describe('when the user has sufficient permissions', () => {
         let request;
@@ -302,10 +323,13 @@ describe('Test /admin endpoint', () => {
           const app = new Application({
             nconfSettings: {
               platformSettings: {
-                platformConfig: path.resolve(__dirname, '../fixtures/migration-not-needed/config/platform.yml'),
-                platformTemplate: templatePath,
-              },
-            },
+                platformConfig: path.resolve(
+                  __dirname,
+                  '../fixtures/migration-not-needed/config/platform.yml'
+                ),
+                platformTemplate: templatePath
+              }
+            }
           });
           request = supertest(app.express);
         });
@@ -324,22 +348,39 @@ describe('Test /admin endpoint', () => {
   describe('POST /admin/migrations/apply', () => {
     let templatePath;
     before(() => {
-      templatePath = path.resolve(__dirname, '../../src/controller/migration/scriptsAndTemplates/cluster/1.7.0-template.yml');
+      templatePath = path.resolve(
+        __dirname,
+        '../../src/controller/migration/scriptsAndTemplates/cluster/1.7.0-template.yml'
+      );
     });
 
     describe('when there is an update', () => {
-      let request; let backupPlatform; let platformPath;
-      let expectedPlatform; let app;
+      let request;
+      let backupPlatform;
+      let platformPath;
+      let expectedPlatform;
+      let app;
       before(async () => {
-        platformPath = path.resolve(__dirname, '../fixtures/migration-needed/1.7.0/platform.yml');
-        expectedPlatform = yaml.load(fs.readFileSync(path.resolve(__dirname, '../fixtures/migration-needed/1.7.0/expected.yml'), 'utf-8'));
+        platformPath = path.resolve(
+          __dirname,
+          '../fixtures/migration-needed/1.7.0/platform.yml'
+        );
+        expectedPlatform = yaml.load(
+          fs.readFileSync(
+            path.resolve(
+              __dirname,
+              '../fixtures/migration-needed/1.7.0/expected.yml'
+            ),
+            'utf-8'
+          )
+        );
         app = new Application({
           nconfSettings: {
             platformSettings: {
               platformConfig: platformPath,
-              platformTemplate: templatePath,
-            },
-          },
+              platformTemplate: templatePath
+            }
+          }
         });
         await app.init();
         request = supertest(app.express);
@@ -351,6 +392,7 @@ describe('Test /admin endpoint', () => {
           after(() => {
             fs.writeFileSync(platformPath, backupPlatform);
           });
+
           it('must migrate the platform configuration and return the executed migrations', async function () {
             if (process.env.IS_CI) {
               // for some reason, in CI, the "git commit" action can't figure out the author
@@ -364,64 +406,93 @@ describe('Test /admin endpoint', () => {
             assert.deepEqual(migrations, [
               { versionsFrom: ['1.6.21'], versionTo: '1.6.22' },
               { versionsFrom: ['1.6.22'], versionTo: '1.6.23' },
-              { versionsFrom: ['1.6.23'], versionTo: '1.7.0' },
+              { versionsFrom: ['1.6.23'], versionTo: '1.7.0' }
             ]);
             const migratedPlatform = yaml.load(fs.readFileSync(platformPath));
-            assert.deepEqual(migratedPlatform, expectedPlatform, 'platform configuration not migrated on disk');
-            assert.deepEqual(app.platformSettings.get(), expectedPlatform.vars, 'platform configuration not migrated in memory');
+            assert.deepEqual(
+              migratedPlatform,
+              expectedPlatform,
+              'platform configuration not migrated on disk'
+            );
+            assert.deepEqual(
+              app.platformSettings.get(),
+              expectedPlatform.vars,
+              'platform configuration not migrated in memory'
+            );
           });
         });
 
         describe('when there is an error in the platform.yml', () => {
-          let request; let platformPath; let
-              originalPlatform;
+          let request;
+          let platformPath;
+          let originalPlatform;
           before(() => {
-            platformPath = path.resolve(__dirname, '../fixtures/migration-broken/config/platform.yml');
+            platformPath = path.resolve(
+              __dirname,
+              '../fixtures/migration-broken/config/platform.yml'
+            );
             const app = new Application({
               nconfSettings: {
                 platformSettings: {
                   platformConfig: platformPath,
-                  platformTemplate: templatePath,
-                },
-              },
+                  platformTemplate: templatePath
+                }
+              }
             });
             request = supertest(app.express);
             originalPlatform = fs.readFileSync(platformPath, 'utf-8');
           });
+
           it('must return a 400 error and not alter the platform.yml', async () => {
             const res = await request
               .post('/admin/migrations/apply')
               .set('Authorization', updateOnlyToken);
             assert.equal(res.status, 500);
-            assert.equal(fs.readFileSync(platformPath, 'utf-8'), originalPlatform);
+            assert.equal(
+              fs.readFileSync(platformPath, 'utf-8'),
+              originalPlatform
+            );
           });
         });
+
         describe('when there is no migration path from the platform.yml to the template', () => {
-          let request; let platformPath; let
-              originalPlatform;
+          let request;
+          let platformPath;
+          let originalPlatform;
           before(() => {
-            platformPath = path.resolve(__dirname, '../fixtures/migration-broken/unavailable-migration/platform.yml');
+            platformPath = path.resolve(
+              __dirname,
+              '../fixtures/migration-broken/unavailable-migration/platform.yml'
+            );
             const app = new Application({
               nconfSettings: {
                 platformSettings: {
                   platformConfig: platformPath,
-                  platformTemplate: templatePath,
-                },
-              },
+                  platformTemplate: templatePath
+                }
+              }
             });
             request = supertest(app.express);
             originalPlatform = fs.readFileSync(platformPath, 'utf-8');
           });
+
           it('must return a 400 error and not alter the platform.yml', async () => {
             const res = await request
               .post('/admin/migrations/apply')
               .set('Authorization', updateOnlyToken);
             assert.equal(res.status, 500);
-            assert.equal(res.body.error.message, 'No migration available from 1.2.3 to 1.7.0. Contact Pryv support for more information');
-            assert.equal(fs.readFileSync(platformPath, 'utf-8'), originalPlatform);
+            assert.equal(
+              res.body.error.message,
+              'No migration available from 1.2.3 to 1.7.0. Contact Pryv support for more information'
+            );
+            assert.equal(
+              fs.readFileSync(platformPath, 'utf-8'),
+              originalPlatform
+            );
           });
         });
       });
+
       describe('when the user has insufficient permissions', () => {
         it('must return a 401 error', async () => {
           const res = await request
@@ -431,23 +502,29 @@ describe('Test /admin endpoint', () => {
         });
       });
     });
+
     describe('when there is no update', () => {
       describe('when the user has sufficient permissions', () => {
-        let request; let backupPlatform; let
-            platformPath;
+        let request;
+        let backupPlatform;
+        let platformPath;
         before(() => {
-          platformPath = path.resolve(__dirname, '../fixtures/migration-not-needed/config/platform.yml');
+          platformPath = path.resolve(
+            __dirname,
+            '../fixtures/migration-not-needed/config/platform.yml'
+          );
           const app = new Application({
             nconfSettings: {
               platformSettings: {
                 platformConfig: platformPath,
-                platformTemplate: templatePath,
-              },
-            },
+                platformTemplate: templatePath
+              }
+            }
           });
           request = supertest(app.express);
           backupPlatform = fs.readFileSync(platformPath, 'utf-8');
         });
+
         after(() => {
           fs.writeFileSync(platformPath, backupPlatform);
         });

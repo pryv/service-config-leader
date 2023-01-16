@@ -1,47 +1,44 @@
-// @flow
-
-import UsersRepository from '@repositories/users.repository';
-
+/**
+ * @license
+ * Copyright (C) 2019–2023 Pryv S.A. https://pryv.com - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ */
+const UsersRepository = require('@repositories/users.repository');
 const { assert } = require('chai');
 const Database = require('better-sqlite3');
-const {
-  describe, before, it, after,
-} = require('mocha');
+const { describe, before, it, after } = require('mocha');
 
 describe('Test Users Repository', () => {
-  let db: Database;
+  let db;
   let usersRepository;
   let selectUserStmt;
-
   const user = {
     username: 'some_name',
     password: 'pass',
-    permissions: { some_cat: 'read' },
+    permissions: { some_cat: 'read' }
   };
   const newUser = {
     username: 'new_name',
-    password: 'new_pass',
+    password: 'new_pass'
   };
-
   before(() => {
-    db = new Database(':memory:', { /* verbose: console.log */ });
+    db = new Database(':memory:', {
+      /* verbose: console.log */
+    });
     usersRepository = new UsersRepository(db);
     selectUserStmt = db.prepare('SELECT * FROM users WHERE username = ?;');
   });
-
   after(() => {
     db.close();
   });
-
   describe('Create user', () => {
     let createdUser;
     let savedUser;
-
     before(() => {
       createdUser = usersRepository.createUser(user);
       savedUser = selectUserStmt.get(user.username);
     });
-
     it('must save user with hashed password and created id', () => {
       assert.exists(savedUser);
       assert.exists(savedUser.id);
@@ -57,11 +54,9 @@ describe('Test Users Repository', () => {
   });
   describe('Find user', () => {
     let foundUser;
-
     before(() => {
       foundUser = usersRepository.findUser(user.username);
     });
-
     it('must return username and permissions of the user', () => {
       assert.exists(foundUser);
       assert.exists(foundUser.username);
@@ -73,11 +68,9 @@ describe('Test Users Repository', () => {
   });
   describe('Find all users', () => {
     let foundUsers;
-
     before(() => {
       foundUsers = usersRepository.findAllUsers();
     });
-
     it('must return an array with users', () => {
       assert.exists(foundUsers);
       assert.equal(foundUsers.length, 1);
@@ -88,14 +81,13 @@ describe('Test Users Repository', () => {
   describe('Check password', () => {
     let checkOfValidPassword;
     let checkOfInvalidPassword;
-
     before(() => {
       checkOfValidPassword = usersRepository.isPasswordValid(user);
-      checkOfInvalidPassword = usersRepository.isPasswordValid(
-        { ...user, password: 'wrong_pass' },
-      );
+      checkOfInvalidPassword = usersRepository.isPasswordValid({
+        ...user,
+        password: 'wrong_pass'
+      });
     });
-
     it('must return true given valid password', () => {
       assert.exists(checkOfValidPassword);
     });
@@ -106,12 +98,10 @@ describe('Test Users Repository', () => {
   describe('Update user', () => {
     let updatedUser;
     let savedUser;
-
     before(() => {
       updatedUser = usersRepository.updateUser(user.username, newUser);
       savedUser = selectUserStmt.get(newUser.username);
     });
-
     it('must update the user with provided changes', () => {
       assert.exists(savedUser);
       assert.exists(savedUser.id);
@@ -129,12 +119,10 @@ describe('Test Users Repository', () => {
   });
   describe('Reset password', () => {
     let savedUser;
-
     before(() => {
       usersRepository.resetPassword(newUser.username);
       savedUser = selectUserStmt.get(newUser.username);
     });
-
     it('must set random string as new user password', () => {
       assert.exists(savedUser);
       assert.exists(savedUser.id);
@@ -147,12 +135,10 @@ describe('Test Users Repository', () => {
   describe('Delete user', () => {
     let deletedUsername;
     let deletedUser;
-
     before(() => {
       deletedUsername = usersRepository.deleteUser(newUser.username);
       deletedUser = selectUserStmt.get(newUser.username);
     });
-
     it('must return deleted user username', () => {
       assert.equal(deletedUsername, newUser.username);
     });

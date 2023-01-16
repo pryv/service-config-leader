@@ -1,7 +1,9 @@
-// @flow
-
-/* global describe, before, beforeEach, it */
-
+/**
+ * @license
+ * Copyright (C) 2019–2023 Pryv S.A. https://pryv.com - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ */
 const yaml = require('js-yaml');
 const path = require('path');
 const fs = require('fs');
@@ -9,8 +11,13 @@ const { assert } = require('chai');
 const Application = require('@root/app');
 
 describe('GET /conf', () => {
-  let app; let request; let settings; let follower; let followerKey; let platformPath; let
-      platform;
+  let app;
+  let request;
+  let settings;
+  let follower;
+  let followerKey;
+  let platformPath;
+  let platform;
   before(() => {
     app = new Application();
     request = require('supertest')(app.express);
@@ -27,34 +34,30 @@ describe('GET /conf', () => {
 
   it('fails if configuration folder for given role does not exist', async () => {
     const res = await request.get('/conf').set('Authorization', 'valid');
-
     assert.strictEqual(res.status, 404);
     const { error } = res.body;
     assert.isDefined(error);
     assert.strictEqual(
       error.message,
-      'Configuration folder not found for \'unexisting\'.',
+      "Configuration folder not found for 'unexisting'."
     );
   });
 
   it('serves a full configuration', async () => {
     const res = await request.get('/conf').set('Authorization', followerKey);
     assert.strictEqual(res.status, 200);
-
     const { files } = res.body;
     assert.exists(files);
-
     ['core', 'register', 'mfa'].forEach((component) => {
       const conf = files.find(
-        (f) => f.path === `/${component}/conf/${component}.json`,
+        (f) => f.path === `/${component}/conf/${component}.json`
       );
       assert.exists(conf);
       assert.deepEqual(
         conf.content.replace(/\s/g, ''),
-        getExpectedConf(follower.role, component),
+        getExpectedConf(follower.role, component)
       );
     });
-
     // verify ignoring .json for .yml
     const jsonFile = files.find((f) => f.path === '/new-one/conf/new.json');
     assert.notExists(jsonFile);
@@ -62,7 +65,7 @@ describe('GET /conf', () => {
     assert.exists(yamlFile);
     assert.deepEqual(
       yamlFile.content.replace(/\s/g, ''),
-      getExpectedConf(follower.role, 'new-one', 'expected.yml', true),
+      getExpectedConf(follower.role, 'new-one', 'expected.yml', true)
     );
   });
 
@@ -73,7 +76,6 @@ describe('GET /conf', () => {
       .content;
     coreConfig1 = JSON.parse(coreConfig1);
     assert.equal(coreConfig1.http.port, 9000);
-
     const path = `${settings.get('templatesPath')}/pryv/core/conf/core.json`;
     const backup = fs.readFileSync(path);
     const modifiedConfig = JSON.parse(backup);
@@ -93,19 +95,21 @@ describe('GET /conf', () => {
     // Call first time
     const call1 = await request.get('/conf').set('Authorization', followerKey);
     const files1 = call1.body.files;
-    let coreConfig1 = files1.filter((f) => f.path.indexOf('substitute.json') > 0)[0].content;
+    let coreConfig1 = files1.filter(
+      (f) => f.path.indexOf('substitute.json') > 0
+    )[0].content;
     coreConfig1 = JSON.parse(coreConfig1);
     assert.equal(coreConfig1.domain, 'rec.la');
-
     // Modify platform.yml
     const modifiedConfig = yaml.load(platform);
     modifiedConfig.vars.MAIN_PROPS.settings.DOMAIN.value = 'test.la';
     fs.writeFileSync(platformPath, yaml.dump(modifiedConfig));
-
     // Check if /conf give the fresh settings
     const call2 = await request.get('/conf').set('Authorization', followerKey);
     const files2 = call2.body.files;
-    let coreConfig2 = files2.filter((f) => f.path.indexOf('substitute.json') > 0)[0].content;
+    let coreConfig2 = files2.filter(
+      (f) => f.path.indexOf('substitute.json') > 0
+    )[0].content;
     coreConfig2 = JSON.parse(coreConfig2);
     assert.equal(coreConfig2.domain, 'test.la');
   });
@@ -117,16 +121,19 @@ describe('GET /conf', () => {
     const modifiedConfig = yaml.load(backup);
     modifiedConfig.vars.DNS_SETTINGS.settings.DNS_CUSTOM_ENTRIES.value = '';
     fs.writeFileSync(path, yaml.dump(modifiedConfig));
-
     const res = await request.get('/conf').set('Authorization', followerKey);
     assert.equal(res.status, 500);
     assert.isDefined(res.error);
-
     // Set platform.yml to the backup
     fs.writeFileSync(path, backup);
   });
 
-  function getExpectedConf(role: string, component: string, expectedFilename: string = 'expected.json', isYaml: boolean = false) {
+  function getExpectedConf (
+    role,
+    component,
+    expectedFilename = 'expected.json',
+    isYaml = false
+  ) {
     const dataFolder = path.resolve(settings.get('templatesPath'));
     const filePath = `${dataFolder}/${role}/${component}/conf/${expectedFilename}`;
     let expectedConf;

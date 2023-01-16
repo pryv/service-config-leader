@@ -1,12 +1,13 @@
-name: PrYv Config Leader CI
+name: Service Config-leader CI
 
 on:
   pull_request:
-    branches: 
+    branches:
       - '*'
   push:
     branches:
       - master
+  workflow_dispatch:
 
 jobs:
   build:
@@ -17,19 +18,22 @@ jobs:
         node-version: [16.4.1]
 
     steps:
-      - name: Download master branch
-        uses: actions/checkout@v2
+    - name: Install `just`
+      uses: extractions/setup-just@v1
 
-      - name: Node.js installation
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
+    - name: Download master branch
+      uses: actions/checkout@v2
 
-      - name: Npm packages installation
-        run: yarn install --frozen-lockfile # equivalent to "npm ci"
+    - name: Install Node.js with version ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
 
-      - name: lint
-        run: yarn lint
+    - name: Install dependencies
+      run: just install-stable
 
-      - name: Tests
-        run: IS_CI=true yarn test
+    - name: Lint
+      run: just lint
+
+    - name: Test
+      run: IS_CI=true just test

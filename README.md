@@ -1,23 +1,28 @@
-# Service-config-leader
+# service-config-leader
 
 Service enabling centralized configuration of all Pryv.io components; paired with [service-config-follower](https://github.com/pryv/service-config-follower).
 
 Exposes HTTP REST API to retrieve and update platform configuration.
 Exposes also HTTP REST API to manage users having access to the platform configuration API.
 
-Prerequisites: Node v8+, Yarn v1+
+## Installation
+
+Prerequisites: [Node.js](https://nodejs.org/en/download/) 16, [just](https://github.com/casey/just#installation)
+
+Then:
+1. `just setup-dev-env`
+2. `just install` to install node modules
+
+Running `just` with no argument displays the available commands (defined in `justfile`).
 
 
-## How to?
+## Testing
 
-| Task                         | Command        |
-| ---------------------------- | -------------- |
-| Setup                        | `yarn install` |
-| Run API server               | `yarn start`   |
-| Run Tests                    | `yarn test`    |
-| Run Tests with server logs   | `yarn test-log`|
-| Create Distribution          | `yarn release` |
-| Recompile During Development | `yarn watch`   |
+```
+just test [...params]
+```
+- Extra parameters at the end are passed on to [Mocha](https://mochajs.org/) (default settings are defined in `.mocharc.js`)
+- Replace `test` with `test-detailed`, `test-debug`, `test-cover` for common presets
 
 
 ## Adding a new template
@@ -61,3 +66,8 @@ On the startup of the server, a user is created with all possible permissions.
 Credentials of this user will be displayed in console upon it's creation.
 Note that this user is recreated each time the server restarts.
 Therefore it is not an admin user, but rather an initial user, that has sufficient permissions to create other users and should serve as an emergency user after having created first admin-like user.
+
+
+## License
+
+[UNLICENSED](LICENSE)

@@ -1,7 +1,9 @@
-// @flow
-
-import type { UserNoPerms } from '@models/user.model';
-
+/**
+ * @license
+ * Copyright (C) 2019–2023 Pryv S.A. https://pryv.com - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ */
 const bluebird = require('bluebird');
 const express = require('express');
 const middlewares = require('@middlewares');
@@ -13,30 +15,41 @@ const TokensRepository = require('@repositories/tokens.repository');
 const {
   USERS_PERMISSIONS,
   SETTINGS_PERMISSIONS,
-  PLATFORM_USERS_PERMISSIONS,
+  PLATFORM_USERS_PERMISSIONS
 } = require('@models/permissions.model');
 const morgan = require('morgan');
 const { setupGit } = require('@controller/migration');
 const { injectTestSettings, getSettings } = require('./settings');
 
 class Application {
-  express: express$Application;
+  /**
+   * @type {express$Application}
+   */
+  express;
+  settings;
+  platformSettings;
+  logger;
+  /**
+   * @type {Database}
+   */
+  db;
+  /**
+   * @type {UsersRepository}
+  */
+  usersRepository;
+  /**
+   * @type {TokensRepository}
+   */
+  tokensRepository;
+  /**
+   * @type {object}
+   */
+  git;
 
-  settings: Object;
-
-  platformSettings: Object;
-
-  logger: Object;
-
-  db: Database;
-
-  usersRepository: UsersRepository;
-
-  tokensRepository: TokensRepository;
-
-  git: {};
-
-  constructor(settingsOverride: {} = {}) {
+  /**
+   * @param {object} settingsOverride
+   */
+  constructor (settingsOverride = {}) {
     if (settingsOverride.nconfSettings != null) injectTestSettings(settingsOverride.nconfSettings);
     this.settings = getSettings();
     this.platformSettings = require('./platform')(this.settings);
@@ -49,22 +62,26 @@ class Application {
     this.generateInitialUser();
     this.startTokensBlacklistCleanupJob();
     this.git = setupGit({
-      baseDir: this.settings.get('gitRepoPath'),
+      baseDir: this.settings.get('gitRepoPath')
     });
   }
 
   /**
    * mandatory in production and tests requiring git (POST /admin/migrations/apply)
+   * @returns {Promise<void>}
    */
-  async init() {
+  async init () {
     await this.platformSettings.load();
     await this.generateSecretsIfNeeded();
     await this.git.initRepo();
     // for some reason, in CI, the "git commit" action can't figure out the author
-    if (! process.env.IS_CI) await this.git.commitChanges('config leader boot');
+    if (!process.env.IS_CI) await this.git.commitChanges('config leader boot');
   }
 
-  async generateSecretsIfNeeded(): Promise<void> {
+  /**
+   * @returns {Promise<void>}
+   */
+  async generateSecretsIfNeeded () {
     const internalSettings = this.settings.get('internals');
 
     if (internalSettings == null) return;
@@ -83,7 +100,7 @@ class Application {
       this.logger.error('Error when saving secrets.', err);
     }
 
-    function randomAlphaNumKey(size: number): string {
+    function randomAlphaNumKey (size) {
       return Array(size)
         .fill(0)
         .map(() => Math.random().toString(36).charAt(2))
@@ -91,22 +108,33 @@ class Application {
     }
   }
 
-  connectToDb(): Database {
+  /**
+   * @returns {Database}
+   */
+  connectToDb () {
     return new Database(
-      `${this.settings.get('databasePath')}/config-user-management.db`,
+      `${this.settings.get('databasePath')}/config-user-management.db`
     );
   }
 
-  disconnectFromDb() {
+  /**
+   * @returns {void}
+   */
+  disconnectFromDb () {
     this.db.close();
   }
 
-  setupExpressApp(): express$Application {
+  /**
+   * @returns {express$Application}
+   */
+  setupExpressApp () {
     const { settings, platformSettings } = this;
     const expressApp = express();
 
     expressApp.use(express.json());
-    expressApp.use(morgan('combined', { skip: () => process.env.NODE_ENV === 'test' }));
+    expressApp.use(
+      morgan('combined', { skip: () => process.env.NODE_ENV === 'test' })
+    );
     expressApp.use(middlewares.cors);
 
     require('./routes/conf.route')(expressApp, settings, platformSettings);
@@ -115,24 +143,24 @@ class Application {
       settings,
       platformSettings,
       this.usersRepository,
-      this.tokensRepository,
+      this.tokensRepository
     );
     require('./routes/users.route')(
       expressApp,
       this.usersRepository,
-      this.tokensRepository,
+      this.tokensRepository
     );
     require('./routes/auth.route')(
       expressApp,
       this.usersRepository,
-      this.tokensRepository,
+      this.tokensRepository
     );
     require('./routes/platformUsers.route')(
       expressApp,
       settings,
       platformSettings,
       this.usersRepository,
-      this.tokensRepository,
+      this.tokensRepository
     );
 
     expressApp.use(middlewares.errors);
@@ -140,19 +168,25 @@ class Application {
     return expressApp;
   }
 
-  startTokensBlacklistCleanupJob() {
+  /**
+   * @returns {void}
+   */
+  startTokensBlacklistCleanupJob () {
     const job = new CronJob(
       '0 0 * * 0,3,5',
-      (() => {
+      () => {
         this.tokensRepository.clean();
-      }),
+      },
       null,
-      false,
+      false
     );
     job.start();
   }
 
-  generateInitialUser() {
+  /**
+   * @returns {void}
+   */
+  generateInitialUser () {
     const initialUser = {
       username: 'initial_user',
       password: 'temp_pass',
@@ -162,29 +196,28 @@ class Application {
           USERS_PERMISSIONS.CREATE,
           USERS_PERMISSIONS.DELETE,
           USERS_PERMISSIONS.RESET_PASSWORD,
-          USERS_PERMISSIONS.CHANGE_PERMISSIONS,
+          USERS_PERMISSIONS.CHANGE_PERMISSIONS
         ],
         settings: [SETTINGS_PERMISSIONS.READ, SETTINGS_PERMISSIONS.UPDATE],
         platformUsers: [
           PLATFORM_USERS_PERMISSIONS.READ,
           PLATFORM_USERS_PERMISSIONS.DELETE,
-          PLATFORM_USERS_PERMISSIONS.MODIFY,
-        ],
-      },
+          PLATFORM_USERS_PERMISSIONS.MODIFY
+        ]
+      }
     };
 
     this.usersRepository.deleteUser(initialUser.username);
     this.usersRepository.createUser(initialUser);
-    const createdUser: UserNoPerms = this.usersRepository.resetPassword(
-      initialUser.username,
+    const createdUser = this.usersRepository.resetPassword(
+      initialUser.username
     );
     this.logger.info(
-      `Initial user generated. Username: ${initialUser.username}, password: ${createdUser.password}`,
+      `Initial user generated. Username: ${initialUser.username}, password: ${createdUser.password}`
     );
     // also set password in the credentials volume - this directory should be set in docker-compose
     const credentialsFilePath = this.settings.get('credentials:filePath');
     fs.writeFileSync(credentialsFilePath, createdUser.password);
   }
 }
-
 module.exports = Application;

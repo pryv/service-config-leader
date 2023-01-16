@@ -1,40 +1,75 @@
-// @flow
-
-// Class that implements an Api Error.
-//
+/**
+ * @license
+ * Copyright (C) 2019–2023 Pryv S.A. https://pryv.com - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ */
+/**
+ * @extends Error
+ */
 class ApiError extends Error {
-  httpStatus: number;
+  /**
+   * @type {number}
+   */
+  httpStatus;
 
-  constructor(status: number, msg: string) {
+  /**
+   * @param {number} status
+   * @param {string} msg
+   */
+  constructor (status, msg) {
     super(msg);
     this.httpStatus = status;
   }
 }
 
-// Factory class that allows to generate Api Error.
-//
 class ErrorsFactory {
-  static unexpectedError(error: Error) {
+  /**
+   * @static
+   * @param {Error} error
+   * @returns {ApiError}
+   */
+  static unexpectedError (error) {
     const msg = error.message || 'Unexpected error.';
     return new ApiError(500, msg);
   }
 
-  static unauthorized(message: ?string) {
+  /**
+   * @static
+   * @param {string | null} message
+   * @returns {ApiError}
+   */
+  static unauthorized (message) {
     const msg = message || 'Operation is not authorized.';
     return new ApiError(401, msg);
   }
 
-  static invalidInput(message: ?string) {
+  /**
+   * @static
+   * @param {string | null} message
+   * @returns {ApiError}
+   */
+  static invalidInput (message) {
     const msg = message || 'Invalid input';
     return new ApiError(400, msg);
   }
 
-  static missingHeader(headerName: string): ApiError {
+  /**
+   * @static
+   * @param {string} headerName
+   * @returns {ApiError}
+   */
+  static missingHeader (headerName) {
     const msg = `Missing expected header "${headerName}".`;
     return new ApiError(400, msg);
   }
 
-  static notFound(message: ?string): ApiError {
+  /**
+   * @static
+   * @param {string | null} message
+   * @returns {ApiError}
+   */
+  static notFound (message) {
     const msg = message || 'Resource not found.';
     return new ApiError(404, msg);
   }

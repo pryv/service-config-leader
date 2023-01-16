@@ -1,5 +1,9 @@
-/* global describe, it, before */
-
+/**
+ * @license
+ * Copyright (C) 2019–2023 Pryv S.A. https://pryv.com - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ */
 const { assert } = require('chai');
 const path = require('path');
 const { mkdirSync, statSync, writeFileSync } = require('fs');
@@ -9,8 +13,9 @@ const { setupGit, getGit } = require('@controller/migration/git');
 const simpleGit = require('simple-git');
 
 describe('git', () => {
-  let git; let baseDir; let
-      gitClient;
+  let git;
+  let baseDir;
+  let gitClient;
   before(() => {
     baseDir = path.resolve(tmpdir(), cuid());
     mkdirSync(baseDir);
@@ -28,14 +33,15 @@ describe('git', () => {
   });
 
   describe('commitChanges()', () => {
-    let text; let
-        commitMsg;
+    let text;
+    let commitMsg;
     before(async () => {
       await git.initRepo();
       text = 'hello';
       commitMsg = 'howdy';
       writeFileSync(path.resolve(baseDir, 'someFile'), text);
     });
+
     it('must commit changes', async function () {
       if (process.env.IS_CI) {
         // for some reason, in CI, the "git commit" action can't figure out the author
