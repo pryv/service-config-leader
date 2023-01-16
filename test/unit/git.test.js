@@ -9,8 +9,9 @@ const { setupGit, getGit } = require('@controller/migration/git');
 const simpleGit = require('simple-git');
 
 describe('git', () => {
-  let git; let baseDir; let
-      gitClient;
+  let git;
+  let baseDir;
+  let gitClient;
   before(() => {
     baseDir = path.resolve(tmpdir(), cuid());
     mkdirSync(baseDir);
@@ -28,8 +29,8 @@ describe('git', () => {
   });
 
   describe('commitChanges()', () => {
-    let text; let
-        commitMsg;
+    let text;
+    let commitMsg;
     before(async () => {
       await git.initRepo();
       text = 'hello';
