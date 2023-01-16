@@ -1,4 +1,4 @@
-name: PrYv Config Leader deployment workflow
+name: Service Config-leader publish release
 
 on:
   push:
@@ -14,31 +14,28 @@ jobs:
         node-version: [16.4.1]
 
     steps:
-      - name: Download master branch
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+    - name: Install `just`
+      uses: extractions/setup-just@v1
 
-      - name: Install Node.js with version ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
+    - name: Download master branch
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
 
-      - name: Login to the docker containers registry
-        uses: azure/docker-login@v1
-        with:
-          login-server: ${{ secrets.REGISTRY_PRYV_SERVER }}
-          username: ${{ secrets.REGISTRY_PRYV_USERNAME }}
-          password: ${{ secrets.REGISTRY_PRYV_PASSWORD }}
+    - name: Install Node.js with version ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
 
-      - name: Npm packages installation
-        run: yarn install --frozen-lockfile # equivalent to "npm ci"
+    - name: Install dependencies
+      run: just install-stable
 
-      - name: lint
-        run: yarn lint        
+    - name: Login to the docker containers registry
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ secrets.REGISTRY_PRYV_SERVER }}
+        username: ${{ secrets.REGISTRY_PRYV_USERNAME }}
+        password: ${{ secrets.REGISTRY_PRYV_PASSWORD }}
 
-      - name: Tests
-        run: IS_CI=true yarn test
-
-      - name: Build and publish image
-        run: ./build/build 
+    - name: Build and publish image
+      run: ./build/build

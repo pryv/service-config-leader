@@ -18,4 +18,3 @@ coverage/
 credentials.txt
 node_modules/
 test_results/
-yarn-error.log

@@ -19,7 +19,8 @@ minimal_apt_get_install unicode-data
 pushd $target_dir
 run run tar --owner app -xf /pd_build/release.tar
 
-PYTHON=$(which python2.7) run yarn install
+# Skip install: already done in the GitHub workflow
+# npm install
 
 # Install the config file
 run mkdir -p $conf_dir && \
