@@ -29,7 +29,7 @@ module.exports = (platform, template) => {
   return platformCopy;
 };
 /** @returns {{}[]} */
-function convertRootKeysToStreams(oldAccountStreamsObject) {
+function convertRootKeysToStreams (oldAccountStreamsObject) {
   const streamsArray = [];
   for (const [streamId, children] of Object.entries(oldAccountStreamsObject)) {
     streamsArray.push({

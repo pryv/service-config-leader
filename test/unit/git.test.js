@@ -1,5 +1,3 @@
-/* global describe, it, before */
-
 const { assert } = require('chai');
 const path = require('path');
 const { mkdirSync, statSync, writeFileSync } = require('fs');
@@ -37,6 +35,7 @@ describe('git', () => {
       commitMsg = 'howdy';
       writeFileSync(path.resolve(baseDir, 'someFile'), text);
     });
+
     it('must commit changes', async function () {
       if (process.env.IS_CI) {
         // for some reason, in CI, the "git commit" action can't figure out the author

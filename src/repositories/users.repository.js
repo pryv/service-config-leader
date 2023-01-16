@@ -1,7 +1,13 @@
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
-const { Database, Statement } = require('better-sqlite3');
 const cryptoRandomString = require('crypto-random-string');
+
+/**
+ * @typedef {import('better-sqlite3').Database} Database
+ */
+/**
+ * @typedef {import('better-sqlite3').Statement} Statement
+ */
 
 class UsersRepository {
   /**
@@ -36,7 +42,7 @@ class UsersRepository {
   /**
    * @param {Database} db
    */
-  constructor(db) {
+  constructor (db) {
     this.db = db;
     const tableCreationStatement = this.db.prepare(
       'CREATE TABLE IF NOT EXISTS users ' +
@@ -52,7 +58,7 @@ class UsersRepository {
   /**
    * @returns {void}
    */
-  prepareStatements() {
+  prepareStatements () {
     this.createUserStmt = this.db.prepare(
       'INSERT INTO users(username, password, permissions) VALUES(@username, @password, @permissions);'
     );
@@ -74,7 +80,7 @@ class UsersRepository {
    * @param {User} user
    * @returns {any}
    */
-  createUser(user) {
+  createUser (user) {
     const passwordHash = bcrypt.hashSync(user.password, 10);
     const userToCreate = {
       ...user,
@@ -88,7 +94,7 @@ class UsersRepository {
   /**
    * @returns {any[]}
    */
-  findAllUsers() {
+  findAllUsers () {
     const users = this.getAllUsersStmt
       .all()
       .map((user) => UsersRepository.sanitizeOutput(user));
@@ -99,7 +105,7 @@ class UsersRepository {
    * @param {string} username
    * @returns {any}
    */
-  findUser(username) {
+  findUser (username) {
     const row = this.getUserWithPermissionsStmt.get(username);
     return row ? UsersRepository.sanitizeOutput(row) : null;
   }
@@ -108,7 +114,7 @@ class UsersRepository {
    * @param {UserNoPerms} user
    * @returns {boolean}
    */
-  isPasswordValid(user) {
+  isPasswordValid (user) {
     const row = this.getUserWithPasswordStmt.get(user.username);
     return row && bcrypt.compareSync(user.password, row.password);
   }
@@ -117,7 +123,7 @@ class UsersRepository {
    * @param {string} username
    * @returns {any}
    */
-  resetPassword(username) {
+  resetPassword (username) {
     const password = cryptoRandomString({ length: 15 });
     this.updateUser(username, { password });
     return { username, password };
@@ -128,7 +134,7 @@ class UsersRepository {
    * @param {UserOptional} newUser
    * @returns {any}
    */
-  updateUser(username, newUser) {
+  updateUser (username, newUser) {
     const userToUpdate = newUser;
     const placeholders = Object.keys(userToUpdate)
       .map((key) => `${key} = ?`)
@@ -152,7 +158,7 @@ class UsersRepository {
    * @param {string} username
    * @returns {string}
    */
-  deleteUser(username) {
+  deleteUser (username) {
     const info = this.deleteUserStmt.run(username);
     if (info.changes) {
       return username;
@@ -165,7 +171,7 @@ class UsersRepository {
    * @param {any} user
    * @returns {any}
    */
-  static sanitizeOutput(user) {
+  static sanitizeOutput (user) {
     const sanitizedUser = _.pick(user, ['username', 'permissions']);
     if (sanitizedUser.permissions) {
       Object.assign(sanitizedUser, {

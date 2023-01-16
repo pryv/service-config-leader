@@ -1,14 +1,8 @@
-const url = require('url');
 const request = require('superagent');
 const bluebird = require('bluebird');
 const logger = require('@utils/logging').getLogger('platform-users');
-const UsersRepository = require('@repositories/users.repository');
-const TokensRepository = require('@repositories/tokens.repository');
 const verifyToken = require('@middlewares/security/token.verification');
-const {
-  getAuthorizationService,
-  AuthorizationService
-} = require('@middlewares/security/authorization.service');
+const { getAuthorizationService } = require('@middlewares/security/authorization.service');
 const { PLATFORM_USERS_PERMISSIONS } = require('@models/permissions.model');
 const {
   getAuditLogger,
@@ -17,6 +11,7 @@ const {
 } = require('@utils/auditLogger');
 const errors = require('@utils/errorsHandling').factory;
 const { isSingleNode, findCoresUrls } = require('@utils/configuration.utils');
+
 module.exports = function (
   expressApp,
   settings,
@@ -36,16 +31,17 @@ module.exports = function (
       const { username } = req.params;
       try {
         const getResponse = await request
-          .get(url.resolve(registerUrl, `/admin/users/${username}`))
+          .get(new URL(`/admin/users/${username}`, registerUrl).href)
           .set('Authorization', authKey);
         return res.status(200).json({ user: getResponse.body });
       } catch (err) {
-        if (err.status && err.status === 404)
+        if (err.status && err.status === 404) {
           return next(
             errors.notFound(
               `user with username: "${username}" not found on register at: ${registerUrl}. Register error: ${err.message}`
             )
           );
+        }
         return next(
           errors.unexpectedError(
             new Error(
@@ -86,7 +82,7 @@ module.exports = function (
         for (const coreUrl of coreUrls) {
           deleteFromCoresPromises.push(
             request
-              .delete(url.resolve(coreUrl, `/users/${usernameToDelete}`))
+              .delete(new URL(`/users/${usernameToDelete}`, coreUrl).href)
               .set('Authorization', authKeyCore)
           );
         }
@@ -108,13 +104,11 @@ module.exports = function (
       }
       try {
         await request
-          .delete(
-            url.resolve(registerUrl, `/users/${usernameToDelete}?onlyReg=true`)
-          )
+          .delete(new URL(`/users/${usernameToDelete}?onlyReg=true`, registerUrl).href)
           .set('Authorization', authKeyReg);
       } catch (err) {
         // was already deleted by core
-        if (err.status !== 404)
+        if (err.status !== 404) {
           return next(
             errors.unexpectedError(
               new Error(
@@ -122,6 +116,7 @@ module.exports = function (
               )
             )
           );
+        }
       }
       auditLogger.appendToLogFile(
         res.locals.username,
@@ -145,7 +140,7 @@ module.exports = function (
         // find core
         try {
           const res = await request
-            .get(url.resolve(registerUrl, '/cores'))
+            .get(new URL('/cores', registerUrl).href)
             .query({ username });
           coreUrl = res.body.core.url;
         } catch (err) {
@@ -161,7 +156,7 @@ module.exports = function (
       // send request
       try {
         await request
-          .delete(url.resolve(coreUrl, `/system/users/${username}/mfa`))
+          .delete(new URL(`/system/users/${username}/mfa`, coreUrl).href)
           .set('authorization', authKeyCore);
       } catch (err) {
         return next(

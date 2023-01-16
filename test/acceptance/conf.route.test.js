@@ -1,9 +1,9 @@
-/* global describe, before, beforeEach, it */
 const yaml = require('js-yaml');
 const path = require('path');
 const fs = require('fs');
 const { assert } = require('chai');
 const Application = require('@root/app');
+
 describe('GET /conf', () => {
   let app;
   let request;
@@ -21,9 +21,11 @@ describe('GET /conf', () => {
     platformPath = settings.get('platformSettings:platformConfig');
     platform = fs.readFileSync(platformPath, 'utf-8');
   });
+
   beforeEach(() => {
     fs.writeFileSync(platformPath, platform);
   });
+
   it('fails if configuration folder for given role does not exist', async () => {
     const res = await request.get('/conf').set('Authorization', 'valid');
     assert.strictEqual(res.status, 404);
@@ -34,6 +36,7 @@ describe('GET /conf', () => {
       "Configuration folder not found for 'unexisting'."
     );
   });
+
   it('serves a full configuration', async () => {
     const res = await request.get('/conf').set('Authorization', followerKey);
     assert.strictEqual(res.status, 200);
@@ -59,6 +62,7 @@ describe('GET /conf', () => {
       getExpectedConf(follower.role, 'new-one', 'expected.yml', true)
     );
   });
+
   it('loads a fresh template from disk at each call', async () => {
     const call1 = await request.get('/conf').set('Authorization', followerKey);
     const files1 = call1.body.files;
@@ -80,6 +84,7 @@ describe('GET /conf', () => {
     assert.equal(coreConfig.http.port, 8000);
     fs.writeFileSync(path, backup);
   });
+
   it('loads a fresh platform parameters from disk at each call', async () => {
     // Call first time
     const call1 = await request.get('/conf').set('Authorization', followerKey);
@@ -102,6 +107,7 @@ describe('GET /conf', () => {
     coreConfig2 = JSON.parse(coreConfig2);
     assert.equal(coreConfig2.domain, 'test.la');
   });
+
   it('responds with 500 given incorrect config stored', async () => {
     // Set invalid config in platform.yml
     const path = settings.get('platformSettings:platformConfig');
@@ -115,7 +121,8 @@ describe('GET /conf', () => {
     // Set platform.yml to the backup
     fs.writeFileSync(path, backup);
   });
-  function getExpectedConf(
+
+  function getExpectedConf (
     role,
     component,
     expectedFilename = 'expected.json',

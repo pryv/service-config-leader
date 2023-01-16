@@ -59,11 +59,13 @@ describe('Test /admin endpoint', () => {
       settings.get('internals:configLeaderTokenSecret')
     );
   });
+
   after(() => {
     deleteAllStmt.run();
     fs.writeFileSync(platformPath, platformBackup);
     injectTestSettings({});
   });
+
   it('responds with CORS related headers', async () => {
     const res = await request
       .put('/admin/settings')
@@ -86,10 +88,12 @@ describe('Test /admin endpoint', () => {
     assert.isDefined(headers['access-control-allow-credentials']);
     assert.equal(headers['access-control-allow-credentials'], 'true');
   });
+
   it('responds with 200 to OPTIONS request', async () => {
     const res = await request.options('/');
     assert.strictEqual(res.status, 200);
   });
+
   describe('GET /admin/settings', () => {
     it('retrieves the current platform settings', async () => {
       const res = await request
@@ -101,6 +105,7 @@ describe('Test /admin endpoint', () => {
       assert.include(res.headers['content-type'], 'application/json');
       assert.deepEqual(res.body.settings, platform.vars);
     });
+
     it('must return 401 when given token with insufficient permissions', async () => {
       const res = await request
         .get('/admin/settings')
@@ -108,6 +113,7 @@ describe('Test /admin endpoint', () => {
       assert.strictEqual(res.status, 401);
     });
   });
+
   describe('PUT /admin/settings', () => {
     let gitClient;
     before(() => {
@@ -118,6 +124,7 @@ describe('Test /admin endpoint', () => {
         )
       });
     });
+
     it('updates settings in memory and on disk, with a git commit', async function () {
       if (process.env.IS_CI) {
         // for some reason, in CI, the "git commit" action can't figure out the author
@@ -156,6 +163,7 @@ describe('Test /admin endpoint', () => {
         'update through PUT /admin/settings by userOnlyUpdatePerm'
       );
     });
+
     it('must respond with 400 when given properties that create invalid config', async () => {
       const invalidProps = {
         ADVANCED_API_SETTINGS: {
@@ -175,6 +183,7 @@ describe('Test /admin endpoint', () => {
         .send(invalidProps);
       assert.strictEqual(res.status, 400);
     });
+
     it('must return 401 when given token with insufficient permissions', async () => {
       const res = await request
         .put('/admin/settings')
@@ -182,11 +191,13 @@ describe('Test /admin endpoint', () => {
       assert.strictEqual(res.status, 401);
     });
   });
+
   describe('POST /admin/notify', () => {
     beforeEach(async () => {
       // Mocking followers
       mockFollowers.server();
     });
+
     it('must notify followers and returns an array listing successes and failures', async () => {
       const res = await request
         .post('/admin/notify')
@@ -216,12 +227,14 @@ describe('Test /admin endpoint', () => {
         }
       }
     });
+
     it('must return 401 when given token with insufficient permissions', async () => {
       const res = await request
         .post('/admin/notify')
         .set('Authorization', readOnlyToken);
       assert.strictEqual(res.status, 401);
     });
+
     it('must notify followers to restart some services', async () => {
       const services = ['service1', 'service2'];
       const spy = sinon.spy(helper, 'spy');
@@ -233,6 +246,7 @@ describe('Test /admin endpoint', () => {
       sinon.assert.calledWith(spy, services);
       spy.restore();
     });
+
     it('must notify followers to restart all services', async () => {
       const spy = sinon.spy(helper, 'spy');
       const res = await request
@@ -243,6 +257,7 @@ describe('Test /admin endpoint', () => {
       spy.restore();
     });
   });
+
   describe('GET /admin/migrations', () => {
     let templatePath;
     before(() => {
@@ -251,6 +266,7 @@ describe('Test /admin endpoint', () => {
         '../../src/controller/migration/scriptsAndTemplates/cluster/1.7.0-template.yml'
       );
     });
+
     describe('when there is an update', () => {
       let request;
       before(() => {
@@ -267,6 +283,7 @@ describe('Test /admin endpoint', () => {
         });
         request = supertest(app.express);
       });
+
       describe('when the user has sufficient permissions', () => {
         it('must return the list of migrations to perform', async () => {
           const res = await request
@@ -282,6 +299,7 @@ describe('Test /admin endpoint', () => {
           ]);
         });
       });
+
       describe('when the user has insufficient permissions', () => {
         it('must return a 401 error', async () => {
           const res = await request
@@ -291,6 +309,7 @@ describe('Test /admin endpoint', () => {
         });
       });
     });
+
     describe('when there is no update', () => {
       describe('when the user has sufficient permissions', () => {
         let request;
@@ -308,6 +327,7 @@ describe('Test /admin endpoint', () => {
           });
           request = supertest(app.express);
         });
+
         it('must return an empty list', async () => {
           const res = await request
             .get('/admin/migrations')
@@ -318,6 +338,7 @@ describe('Test /admin endpoint', () => {
       });
     });
   });
+
   describe('POST /admin/migrations/apply', () => {
     let templatePath;
     before(() => {
@@ -326,6 +347,7 @@ describe('Test /admin endpoint', () => {
         '../../src/controller/migration/scriptsAndTemplates/cluster/1.7.0-template.yml'
       );
     });
+
     describe('when there is an update', () => {
       let request;
       let backupPlatform;
@@ -358,11 +380,13 @@ describe('Test /admin endpoint', () => {
         request = supertest(app.express);
         backupPlatform = fs.readFileSync(platformPath, 'utf-8');
       });
+
       describe('when the user has sufficient permissions', () => {
         describe('when the configuration is correct', () => {
           after(() => {
             fs.writeFileSync(platformPath, backupPlatform);
           });
+
           it('must migrate the platform configuration and return the executed migrations', async function () {
             if (process.env.IS_CI) {
               // for some reason, in CI, the "git commit" action can't figure out the author
@@ -391,6 +415,7 @@ describe('Test /admin endpoint', () => {
             );
           });
         });
+
         describe('when there is an error in the platform.yml', () => {
           let request;
           let platformPath;
@@ -411,6 +436,7 @@ describe('Test /admin endpoint', () => {
             request = supertest(app.express);
             originalPlatform = fs.readFileSync(platformPath, 'utf-8');
           });
+
           it('must return a 400 error and not alter the platform.yml', async () => {
             const res = await request
               .post('/admin/migrations/apply')
@@ -422,6 +448,7 @@ describe('Test /admin endpoint', () => {
             );
           });
         });
+
         describe('when there is no migration path from the platform.yml to the template', () => {
           let request;
           let platformPath;
@@ -442,6 +469,7 @@ describe('Test /admin endpoint', () => {
             request = supertest(app.express);
             originalPlatform = fs.readFileSync(platformPath, 'utf-8');
           });
+
           it('must return a 400 error and not alter the platform.yml', async () => {
             const res = await request
               .post('/admin/migrations/apply')
@@ -458,6 +486,7 @@ describe('Test /admin endpoint', () => {
           });
         });
       });
+
       describe('when the user has insufficient permissions', () => {
         it('must return a 401 error', async () => {
           const res = await request
@@ -467,6 +496,7 @@ describe('Test /admin endpoint', () => {
         });
       });
     });
+
     describe('when there is no update', () => {
       describe('when the user has sufficient permissions', () => {
         let request;
@@ -488,9 +518,11 @@ describe('Test /admin endpoint', () => {
           request = supertest(app.express);
           backupPlatform = fs.readFileSync(platformPath, 'utf-8');
         });
+
         after(() => {
           fs.writeFileSync(platformPath, backupPlatform);
         });
+
         it('must not alter the platform configuration and return an empty list', async () => {
           const res = await request
             .post('/admin/migrations/apply')

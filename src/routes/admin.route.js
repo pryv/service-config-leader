@@ -11,12 +11,7 @@ const logger = require('@utils/logging').getLogger('admin');
 const errorsFactory = require('@utils/errorsHandling').factory;
 const { SETTINGS_PERMISSIONS } = require('@models/permissions.model');
 const verifyToken = require('@middlewares/security/token.verification');
-const {
-  getAuthorizationService,
-  AuthorizationService
-} = require('@middlewares/security/authorization.service');
-const UsersRepository = require('@repositories/users.repository');
-const TokensRepository = require('@repositories/tokens.repository');
+const { getAuthorizationService } = require('@middlewares/security/authorization.service');
 const {
   loadPlatformTemplate,
   checkMigrations,
@@ -31,7 +26,9 @@ module.exports = function (
   tokensRepository
 ) {
   const authorizationService = getAuthorizationService(usersRepository);
+
   expressApp.all('/admin*', verifyToken(tokensRepository));
+
   // updates current settings and save them to disk
   expressApp.put(
     '/admin/settings',
@@ -67,6 +64,7 @@ module.exports = function (
       }
     }
   );
+
   // returns current settings as json
   expressApp.get(
     '/admin/settings',
@@ -86,6 +84,7 @@ module.exports = function (
       }
     }
   );
+
   // notifies followers about configuration changes
   expressApp.post(
     '/admin/notify',
@@ -123,6 +122,7 @@ module.exports = function (
       });
     }
   );
+
   // returns list of available config migrations
   expressApp.get(
     '/admin/migrations',
@@ -142,6 +142,7 @@ module.exports = function (
       }
     }
   );
+
   expressApp.post(
     '/admin/migrations/apply',
     authorizationService.verifyIsAllowedTo(SETTINGS_PERMISSIONS.UPDATE),
@@ -154,11 +155,12 @@ module.exports = function (
           platform,
           platformTemplate
         );
-        if (migrations.length > 0)
+        if (migrations.length > 0) {
           await platformSettings.save(
             migratedPlatform,
             `update through POST /admin/migrations/apply by ${res.locals.username}`
           );
+        }
         res.json({
           migrations: migrations.map((m) =>
             _.pick(m, ['versionsFrom', 'versionTo'])

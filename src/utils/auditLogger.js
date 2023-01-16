@@ -6,7 +6,7 @@ let auditLogger = null;
  * @param {string} filePath
  * @returns {AuditLogger}
  */
-function getAuditLogger(filePath) {
+function getAuditLogger (filePath) {
   if (auditLogger == null) {
     auditLogger = new AuditLogger(filePath);
   }
@@ -31,7 +31,7 @@ class AuditLogger {
   /**
    * @param {string} filePath
    */
-  constructor(filePath) {
+  constructor (filePath) {
     this.filePath = filePath;
   }
 
@@ -41,7 +41,7 @@ class AuditLogger {
    * @param {string} platformUser
    * @returns {void}
    */
-  appendToLogFile(adminUser, action, platformUser) {
+  appendToLogFile (adminUser, action, platformUser) {
     fs.appendFileSync(this.filePath, `${new Date()} admin:${adminUser} ${action} platformUser:${platformUser}\n`);
   }
 }

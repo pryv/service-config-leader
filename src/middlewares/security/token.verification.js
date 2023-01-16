@@ -1,6 +1,5 @@
 const { verify } = require('jsonwebtoken');
 const errorsFactory = require('@utils/errorsHandling').factory;
-const TokensRepository = require('@repositories/tokens.repository');
 const nconfSettings = require('@root/settings').getSettings();
 
 module.exports = (tokensRepository) => function (req, res, next) {

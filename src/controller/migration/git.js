@@ -4,7 +4,7 @@ let git = null;
 /**
  * @returns {{}}
  */
-function setupGit(settings) {
+function setupGit (settings) {
   git = new Git(settings);
   return getGit();
 }
@@ -13,7 +13,7 @@ module.exports.setupGit = setupGit;
 /**
  * @returns {any}
  */
-function getGit() {
+function getGit () {
   if (git == null) throw new Error('git not setup, please call setupGit() before fetching singleton.');
   return git;
 }
@@ -28,7 +28,7 @@ class Git {
   /**
    * @param {object} params
    */
-  constructor(params) {
+  constructor (params) {
     this.git = new SimpleGit(params);
     this.git.addConfig('user.name', 'Pryv config');
     this.git.addConfig('user.email', 'support@pryv.com');
@@ -37,7 +37,7 @@ class Git {
   /**
    * @returns {Promise<void>}
    */
-  async initRepo() {
+  async initRepo () {
     return this.git.init();
   }
 
@@ -45,7 +45,7 @@ class Git {
    * @param {string} message
    * @returns {Promise<void>}
    */
-  async commitChanges(message = 'update') {
+  async commitChanges (message = 'update') {
     await this.git.add('.');
     await this.git.commit(message);
   }

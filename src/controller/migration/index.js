@@ -46,10 +46,10 @@ const checkMigrations = (platform, template) => {
     deploymentType
   };
 
-  function validate(conf, filename) {
+  function validate (conf, filename) {
     if (conf?.MISCELLANEOUS_SETTINGS?.settings?.TEMPLATE_VERSION?.value == null) throw new Error(`template version missing in ${filename}. "MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value" is undefined. Please fix the service's configuration files`);
   }
-  function findDeploymentType(platform) {
+  function findDeploymentType (platform) {
     if (platform.MACHINES_AND_PLATFORM_SETTINGS.settings.SINGLE_MACHINE_IP_ADDRESS != null) return 'singlenode';
     return 'cluster';
   }
@@ -63,7 +63,7 @@ module.exports.checkMigrations = checkMigrations;
  * @param {string} targetVersion  undefined
  * @returns {any[]}
  */
-function computeNeededMigrations(platformVersion, targetVersion) {
+function computeNeededMigrations (platformVersion, targetVersion) {
   const foundMigrations = [];
 
   if (platformVersion === targetVersion) return foundMigrations;
@@ -84,7 +84,7 @@ function computeNeededMigrations(platformVersion, targetVersion) {
   logger.info(`available migrations found: ${foundMigrations.map((m) => ({ from: m.versionsFrom, to: m.versionTo }))}`);
   return foundMigrations;
 
-  function isPartOfVersionsFrom(versionsFrom, targetVersion) {
+  function isPartOfVersionsFrom (versionsFrom, targetVersion) {
     return versionsFrom.includes(targetVersion);
   }
 
@@ -94,7 +94,7 @@ function computeNeededMigrations(platformVersion, targetVersion) {
    * @param {*} versionA
    * @param {*} versionB
    */
-  function isSmallerOrEqual(versionA, versionB) {
+  function isSmallerOrEqual (versionA, versionB) {
     const cv = compareVersions(versionA, versionB);
     return cv === -1 || cv === 0;
   }

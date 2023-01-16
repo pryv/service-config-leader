@@ -11,7 +11,7 @@ class ApiError extends Error {
    * @param {number} status
    * @param {string} msg
    */
-  constructor(status, msg) {
+  constructor (status, msg) {
     super(msg);
     this.httpStatus = status;
   }
@@ -23,7 +23,7 @@ class ErrorsFactory {
    * @param {Error} error
    * @returns {ApiError}
    */
-  static unexpectedError(error) {
+  static unexpectedError (error) {
     const msg = error.message || 'Unexpected error.';
     return new ApiError(500, msg);
   }
@@ -33,7 +33,7 @@ class ErrorsFactory {
    * @param {string | null} message
    * @returns {ApiError}
    */
-  static unauthorized(message) {
+  static unauthorized (message) {
     const msg = message || 'Operation is not authorized.';
     return new ApiError(401, msg);
   }
@@ -43,7 +43,7 @@ class ErrorsFactory {
    * @param {string | null} message
    * @returns {ApiError}
    */
-  static invalidInput(message) {
+  static invalidInput (message) {
     const msg = message || 'Invalid input';
     return new ApiError(400, msg);
   }
@@ -53,7 +53,7 @@ class ErrorsFactory {
    * @param {string} headerName
    * @returns {ApiError}
    */
-  static missingHeader(headerName) {
+  static missingHeader (headerName) {
     const msg = `Missing expected header "${headerName}".`;
     return new ApiError(400, msg);
   }
@@ -63,7 +63,7 @@ class ErrorsFactory {
    * @param {string | null} message
    * @returns {ApiError}
    */
-  static notFound(message) {
+  static notFound (message) {
     const msg = message || 'Resource not found.';
     return new ApiError(404, msg);
   }

@@ -8,9 +8,8 @@ const { injectTestSettings } = require('@root/settings');
 const app = new Application();
 const request = require('supertest')(app.express);
 const { sign } = require('jsonwebtoken');
-const {
-  PLATFORM_USERS_PERMISSIONS
-} = require('@root/models/permissions.model');
+const { PLATFORM_USERS_PERMISSIONS } = require('@root/models/permissions.model');
+
 describe('/platform-users', () => {
   const registerUrl = app.settings.get('registerUrl');
   const coreUrl = app.settings.get('followers:core:url');
@@ -20,7 +19,8 @@ describe('/platform-users', () => {
     DELETE_USER_ACTION,
     MODIFY_USER_ACTION
   } = require('@utils/auditLogger');
-  function assertLog(user, action, platformUser, isWritten) {
+
+  function assertLog (user, action, platformUser, isWritten) {
     if (!isWritten) {
       assert.isFalse(fs.existsSync(auditLogPath));
     } else {
@@ -33,11 +33,13 @@ describe('/platform-users', () => {
       );
     }
   }
-  function cleanupLogFileIfNeeded() {
+
+  function cleanupLogFileIfNeeded () {
     if (fs.existsSync(auditLogPath)) {
       fs.unlinkSync(auditLogPath);
     }
   }
+
   const user = {
     username: charlatan.Lorem.characters(9),
     password: charlatan.Lorem.characters(9),
@@ -78,6 +80,7 @@ describe('/platform-users', () => {
       app.settings.get('internals:configLeaderTokenSecret')
     );
   };
+
   before(() => {
     token = generateToken(user.username);
     deleteAllStmt = app.db.prepare('DELETE FROM users;');
@@ -87,12 +90,15 @@ describe('/platform-users', () => {
     deleteAllStmt.run();
     app.usersRepository.createUser(user);
   });
+
   afterEach(() => {
     deleteAllExceptMainStmt.run(user.username);
   });
+
   after(() => {
     deleteAllStmt.run();
   });
+
   describe('GET /:username', () => {
     describe('when user has sufficient permissions', () => {
       describe('and the user exists', () => {
@@ -105,9 +111,11 @@ describe('/platform-users', () => {
             .get(`/platform-users/${platformUser.username}`)
             .set('Authorization', token);
         });
+
         it('must respond with 200', () => {
           assert.strictEqual(res.status, 200);
         });
+
         it('must respond with retrieved user in body', () => {
           assert.exists(res.body.user);
           const { user } = res.body;
@@ -120,6 +128,7 @@ describe('/platform-users', () => {
           assert.equal(user.languageCode, platformUser.languageCode);
         });
       });
+
       describe('and the user does not exist', () => {
         let res;
         before(async () => {
@@ -130,11 +139,13 @@ describe('/platform-users', () => {
             .get(`/platform-users/${platformUser.username}`)
             .set('Authorization', token);
         });
+
         it('must respond with 404', () => {
           assert.strictEqual(res.status, 404);
         });
       });
     });
+
     describe('when request to register returns an error', () => {
       let res;
       before(async () => {
@@ -145,10 +156,12 @@ describe('/platform-users', () => {
           .get(`/platform-users/${platformUser.username}`)
           .set('Authorization', token);
       });
+
       it('must respond with the 500 status code', () => {
         assert.strictEqual(res.status, 500);
       });
     });
+
     describe('when user has insufficient permissions', () => {
       let res;
       before(async () => {
@@ -159,11 +172,13 @@ describe('/platform-users', () => {
           .get(`/platform-users/${platformUser.username}`)
           .set('Authorization', insufficientPermsToken);
       });
+
       it('must respond with 401', () => {
         assert.strictEqual(res.status, 401);
       });
     });
   });
+
   describe('DELETE /:username', () => {
     describe('when user has sufficient permissions', () => {
       describe('when core and register succeed', () => {
@@ -178,12 +193,15 @@ describe('/platform-users', () => {
               .delete(`/platform-users/${platformUser.username}`)
               .set('Authorization', token);
           });
+
           it('must respond with 200', () => {
             assert.strictEqual(res.status, 200);
           });
+
           it('must respond with deleted username in body', () => {
             assert.equal(res.body.username, platformUser.username);
           });
+
           it('must write to log file', () => {
             assertLog(
               user.username,
@@ -193,6 +211,7 @@ describe('/platform-users', () => {
             );
           });
         });
+
         describe('in single-node setup', () => {
           let res;
           let followersBackup;
@@ -217,17 +236,21 @@ describe('/platform-users', () => {
               .delete(`/platform-users/${platformUser.username}`)
               .set('Authorization', token);
           });
+
           after(() => {
             app.settings.set('followers', followersBackup);
             app.settings.set('registerUrl', registerUrlBackup);
             injectTestSettings({});
           });
+
           it('must respond with 200', () => {
             assert.strictEqual(res.status, 200);
           });
+
           it('must respond with deleted username in body', () => {
             assert.equal(res.body.username, platformUser.username);
           });
+
           it('must write to log file', () => {
             assertLog(
               user.username,
@@ -238,6 +261,7 @@ describe('/platform-users', () => {
           });
         });
       });
+
       describe('when core fails with 404, it must still delete in register for idempotency', () => {
         let res;
         before(async () => {
@@ -250,12 +274,15 @@ describe('/platform-users', () => {
             .delete(`/platform-users/${platformUser.username}`)
             .set('Authorization', token);
         });
+
         it('must respond with 200', () => {
           assert.equal(res.status, 200);
         });
+
         it('must respond with deleted username in body', () => {
           assert.equal(res.body.username, platformUser.username);
         });
+
         it('must write to log file', () => {
           assertLog(
             user.username,
@@ -265,6 +292,7 @@ describe('/platform-users', () => {
           );
         });
       });
+
       describe('when core fails with not 404, it must not delete in register', () => {
         let res;
         let isRegCalled = false;
@@ -280,16 +308,20 @@ describe('/platform-users', () => {
             .delete(`/platform-users/${platformUser.username}`)
             .set('Authorization', token);
         });
+
         after(() => {
           // unregister uncalled register mock from above
           nock.cleanAll();
         });
+
         it('must respond with the same status code', () => {
           assert.equal(res.status, 500);
         });
+
         it('must not call register', () => {
           assert.isFalse(isRegCalled);
         });
+
         it('must not write to log file', () => {
           assertLog(
             user.username,
@@ -300,6 +332,7 @@ describe('/platform-users', () => {
         });
       });
     });
+
     describe('when user has insufficient permissions', () => {
       let res;
       before(async () => {
@@ -311,9 +344,11 @@ describe('/platform-users', () => {
           .delete(`/platform-users/${platformUser.username}`)
           .set('Authorization', insufficientPermsToken);
       });
+
       it('must respond with 401', () => {
         assert.strictEqual(res.status, 401);
       });
+
       it('must not write to log file', () => {
         assertLog(
           user.username,
@@ -323,6 +358,7 @@ describe('/platform-users', () => {
         );
       });
     });
+
     describe('when request to register returns an error', () => {
       let res;
       before(async () => {
@@ -335,9 +371,11 @@ describe('/platform-users', () => {
           .delete(`/platform-users/${platformUser.username}`)
           .set('Authorization', token);
       });
+
       it('must respond with the 500 status code', () => {
         assert.strictEqual(res.status, 500);
       });
+
       it('must not write to log file', () => {
         assertLog(
           user.username,
@@ -347,6 +385,7 @@ describe('/platform-users', () => {
         );
       });
     });
+
     describe('when user deletion is disabled', () => {
       let request2;
       let res;
@@ -360,16 +399,19 @@ describe('/platform-users', () => {
         });
         request2 = require('supertest')(app2.express);
       });
+
       before(async () => {
         res = await request2
           .delete('/platform-users/doesntmatter')
           .set('Authorization', token);
       });
+
       it('must respond with 403', () => {
         assert.equal(res.status, 403);
       });
     });
   });
+
   describe('DELETE /:username/mfa', () => {
     describe('when user has sufficient permissions', () => {
       let res;
@@ -385,12 +427,15 @@ describe('/platform-users', () => {
           .delete(`/platform-users/${platformUser.username}/mfa`)
           .set('Authorization', token);
       });
+
       after(() => {
         cleanupLogFileIfNeeded();
       });
+
       it('must respond with 204', () => {
         assert.strictEqual(res.status, 204);
       });
+
       it('must write to log file', () => {
         assertLog(
           user.username,
@@ -400,6 +445,7 @@ describe('/platform-users', () => {
         );
       });
     });
+
     describe('when the request to core returns an error', () => {
       let res;
       before(async () => {
@@ -414,12 +460,15 @@ describe('/platform-users', () => {
           .delete(`/platform-users/${platformUser.username}/mfa`)
           .set('Authorization', token);
       });
+
       after(() => {
         cleanupLogFileIfNeeded();
       });
+
       it('must respond with the 500 status code', () => {
         assert.equal(res.status, 500);
       });
+
       it('must not write to log file', () => {
         assertLog(
           user.username,
@@ -429,6 +478,7 @@ describe('/platform-users', () => {
         );
       });
     });
+
     describe('when user has insufficient permissions', () => {
       let res;
       before(async () => {
@@ -439,12 +489,15 @@ describe('/platform-users', () => {
           .delete(`/platform-users/${platformUser.username}/mfa`)
           .set('Authorization', insufficientPermsToken);
       });
+
       after(() => {
         cleanupLogFileIfNeeded();
       });
+
       it('must respond with 401', () => {
         assert.equal(res.status, 401);
       });
+
       it('must not write to log file', () => {
         assertLog(
           user.username,

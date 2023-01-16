@@ -1,4 +1,9 @@
-const { Database, Statement } = require('better-sqlite3');
+/**
+ * @typedef {import('better-sqlite3').Database} Database
+ */
+/**
+ * @typedef {import('better-sqlite3').Statement} Statement
+ */
 
 class TokensRepository {
   /**
@@ -21,7 +26,7 @@ class TokensRepository {
   /**
    * @param {Database} db
    */
-  constructor(db) {
+  constructor (db) {
     this.db = db;
     const tableCreationStatement = this.db.prepare(
       'CREATE TABLE IF NOT EXISTS blacklisted_tokens ' +
@@ -35,7 +40,7 @@ class TokensRepository {
   /**
    * @returns {void}
    */
-  prepareStatements() {
+  prepareStatements () {
     this.addTokenStmt = this.db.prepare(
       'INSERT INTO blacklisted_tokens(token) VALUES(?);'
     );
@@ -49,7 +54,7 @@ class TokensRepository {
    * @param {string} token
    * @returns {string}
    */
-  blacklist(token) {
+  blacklist (token) {
     this.addTokenStmt.run(token);
     return token;
   }
@@ -58,7 +63,7 @@ class TokensRepository {
    * @param {string} token
    * @returns {string}
    */
-  contains(token) {
+  contains (token) {
     const row = this.getTokenStmt.get(token);
     return !!row;
   }
@@ -66,7 +71,7 @@ class TokensRepository {
   /**
    * @returns {void}
    */
-  clean() {
+  clean () {
     this.deleteAllStmt.run();
   }
 }

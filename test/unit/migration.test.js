@@ -1,5 +1,3 @@
-/* global describe, it, before */
-
 const yaml = require('js-yaml');
 const fs = require('fs');
 const path = require('path');
@@ -21,23 +19,28 @@ describe('migration', () => {
       it.skip('must return the migrated config: 1.6.0', async () => {
         await testMigration('1.6.0');
       });
+
       it('must return the migrated config: 1.6.4', async () => {
         await testMigration('1.6.4');
       });
+
       it('must return the migrated config: 1.6.12', async () => {
         await testMigration('1.6.12');
       });
+
       it('must return the migrated config: 1.6.15', async () => {
         await testMigration('1.6.15');
       });
+
       it('must return the migrated config: 1.6.21', async () => {
         await testMigration('1.6.21');
       });
+
       it('must return the migrated config: 1.7.0', async () => {
         await testMigration('1.7.0');
       });
 
-      async function testMigration(version) {
+      async function testMigration (version) {
         const configFolder = path.resolve(
           __dirname,
           `../fixtures/migration-needed/${version}`
@@ -62,6 +65,7 @@ describe('migration', () => {
       }
     });
   });
+
   describe('checkAvailableMigrations()', () => {
     describe('when there are migrations to apply', () => {
       let configFolder;
@@ -71,6 +75,7 @@ describe('migration', () => {
           '../fixtures/migration-needed/1.7.0'
         );
       });
+
       it('must return the available migrations', () => {
         const platform = parseYamlFile(
           path.resolve(configFolder, 'platform.yml')
@@ -96,6 +101,7 @@ describe('migration', () => {
         assert.equal(deploymentType, 'cluster');
       });
     });
+
     describe('when there are no migrations to apply', () => {
       let configFolder;
       before(() => {
@@ -104,6 +110,7 @@ describe('migration', () => {
           '../fixtures/migration-not-needed/config'
         );
       });
+
       it('must return an empty array', () => {
         const platform = parseYamlFile(
           path.resolve(configFolder, 'platform.yml')
@@ -118,6 +125,7 @@ describe('migration', () => {
         );
       });
     });
+
     describe('when there is no migration for the target template version', () => {
       it('must throw an error', () => {
         const platform = {
@@ -134,7 +142,7 @@ describe('migration', () => {
     });
   });
 
-  function parseYamlFile(filepath) {
+  function parseYamlFile (filepath) {
     const file = yaml.load(fs.readFileSync(filepath, { encoding: 'utf-8' }));
     return file.vars;
   }

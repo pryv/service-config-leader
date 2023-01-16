@@ -1,5 +1,8 @@
 const errorsFactory = require('@utils/errorsHandling').factory;
-const UsersRepository = require('@repositories/users.repository');
+
+/**
+ * @typedef {import('@repositories/users.repository')} UsersRepository
+ */
 
 let AUTHORIZATION_SERVICE;
 
@@ -19,7 +22,7 @@ class AuthorizationService {
   /**
    * @param {UsersRepository} usersRepository
    */
-  constructor(usersRepository) {
+  constructor (usersRepository) {
     this.usersRepository = usersRepository;
   }
 
@@ -27,7 +30,7 @@ class AuthorizationService {
    * @param {Permission} permission
    * @returns {any}
    */
-  verifyIsAllowedTo(permission) {
+  verifyIsAllowedTo (permission) {
     return function (req, res, next) {
       try {
         let permissionsGroup;
@@ -59,7 +62,7 @@ class AuthorizationService {
    * @static
    * @returns {(req: any, res: any, next: any) => void}
    */
-  static verifyChangesItself() {
+  static verifyChangesItself () {
     return function (req, res, next) {
       const usernameFromToken = res.locals.username;
       const usernameFromPath = req.params.username;
@@ -74,7 +77,7 @@ class AuthorizationService {
   /**
    * @returns {any}
    */
-  verifyOldPasswordValid() {
+  verifyOldPasswordValid () {
     return function (req, res, next) {
       const { username } = res.locals;
       const { oldPassword, newPassword, newPasswordCheck } = req.body;
@@ -96,7 +99,7 @@ class AuthorizationService {
   /**
    * @returns {any}
    */
-  verifyGivenPermissionsNotExceedOwned() {
+  verifyGivenPermissionsNotExceedOwned () {
     return function (req, res, next) {
       try {
         const username = res.locals.username;
@@ -131,7 +134,7 @@ class AuthorizationService {
    * @param {Permission[]} permissions
    * @returns {void}
    */
-  static checkHasPermission(expectedPermission, permissions) {
+  static checkHasPermission (expectedPermission, permissions) {
     if (!permissions.includes(expectedPermission)) {
       throw new Error();
     }
@@ -143,7 +146,7 @@ class AuthorizationService {
    * @param {PermissionsGroup} group
    * @returns {void}
    */
-  static checkHasPermissionsOnGroup(user, group) {
+  static checkHasPermissionsOnGroup (user, group) {
     if (!user || !user.permissions || !user.permissions[group]) {
       throw new Error();
     }

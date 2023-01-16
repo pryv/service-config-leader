@@ -9,7 +9,7 @@ const logger = require('../../../utils/logging').getLogger('migration-utils');
  * @param {{}} template  content of template platform.yml
  * @returns {{}}
  */
-function baseWork(platform, template) {
+function baseWork (platform, template) {
   let platformCopy = _.cloneDeep(platform);
   platformCopy = updateTemplateVersion(platformCopy, template);
   platformCopy = addNewSettings(platformCopy, template);
@@ -22,7 +22,7 @@ function baseWork(platform, template) {
    * @param {*} platform content of platform.yml
    * @param {*} template content of template platform.yml
    */
-  function updateTemplateVersion(platform, template) {
+  function updateTemplateVersion (platform, template) {
     const templateVersion = template.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value;
     platform.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value = templateVersion;
     logger.info(`updated template version to: ${templateVersion}`);
@@ -35,7 +35,7 @@ function baseWork(platform, template) {
    * @param {*} platform content of platform.yml
    * @param {*} template content of template platform.yml
    */
-  function alignMetadata(platform, template) {
+  function alignMetadata (platform, template) {
     for (const [mainSettingKey, mainSettingValue] of Object.entries(template)) {
       platform[mainSettingKey].name = mainSettingValue.name;
       for (const [subSettingKey, subSettingValue] of Object.entries(
@@ -59,7 +59,7 @@ function baseWork(platform, template) {
    * @param {*} platform content of platform.yml
    * @param {*} template content of template platform.yml
    */
-  function addNewSettings(platform, template) {
+  function addNewSettings (platform, template) {
     for (const [mainSettingKey, mainSettingValue] of Object.entries(template)) {
       if (platform[mainSettingKey] == null) {
         platform[mainSettingKey] = mainSettingValue;
@@ -86,7 +86,7 @@ module.exports.baseWork = baseWork;
  * @param {{}} template  undefined
  * @returns {{}}
  */
-function deleteRemovedSettings(platform, template) {
+function deleteRemovedSettings (platform, template) {
   for (const [mainSettingKey, mainSettingValue] of Object.entries(platform)) {
     if (template[mainSettingKey] == null) {
       delete platform[mainSettingKey];
@@ -113,7 +113,7 @@ module.exports.deleteRemovedSettings = deleteRemovedSettings;
  * @param {*} jsonOrObject
  * @returns {{}}
  */
-function getObjectOrParseJSON(fieldName, jsonOrObject) {
+function getObjectOrParseJSON (fieldName, jsonOrObject) {
   try {
     const parsedObject = JSON.parse(jsonOrObject);
     return parsedObject;

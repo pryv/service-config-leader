@@ -1,6 +1,4 @@
 const { createValidator } = require('express-joi-validation');
-const UsersRepository = require('@repositories/users.repository');
-const TokensRepository = require('@repositories/tokens.repository');
 const verifyToken = require('@middlewares/security/token.verification');
 const {
   getAuthorizationService,

@@ -17,7 +17,7 @@ module.exports = {
  * @param {any} platformSettingsVars
  * @returns {string}
  */
-function applySubstitutions(template, settings, platformSettingsVars) {
+function applySubstitutions (template, settings, platformSettingsVars) {
   const platformVars = retrieveFlatSettings(platformSettingsVars);
   const internalVars = settings.get('internals');
   if (platformVars == null && internalVars == null) return template;
@@ -25,7 +25,7 @@ function applySubstitutions(template, settings, platformSettingsVars) {
   const re = new RegExp(Object.keys(substitutions).join('|'), 'g');
   return replaceInString(template);
 
-  function replaceInString(myString) {
+  function replaceInString (myString) {
     return myString.replace(re, (match) => {
       let replacement = substitutions[match];
       if (isObjectWithValueProp(substitutions[match])) {
@@ -38,11 +38,11 @@ function applySubstitutions(template, settings, platformSettingsVars) {
     });
   }
 
-  function isObjectWithValueProp(obj) {
+  function isObjectWithValueProp (obj) {
     return obj != null && obj.value != null;
   }
 
-  function retrieveFlatSettings(rootSettings) {
+  function retrieveFlatSettings (rootSettings) {
     const settings = {};
     for (const group of Object.keys(rootSettings)) {
       for (const setting of Object.keys(rootSettings[group].settings)) {
@@ -61,7 +61,7 @@ function applySubstitutions(template, settings, platformSettingsVars) {
  * @param {Map<string, string>} seen
  * @returns {void}
  */
-function listConfFiles(dir, files, seen) {
+function listConfFiles (dir, files, seen) {
   /**
    * Map: fullPath (without extension) -> fullpath
    */
@@ -101,7 +101,7 @@ function listConfFiles(dir, files, seen) {
    * @param {*} filename the filename to remove
    * @param {*} files
    */
-  function remove(filename, files) {
+  function remove (filename, files) {
     const index = files.indexOf(filename);
     if (index > -1) files.splice(index, 1);
     return files;
@@ -112,7 +112,7 @@ function listConfFiles(dir, files, seen) {
  * @param {string} text
  * @returns {boolean}
  */
-function isValidJSON(text) {
+function isValidJSON (text) {
   try {
     JSON.parse(text);
   } catch (e) {
@@ -126,7 +126,7 @@ function isValidJSON(text) {
  * @param {string} file
  * @returns {boolean}
  */
-function isJSONFile(file) {
+function isJSONFile (file) {
   return path.extname(file) === '.json';
 }
 
@@ -134,7 +134,7 @@ function isJSONFile(file) {
  * @param {{}} followers
  * @returns {boolean}
  */
-function isSingleNode(followers) {
+function isSingleNode (followers) {
   if (followers == null) {
     throw new Error('Missing followers settings');
   }
@@ -151,7 +151,7 @@ function isSingleNode(followers) {
  * @param {{}} followers
  * @returns {string[]}
  */
-function findCoresUrls(followers) {
+function findCoresUrls (followers) {
   if (followers == null) {
     throw new Error('Missing followers settings');
   }

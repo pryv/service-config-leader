@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs/promises');
 const { getGit } = require('@controller/migration');
 
-module.exports = function getPlatformSettings(mainSettings) {
+module.exports = function getPlatformSettings (mainSettings) {
   return new PlatformSettings(mainSettings.get('platformSettings:platformConfig'));
 };
 
@@ -26,14 +26,14 @@ class PlatformSettings {
   /**
    * @param {object} path
    */
-  constructor(path = DEFAULT_PATH) {
+  constructor (path = DEFAULT_PATH) {
     this.path = path;
   }
 
   /**
    * @returns {object}
    */
-  get() {
+  get () {
     return this.vars;
   }
 
@@ -41,14 +41,14 @@ class PlatformSettings {
    * @param {object} overrides
    * @returns {void}
    */
-  setOverrides(overrides) {
+  setOverrides (overrides) {
     this.overrides = overrides;
   }
 
   /**
    * @returns {Promise<{}>}
    */
-  async load() {
+  async load () {
     const data = await fs.readFile(this.path);
     this.vars = await yaml.load(data).vars;
     if (this.overrides != null) {
@@ -64,7 +64,7 @@ class PlatformSettings {
    * @param {string} gitCommitMsg
    * @returns {Promise<void>}
    */
-  async save(newSettings, gitCommitMsg) {
+  async save (newSettings, gitCommitMsg) {
     this.vars = newSettings;
     await fs.writeFile(this.path, yaml.dump({ vars: this.vars }));
     const git = getGit();

@@ -5,7 +5,7 @@ let store;
 /**
  * @returns {any}
  */
-function getSettings() {
+function getSettings () {
   if (store != null) return store;
   store = new nconf.Provider();
 
@@ -64,7 +64,7 @@ function getSettings() {
  * @param {object} testConf
  * @returns {void}
  */
-function injectTestSettings(testConf) {
+function injectTestSettings (testConf) {
   store.add('test', { type: 'literal', store: testConf });
 }
 

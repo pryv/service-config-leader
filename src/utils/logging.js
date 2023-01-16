@@ -74,7 +74,7 @@ class LoggerImpl {
    * @param {string} context
    * @param {*} winstonLogger
    */
-  constructor(context, winstonLogger) {
+  constructor (context, winstonLogger) {
     this.messagePrefix = context ? `[${context}] ` : '';
     this.winstonLogger = winstonLogger;
   }
@@ -84,7 +84,7 @@ class LoggerImpl {
    * @param {{}} metaData
    * @returns {void}
    */
-  debug(msg, metaData) {
+  debug (msg, metaData) {
     this.log('debug', msg, metaData);
   }
 
@@ -93,7 +93,7 @@ class LoggerImpl {
    * @param {{}} metaData
    * @returns {void}
    */
-  info(msg, metaData) {
+  info (msg, metaData) {
     this.log('info', msg, metaData);
   }
 
@@ -102,7 +102,7 @@ class LoggerImpl {
    * @param {{}} metaData
    * @returns {void}
    */
-  warn(msg, metaData) {
+  warn (msg, metaData) {
     this.log('warn', msg, metaData);
   }
 
@@ -111,7 +111,7 @@ class LoggerImpl {
    * @param {{}} metaData
    * @returns {void}
    */
-  error(msg, metaData) {
+  error (msg, metaData) {
     this.log('error', msg, metaData);
   }
 
@@ -121,7 +121,7 @@ class LoggerImpl {
    * @param {{}} metaData
    * @returns {void}
    */
-  log(level, message, metaData) {
+  log (level, message, metaData) {
     const msg = this.messagePrefix + message;
     const meta = metaData ? JSON.stringify(metaData) : {};
     this.winstonLogger[level](msg, meta);

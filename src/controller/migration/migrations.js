@@ -303,15 +303,13 @@ const migrations = addTemplateUpgradeToEmptyRuns([
  * @param {Array<Migration>} migrations  undefined
  * @returns {import("/Users/sim/Code/Pryv/dev/service-config-leader/migrations.ts-to-jsdoc").Migration[]}
  */
-function addTemplateUpgradeToEmptyRuns(migrations) {
+function addTemplateUpgradeToEmptyRuns (migrations) {
   for (const migration of migrations) {
-    if (migration.cluster == null)
-      migration.cluster = addRun(migration.versionTo);
-    if (migration.singlenode == null)
-      migration.singlenode = addRun(migration.versionTo);
+    if (migration.cluster == null) { migration.cluster = addRun(migration.versionTo); }
+    if (migration.singlenode == null) { migration.singlenode = addRun(migration.versionTo); }
   }
   return migrations;
-  function addRun(version) {
+  function addRun (version) {
     return {
       run: (platform) => {
         platform.MISCELLANEOUS_SETTINGS.settings.TEMPLATE_VERSION.value = version;
@@ -328,7 +326,7 @@ function addTemplateUpgradeToEmptyRuns(migrations) {
  * @param {string} filePath  the file path, relative to this directory
  * @returns {{}}
  */
-function loadTemplate(filePath) {
+function loadTemplate (filePath) {
   const template = yaml.load(
     fs.readFileSync(path.resolve(__dirname, filePath), 'utf-8')
   );

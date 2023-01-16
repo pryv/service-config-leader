@@ -43,7 +43,7 @@ class Application {
   /**
    * @param {object} settingsOverride
    */
-  constructor(settingsOverride = {}) {
+  constructor (settingsOverride = {}) {
     if (settingsOverride.nconfSettings != null) injectTestSettings(settingsOverride.nconfSettings);
     this.settings = getSettings();
     this.platformSettings = require('./platform')(this.settings);
@@ -64,7 +64,7 @@ class Application {
    * mandatory in production and tests requiring git (POST /admin/migrations/apply)
    * @returns {Promise<void>}
    */
-  async init() {
+  async init () {
     await this.platformSettings.load();
     await this.generateSecretsIfNeeded();
     await this.git.initRepo();
@@ -75,7 +75,7 @@ class Application {
   /**
    * @returns {Promise<void>}
    */
-  async generateSecretsIfNeeded() {
+  async generateSecretsIfNeeded () {
     const internalSettings = this.settings.get('internals');
 
     if (internalSettings == null) return;
@@ -94,7 +94,7 @@ class Application {
       this.logger.error('Error when saving secrets.', err);
     }
 
-    function randomAlphaNumKey(size) {
+    function randomAlphaNumKey (size) {
       return Array(size)
         .fill(0)
         .map(() => Math.random().toString(36).charAt(2))
@@ -105,7 +105,7 @@ class Application {
   /**
    * @returns {Database}
    */
-  connectToDb() {
+  connectToDb () {
     return new Database(
       `${this.settings.get('databasePath')}/config-user-management.db`
     );
@@ -114,14 +114,14 @@ class Application {
   /**
    * @returns {void}
    */
-  disconnectFromDb() {
+  disconnectFromDb () {
     this.db.close();
   }
 
   /**
    * @returns {express$Application}
    */
-  setupExpressApp() {
+  setupExpressApp () {
     const { settings, platformSettings } = this;
     const expressApp = express();
 
@@ -165,7 +165,7 @@ class Application {
   /**
    * @returns {void}
    */
-  startTokensBlacklistCleanupJob() {
+  startTokensBlacklistCleanupJob () {
     const job = new CronJob(
       '0 0 * * 0,3,5',
       () => {
@@ -180,7 +180,7 @@ class Application {
   /**
    * @returns {void}
    */
-  generateInitialUser() {
+  generateInitialUser () {
     const initialUser = {
       username: 'initial_user',
       password: 'temp_pass',

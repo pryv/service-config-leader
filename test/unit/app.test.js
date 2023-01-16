@@ -1,10 +1,10 @@
-/* global describe, it, before */
 const fs = require('fs');
 const { assert } = require('chai');
 const Application = require('@root/app');
 const path = require('path');
 const cuid = require('cuid');
 const { tmpdir } = require('os');
+
 describe('Application', () => {
   describe('constructor', () => {
     it('generates random secrets at startup, if needed', () => {
@@ -13,6 +13,7 @@ describe('Application', () => {
       assert.strictEqual(internals.SECRET_ONE, '1234');
       assert.match(internals.SECRET_TWO, /^[a-z0-9]{32}$/);
     });
+
     it('generates admin credentials at startup and writes it to credentials file and database', () => {
       const app = new Application();
       const credentialsPath = app.settings.get('credentials:filePath');
@@ -34,6 +35,7 @@ describe('Application', () => {
         nconfSettings: { gitRepoPath: gitFolder }
       });
     });
+
     it('must initialise a git repository', async () => {
       await app.init();
       const stats = fs.statSync(path.resolve(gitFolder, '.git'));

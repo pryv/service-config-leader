@@ -15,7 +15,8 @@ exports.cloneAndApply = function (array, iterator) {
     result.push(applyRecursive(iterator(clone), iterator));
   });
   return result;
-  function applyRecursive(item, iterator) {
+
+  function applyRecursive (item, iterator) {
     if (!Array.isArray(item.children) || item.children.length === 0) return item;
     const result = [];
     item.children.forEach((child) => {
