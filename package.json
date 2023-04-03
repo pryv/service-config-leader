@@ -43,6 +43,9 @@
     "source-licenser": "^2.0.5",
     "supertest": "^4.0.2"
   },
+  "engines": {
+    "node": "16.x"
+  },
   "_moduleAliases": {
     "@root": "src",
     "@controller": "src/controller",
@@ -51,8 +54,5 @@
     "@repositories": "src/repositories",
     "@routes": "src/routes",
     "@utils": "src/utils"
-  }, 
-  "engines": {
-    "node": "16.x"
   }
 }
