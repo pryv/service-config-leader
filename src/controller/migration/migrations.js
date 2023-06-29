@@ -315,6 +315,20 @@ const migrations = addTemplateUpgradeToEmptyRuns([
       run: require('./scriptsAndTemplates/cluster/1.8.1'),
       template: loadTemplate('scriptsAndTemplates/cluster/1.8.1-template.yml')
     }
+  },
+  {
+    versionsFrom: ['1.8.1'],
+    versionTo: '1.9.0',
+    singlenode: {
+      run: require('./scriptsAndTemplates/single-node/1.9.0'),
+      template: loadTemplate(
+        'scriptsAndTemplates/single-node/1.9.0-template.yml'
+      )
+    },
+    cluster: {
+      run: require('./scriptsAndTemplates/cluster/1.9.0'),
+      template: loadTemplate('scriptsAndTemplates/cluster/1.9.0-template.yml')
+    }
   }
 ]);
 
