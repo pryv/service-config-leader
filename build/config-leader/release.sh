@@ -39,3 +39,8 @@ run cp -r /pd_build/runit/* /etc/runit/
 run mv /etc/runit/runit.sh /etc/init.d/
 run mkdir /etc/service/runit
 run ln -s /etc/init.d/runit.sh /etc/service/runit/run #make a link to /etc/service (will be run with runit).
+
+# Make /root/.config/ property of "app" user
+run mkdir -p /root/.config/
+run chmod a+rx /root
+run chown -R app:app /root/.config/

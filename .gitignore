@@ -19,3 +19,5 @@ credentials.txt
 node_modules/
 test_results/
 build/test/files/
+build_tag
+build/config-leader/release.tar
