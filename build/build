@@ -15,6 +15,15 @@ version=$(cat build_tag)
 cp ./build_tag ../.api-version
 
 host="eu.gcr.io"
+release=true
+
+if [ "$1" == "test" ] #build containers for localhost only
+then 
+  version=test
+  host=localhost
+  release=false
+fi
+
 
 # Create a release.tar that contains all the code. 
 tar cf $SCRIPT_FOLDER/config-leader/release.tar \
@@ -25,4 +34,8 @@ tar cf $SCRIPT_FOLDER/config-leader/release.tar \
 
 echo "---------------------------- building config-leader ------------------------------"
 docker build -f $SCRIPT_FOLDER/config-leader/Dockerfile -t $host/pryvio/config-leader:$version $SCRIPT_FOLDER/config-leader/.
-docker push $host/pryvio/config-leader:$version
+if [ "$release" = true ]; then
+  docker push $host/pryvio/config-leader:$version
+fi
+
+

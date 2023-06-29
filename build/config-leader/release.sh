@@ -35,7 +35,6 @@ run mkdir -p $cred_dir && \
   run touch $cred_dir/credentials.txt && run chown -R app:app $cred_dir
 
 # Install the script that runs the api service
-run mkdir /etc/runit
 run cp -r /pd_build/runit/* /etc/runit/
 run mv /etc/runit/runit.sh /etc/init.d/
 run mkdir /etc/service/runit
