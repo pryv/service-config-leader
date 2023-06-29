@@ -20,7 +20,7 @@ pushd $target_dir
 run run tar --owner app -xf /pd_build/release.tar
 
 # Skip install: already done in the GitHub workflow
-# npm install
+npm install
 
 # Install the config file
 run mkdir -p $conf_dir && \
