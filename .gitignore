@@ -18,3 +18,4 @@ coverage/
 credentials.txt
 node_modules/
 test_results/
+build/test/files/

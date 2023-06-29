@@ -1,2 +1,2 @@
 #!/bin/sh
-exec chpst -u app node /app/bin/src/server.js --config /app/conf/config-leader.json
+DEBUG="*pryv*" exec chpst -u app node /app/bin/src/server.js --config /app/conf/config-leader.json
