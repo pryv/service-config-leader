@@ -19,7 +19,8 @@ minimal_apt_get_install unicode-data
 pushd $target_dir
 run run tar --owner app -xf /pd_build/release.tar
 
-# Skip install: already done in the GitHub workflow
+# TODO: clean this up (for now we npm-install both here and in the release workflow;
+#       the build process need refactoring to be aligned with the other projects'
 npm install
 
 # Install the config file

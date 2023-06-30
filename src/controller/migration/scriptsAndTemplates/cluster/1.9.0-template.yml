@@ -54,7 +54,7 @@ vars:
         value: REPLACE_ME
         description: "License name provided with installation files"
       TEMPLATE_VERSION:
-        value: 1.8.0
+        value: 1.9.0
         description: "Version of configuration template"
   API_SETTINGS:
     name: "API settings"
@@ -301,7 +301,7 @@ vars:
         description: "Validity (in milliseconds) of a password reset request"
       PASSWORD_COMPLEXITY_MIN_CHAR_CATS:
         value: 1
-        description: "Value between 1 and 4. Minimal number of character categories contained in a password. 
+        description: "Value between 1 and 4. Minimal number of character categories contained in a password.
         Categories are: lowercase, uppercase, number, symbol"
       PASSWORD_COMPLEXITY_MIN_LENGTH:
         value: 6
