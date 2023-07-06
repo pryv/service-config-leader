@@ -7,6 +7,8 @@
 const { baseWork, deleteRemovedSettings } = require('../utils');
 module.exports = (platform, template) => {
   let platformCopy = baseWork(platform, template);
+  platformCopy.ADVANCED_API_SETTINGS.settings.SSL_CAA_ISSUERS =
+    [{ issuer: platformCopy.ADVANCED_API_SETTINGS.settings.SSL_CAA_ISSUER }];
   platformCopy = deleteRemovedSettings(platformCopy, template);
   return platformCopy;
 };

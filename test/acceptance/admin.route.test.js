@@ -269,7 +269,7 @@ describe('Test /admin endpoint', () => {
     before(() => {
       templatePath = path.resolve(
         __dirname,
-        '../../src/controller/migration/scriptsAndTemplates/cluster/1.7.0-template.yml'
+        '../../src/controller/migration/scriptsAndTemplates/cluster/1.9.0-template.yml'
       );
     });
 
@@ -281,7 +281,7 @@ describe('Test /admin endpoint', () => {
             platformSettings: {
               platformConfig: path.resolve(
                 __dirname,
-                '../fixtures/migration-needed/1.7.0/platform.yml'
+                '../fixtures/migration-needed/1.9.0/platform.yml'
               ),
               platformTemplate: templatePath
             }
@@ -301,7 +301,8 @@ describe('Test /admin endpoint', () => {
           assert.deepEqual(migrations, [
             { versionsFrom: ['1.6.21'], versionTo: '1.6.22' },
             { versionsFrom: ['1.6.22'], versionTo: '1.6.23' },
-            { versionsFrom: ['1.6.23'], versionTo: '1.7.0' }
+            { versionsFrom: ['1.6.23'], versionTo: '1.7.0' },
+            { versionsFrom: ['1.8.1'], versionTo: '1.9.0' }
           ]);
         });
       });
@@ -350,7 +351,7 @@ describe('Test /admin endpoint', () => {
     before(() => {
       templatePath = path.resolve(
         __dirname,
-        '../../src/controller/migration/scriptsAndTemplates/cluster/1.7.0-template.yml'
+        '../../src/controller/migration/scriptsAndTemplates/cluster/1.9.0-template.yml'
       );
     });
 
@@ -363,13 +364,13 @@ describe('Test /admin endpoint', () => {
       before(async () => {
         platformPath = path.resolve(
           __dirname,
-          '../fixtures/migration-needed/1.7.0/platform.yml'
+          '../fixtures/migration-needed/1.9.0/platform.yml'
         );
         expectedPlatform = yaml.load(
           fs.readFileSync(
             path.resolve(
               __dirname,
-              '../fixtures/migration-needed/1.7.0/expected.yml'
+              '../fixtures/migration-needed/1.9.0/expected.yml'
             ),
             'utf-8'
           )
@@ -406,7 +407,8 @@ describe('Test /admin endpoint', () => {
             assert.deepEqual(migrations, [
               { versionsFrom: ['1.6.21'], versionTo: '1.6.22' },
               { versionsFrom: ['1.6.22'], versionTo: '1.6.23' },
-              { versionsFrom: ['1.6.23'], versionTo: '1.7.0' }
+              { versionsFrom: ['1.6.23'], versionTo: '1.7.0' },
+              { versionsFrom: ['1.8.1'], versionTo: '1.9.0' }
             ]);
             const migratedPlatform = yaml.load(fs.readFileSync(platformPath));
             assert.deepEqual(
@@ -483,7 +485,7 @@ describe('Test /admin endpoint', () => {
             assert.equal(res.status, 500);
             assert.equal(
               res.body.error.message,
-              'No migration available from 1.2.3 to 1.7.0. Contact Pryv support for more information'
+              'No migration available from 1.2.3 to 1.9.0. Contact Pryv support for more information'
             );
             assert.equal(
               fs.readFileSync(platformPath, 'utf-8'),

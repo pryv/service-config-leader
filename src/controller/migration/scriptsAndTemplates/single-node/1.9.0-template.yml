@@ -306,9 +306,9 @@ vars:
         value:
           forceKeepHistory: false
           deletionMode: keep-nothing
-      SSL_CAA_ISSUER:
-        value: letsencrypt.org
-        description: "Certificate authority allowed to issue SSL certificates for this domain"
+      SSL_CAA_ISSUERS:
+        value: "[{\"issuer\": \"letsencrypt.org\"}]"
+        description: "Array of certificate authorities allowed to issue SSL certificates for this domain. Property `issuer` is mandatory, `flag` and `tag` properties are also accepted."
       INVITATION_TOKENS:
         value: null
         description: "Allows to define a set of invitation tokens for user creation by providing
