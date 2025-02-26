@@ -70,4 +70,4 @@ Therefore it is not an admin user, but rather an initial user, that has sufficie
 
 ## License
 
-[UNLICENSED](LICENSE)
+[BSD-3-Clause](LICENSE)

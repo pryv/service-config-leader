@@ -4,8 +4,8 @@
   "private": true,
   "description": "A service for centralization of Pryv.io configuration and distribution among all Pryv.io components.",
   "homepage": "https://pryv.com",
-  "license": "UNLICENSED",
-  "author": "Pryv S.A. <info@pryv.com> (https://pryv.com)",
+  "license": "BSD-3-Clause",
+  "author": "Pryv <info@pryv.com> (https://pryv.com)",
   "main": "index.js",
   "scripts": {
     "test": "echo 'This project doesn’t use npm scripts – enter `just` for the available development commands\n' && exit 1"
