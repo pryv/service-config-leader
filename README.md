@@ -67,6 +67,10 @@ Credentials of this user will be displayed in console upon it's creation.
 Note that this user is recreated each time the server restarts.
 Therefore it is not an admin user, but rather an initial user, that has sufficient permissions to create other users and should serve as an emergency user after having created first admin-like user.
 
+## Contributing
+
+### Todo 
+- release github workflow has been archived in `archives` it needs to rewritten to publish on dockerHub
 
 ## License
 

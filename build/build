@@ -14,7 +14,7 @@ version=$(cat build_tag)
 # clients:
 cp ./build_tag ../.api-version
 
-host="eu.gcr.io"
+host="docker.io"
 release=true
 
 if [ "$1" == "test" ] #build containers for localhost only
